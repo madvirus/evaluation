@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:axon="http://www.axonframework.org/schema/core"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.axonframework.org/schema/core http://www.axonframework.org/schema/axon-core.xsd">
+
+
+    <axon:command-bus id="commandBus"
+            />
+    <axon:event-sourcing-repository id="evaluationRepository"
+                                    aggregate-type="net.madvirus.eval.command.domain.evaluation.Evaluation"
+                                    event-store="jdbcEventStore"/>
+
+    <axon:jdbc-event-store id="jdbcEventStore"
+                           data-source="dataStore"
+                           force-utc-timestamp="true"/>
+
+    <axon:cluster id="replayingCluster">
+        <axon:replay-config event-store="jdbcEventStore" transaction-manager=""/>
+    </axon:cluster>
+    <axon:event-bus id="eventBus" />
+
+    <bean id="axonTxMgr" class="org.axonframework.unitofwork.SpringTransactionManager">
+        <!--<property name="transactionManager" ref="" />-->
+    </bean>
+</beans>
