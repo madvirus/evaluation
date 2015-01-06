@@ -5,23 +5,33 @@
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
        http://www.axonframework.org/schema/core http://www.axonframework.org/schema/axon-core.xsd">
 
+    <axon:annotation-config command-bus="commandBus" event-bus="eventBus"/>
 
-    <axon:command-bus id="commandBus"
-            />
-    <axon:event-sourcing-repository id="evaluationRepository"
-                                    aggregate-type="net.madvirus.eval.command.domain.evaluation.Evaluation"
-                                    event-store="jdbcEventStore"/>
+    <axon:command-bus id="commandBus" transaction-manager="axonTxMgr"/>
+
+    <axon:event-sourcing-repository id="evalSeasonRepository"
+                                    aggregate-type="net.madvirus.eval.command.evalseason.EvalSeason"
+                                    event-store="jdbcEventStore"
+                                    event-bus="eventBus" />
+
+    <axon:event-sourcing-repository id="mappingsRepository"
+                                    aggregate-type="net.madvirus.eval.command.mappings.Mappings"
+                                    event-store="jdbcEventStore"
+                                    event-bus="eventBus" />
 
     <axon:jdbc-event-store id="jdbcEventStore"
-                           data-source="dataStore"
+                           data-source="dataSource"
                            force-utc-timestamp="true"/>
 
-    <axon:cluster id="replayingCluster">
-        <axon:replay-config event-store="jdbcEventStore" transaction-manager=""/>
-    </axon:cluster>
     <axon:event-bus id="eventBus" />
 
+    <axon:cluster id="cluster">
+        <axon:selectors>
+            <axon:package prefix="net.madvirus.eval.query" />
+        </axon:selectors>
+    </axon:cluster>
+
     <bean id="axonTxMgr" class="org.axonframework.unitofwork.SpringTransactionManager">
-        <!--<property name="transactionManager" ref="" />-->
+        <property name="transactionManager" ref="transactionManager"/>
     </bean>
 </beans>

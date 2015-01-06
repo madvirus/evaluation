@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:axon="http://www.axonframework.org/schema/core"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.axonframework.org/schema/core http://www.axonframework.org/schema/axon-core.xsd">
+
+    <bean id="createMappingsCommandHandler" class="net.madvirus.eval.command.mappings.CreateMappingsCommandHandler">
+        <constructor-arg ref="mappingsRepository"/>
+    </bean>
+
+    <bean id="createEvalSeasonCommandHandler"
+          class="net.madvirus.eval.command.evalseason.CreateEvalSeasonCommandHandler">
+        <constructor-arg ref="evalSeasonRepository" />
+    </bean>
+    <!--<axon:aggregate-command-handler id="evaluationCommandHandler"-->
+    <!--aggregate-type="net.madvirus.eval.domain.evaluation.Evaluation"-->
+    <!--repository="evaluationRepository"-->
+    <!--command-bus="commandBus"/>-->
+
+</beans>
