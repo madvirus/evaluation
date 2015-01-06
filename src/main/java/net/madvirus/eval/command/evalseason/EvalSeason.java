@@ -3,6 +3,7 @@ package net.madvirus.eval.command.evalseason;
 import net.madvirus.eval.api.EvalSeasonCreatedEvent;
 import org.axonframework.eventsourcing.annotation.AbstractAnnotatedAggregateRoot;
 import org.axonframework.eventsourcing.annotation.AggregateIdentifier;
+import org.axonframework.eventsourcing.annotation.EventSourcedMember;
 import org.axonframework.eventsourcing.annotation.EventSourcingHandler;
 
 public class EvalSeason extends AbstractAnnotatedAggregateRoot<String> {
@@ -10,6 +11,9 @@ public class EvalSeason extends AbstractAnnotatedAggregateRoot<String> {
     private String id;
     private String name;
     private boolean open;
+
+    @EventSourcedMember
+    private Mappings mappings;
 
     public EvalSeason() {
     }
@@ -23,5 +27,6 @@ public class EvalSeason extends AbstractAnnotatedAggregateRoot<String> {
         this.id = event.getEvalSeasonId();
         this.name = event.getName();
         this.open = false;
+        this.mappings = new Mappings();
     }
 }

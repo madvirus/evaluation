@@ -24,6 +24,5 @@ public class CreateEvalSeasonCommandHandler {
         } catch (AggregateNotFoundException e) {
         }
         repository.add(new EvalSeason(command.getEvalSeasonId(), command.getName()));
-
     }
 }

@@ -14,11 +14,6 @@
                                     event-store="jdbcEventStore"
                                     event-bus="eventBus" />
 
-    <axon:event-sourcing-repository id="mappingsRepository"
-                                    aggregate-type="net.madvirus.eval.command.mappings.Mappings"
-                                    event-store="jdbcEventStore"
-                                    event-bus="eventBus" />
-
     <axon:jdbc-event-store id="jdbcEventStore"
                            data-source="dataSource"
                            force-utc-timestamp="true"/>
