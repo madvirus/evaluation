@@ -8,16 +8,8 @@ import org.axonframework.test.Fixtures;
 import org.junit.Before;
 import org.junit.Test;
 
-public class CreateEvalSeasonCommandTest {
+public class CreateEvalSeasonCommandTest extends AbstractEvalSeasonCommandTest {
     public static final String EVALSEASON_ID = "eval-2014";
-
-    private FixtureConfiguration fixture;
-
-    @Before
-    public void setUp() throws Exception {
-        fixture = Fixtures.newGivenWhenThenFixture(EvalSeason.class);
-        fixture.registerAnnotatedCommandHandler(new CreateEvalSeasonCommandHandler(fixture.getRepository()));
-    }
 
     @Test
     public void createNewEvalSeason() throws Exception {

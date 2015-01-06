@@ -7,11 +7,11 @@
 
     <bean id="createEvalSeasonCommandHandler"
           class="net.madvirus.eval.command.evalseason.CreateEvalSeasonCommandHandler">
-        <constructor-arg ref="evalSeasonRepository" />
+        <constructor-arg ref="evalSeasonRepository"/>
     </bean>
-    <!--<axon:aggregate-command-handler id="evaluationCommandHandler"-->
-    <!--aggregate-type="net.madvirus.eval.domain.evaluation.Evaluation"-->
-    <!--repository="evaluationRepository"-->
-    <!--command-bus="commandBus"/>-->
 
+    <axon:aggregate-command-handler id="evaluationCommandHandler"
+                                    aggregate-type="net.madvirus.eval.command.evalseason.EvalSeason"
+                                    repository="evalSeasonRepository"
+                                    command-bus="commandBus"/>
 </beans>
