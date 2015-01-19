@@ -1,8 +1,12 @@
-package net.madvirus.eval.api;
+package net.madvirus.eval.api.evalseaon;
 
-public class MappingUpdatedEvent {
-    private final String evalSeasonId;
-    private final RateeMapping mapping;
+import net.madvirus.eval.api.RateeMapping;
+
+public class MappingUpdatedEvent extends EvalSeasonEvent {
+    private String evalSeasonId;
+    private RateeMapping mapping;
+
+    MappingUpdatedEvent() {}
 
     public MappingUpdatedEvent(String id, RateeMapping mapping) {
         this.evalSeasonId = id;

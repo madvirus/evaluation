@@ -9,20 +9,43 @@
 
     <axon:command-bus id="commandBus" transaction-manager="axonTxMgr"/>
 
+    <bean id="commandGateway" class="org.axonframework.commandhandling.gateway.DefaultCommandGateway">
+        <constructor-arg ref="commandBus"/>
+        <constructor-arg>
+            <list />
+        </constructor-arg>
+    </bean>
+
     <axon:event-sourcing-repository id="evalSeasonRepository"
                                     aggregate-type="net.madvirus.eval.command.evalseason.EvalSeason"
                                     event-store="jdbcEventStore"
-                                    event-bus="eventBus" />
+                                    event-bus="eventBus"
+            />
 
     <axon:jdbc-event-store id="jdbcEventStore"
                            data-source="dataSource"
-                           force-utc-timestamp="true"/>
+                           sql-schema="sqlSchema"
+                           event-serializer="jacksonEventSerializer"
+            />
 
-    <axon:event-bus id="eventBus" />
+    <bean id="jacksonEventSerializer" class="org.axonframework.serializer.json.JacksonSerializer">
+        <constructor-arg>
+            <bean class="net.madvirus.eval.axon.ObjectMapperFactory" />
+        </constructor-arg>
+    </bean>
 
-    <axon:cluster id="cluster">
+
+    <bean id="sqlSchema" class="net.madvirus.eval.axon.CustomEventSqlSchema">
+        <constructor-arg value="#{T(java.lang.String)}"/>
+        <property name="forceUtc" value="true"/>
+    </bean>
+
+    <axon:event-bus id="eventBus"/>
+
+    <axon:cluster id="evalSeasonCluster">
+        <axon:replay-config event-store="jdbcEventStore" transaction-manager="axonTxMgr" />
         <axon:selectors>
-            <axon:package prefix="net.madvirus.eval.query" />
+            <axon:package prefix="net.madvirus.eval.query.evalseason"/>
         </axon:selectors>
     </axon:cluster>
 

@@ -1,5 +1,6 @@
-package net.madvirus.eval.api;
+package net.madvirus.eval.api.evalseaon;
 
+import net.madvirus.eval.api.RateeMapping;
 import org.axonframework.commandhandling.annotation.TargetAggregateIdentifier;
 
 import java.util.List;

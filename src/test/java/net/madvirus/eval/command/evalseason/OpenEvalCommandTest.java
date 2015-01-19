@@ -1,9 +1,11 @@
 package net.madvirus.eval.command.evalseason;
 
-import net.madvirus.eval.api.EvalSeasonCreatedEvent;
-import net.madvirus.eval.api.EvaluationOpenedEvent;
-import net.madvirus.eval.api.OpenEvaluationCommand;
+import net.madvirus.eval.api.evalseaon.EvalSeasonCreatedEvent;
+import net.madvirus.eval.api.evalseaon.EvaluationOpenedEvent;
+import net.madvirus.eval.api.evalseaon.OpenEvaluationCommand;
 import org.junit.Test;
+
+import java.util.Date;
 
 public class OpenEvalCommandTest extends AbstractEvalSeasonCommandTest {
     @Test
@@ -11,7 +13,7 @@ public class OpenEvalCommandTest extends AbstractEvalSeasonCommandTest {
         OpenEvaluationCommand command = new OpenEvaluationCommand();
         command.setId("eval-2014");
 
-        fixture.given(new EvalSeasonCreatedEvent("eval-2014", "평가"))
+        fixture.given(new EvalSeasonCreatedEvent("eval-2014", "평가", new Date()))
                 .when(command)
                 .expectEvents(new EvaluationOpenedEvent("eval-2014"));
     }
@@ -21,7 +23,7 @@ public class OpenEvalCommandTest extends AbstractEvalSeasonCommandTest {
         OpenEvaluationCommand command = new OpenEvaluationCommand();
         command.setId("eval-2014");
 
-        fixture.given(new EvalSeasonCreatedEvent("eval-2014", "평가"), new EvaluationOpenedEvent("eval-2014"))
+        fixture.given(new EvalSeasonCreatedEvent("eval-2014", "평가", new Date()), new EvaluationOpenedEvent("eval-2014"))
                 .when(command)
                 .expectException(AleadyEvaluationOpenedException.class);
     }

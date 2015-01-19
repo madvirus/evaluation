@@ -1,17 +1,15 @@
 package net.madvirus.eval.command.evalseason;
 
-import net.madvirus.eval.api.EvalSeasonCreatedEvent;
-import net.madvirus.eval.api.MappingUpdatedEvent;
 import net.madvirus.eval.api.RateeMapping;
-import net.madvirus.eval.api.UpdateMappingCommand;
-import org.axonframework.commandhandling.annotation.AggregateAnnotationCommandHandler;
+import net.madvirus.eval.api.evalseaon.EvalSeasonCreatedEvent;
+import net.madvirus.eval.api.evalseaon.MappingUpdatedEvent;
+import net.madvirus.eval.api.evalseaon.RateeType;
+import net.madvirus.eval.api.evalseaon.UpdateMappingCommand;
 import org.axonframework.repository.AggregateNotFoundException;
-import org.axonframework.test.FixtureConfiguration;
-import org.axonframework.test.Fixtures;
-import org.junit.Before;
 import org.junit.Test;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class UpdateMappingsCommandTest extends AbstractEvalSeasonCommandTest {
@@ -26,7 +24,7 @@ public class UpdateMappingsCommandTest extends AbstractEvalSeasonCommandTest {
 
     @Test
     public void updateMappings() throws Exception {
-        fixture.given(new EvalSeasonCreatedEvent(EVALSEASON_ID, "평가"))
+        fixture.given(new EvalSeasonCreatedEvent(EVALSEASON_ID, "평가", new Date()))
                 .when(createUpdateMappingsCommand())
                 .expectEvents(
                         new MappingUpdatedEvent(EVALSEASON_ID, createRateeMapping1()),
@@ -46,11 +44,11 @@ public class UpdateMappingsCommandTest extends AbstractEvalSeasonCommandTest {
     }
 
     private RateeMapping createRateeMapping1() {
-        return new RateeMapping("ratee1", "LEADER", "firstRater", "secondRater", "colleague1", "colleague2");
+        return new RateeMapping("ratee1", RateeType.LEADER, "firstRater", "secondRater", "colleague1", "colleague2");
     }
 
     private RateeMapping createRateeMapping2() {
-        return new RateeMapping("ratee2", "MEMBER", "firstRater1", "secondRater1", "colleague1");
+        return new RateeMapping("ratee2", RateeType.LEADER, "firstRater1", "secondRater1", "colleague1");
     }
 
 }

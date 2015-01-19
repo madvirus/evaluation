@@ -1,4 +1,4 @@
-package net.madvirus.eval.api;
+package net.madvirus.eval.api.evalseaon;
 
 import org.axonframework.commandhandling.annotation.TargetAggregateIdentifier;
 

@@ -1,6 +1,6 @@
 package net.madvirus.eval.command.evalseason;
 
-import net.madvirus.eval.api.CreateEvalSeasonCommand;
+import net.madvirus.eval.api.evalseaon.CreateEvalSeasonCommand;
 import net.madvirus.eval.api.DuplicateIdException;
 import org.axonframework.commandhandling.annotation.CommandHandler;
 import org.axonframework.repository.AggregateNotFoundException;
@@ -16,6 +16,11 @@ public class CreateEvalSeasonCommandHandler {
 
     @CommandHandler
     public void handle(CreateEvalSeasonCommand command) {
+        checkDuplicateIdExists(command);
+        repository.add(new EvalSeason(command.getEvalSeasonId(), command.getName()));
+    }
+
+    private void checkDuplicateIdExists(CreateEvalSeasonCommand command) {
         try {
             EvalSeason season = repository.load(command.getEvalSeasonId());
             if (season != null) {
@@ -23,6 +28,5 @@ public class CreateEvalSeasonCommandHandler {
             }
         } catch (AggregateNotFoundException e) {
         }
-        repository.add(new EvalSeason(command.getEvalSeasonId(), command.getName()));
     }
 }

@@ -1,12 +1,19 @@
-package net.madvirus.eval.api;
+package net.madvirus.eval.api.evalseaon;
 
-public class EvalSeasonCreatedEvent {
+import java.util.Date;
+
+public class EvalSeasonCreatedEvent extends EvalSeasonEvent {
     private String evalSeasonId;
     private String name;
+    private Date creationDate;
 
-    public EvalSeasonCreatedEvent(String evalseasonId, String name) {
+    EvalSeasonCreatedEvent() {
+    }
+
+    public EvalSeasonCreatedEvent(String evalseasonId, String name, Date creationDate) {
         this.evalSeasonId = evalseasonId;
         this.name = name;
+        this.creationDate = creationDate;
     }
 
     public String getEvalSeasonId() {
@@ -17,6 +24,10 @@ public class EvalSeasonCreatedEvent {
         return name;
     }
 
+    public Date getCreationDate() {
+        return creationDate;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -24,8 +35,9 @@ public class EvalSeasonCreatedEvent {
 
         EvalSeasonCreatedEvent that = (EvalSeasonCreatedEvent) o;
 
-        if (evalSeasonId != null ? !evalSeasonId.equals(that.evalSeasonId) : that.evalSeasonId != null)
+        if (creationDate != null ? !creationDate.equals(that.creationDate) : that.creationDate != null)
             return false;
+        if (evalSeasonId != null ? !evalSeasonId.equals(that.evalSeasonId) : that.evalSeasonId != null) return false;
         if (name != null ? !name.equals(that.name) : that.name != null) return false;
 
         return true;
@@ -35,6 +47,7 @@ public class EvalSeasonCreatedEvent {
     public int hashCode() {
         int result = evalSeasonId != null ? evalSeasonId.hashCode() : 0;
         result = 31 * result + (name != null ? name.hashCode() : 0);
+        result = 31 * result + (creationDate != null ? creationDate.hashCode() : 0);
         return result;
     }
 }

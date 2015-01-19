@@ -1,29 +1,29 @@
 package net.madvirus.eval.api;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import net.madvirus.eval.api.evalseaon.RateeType;
+
+import java.util.*;
 
 public class RateeMapping {
     private String rateeId;
-    private String type;
+    private RateeType type;
     private String firstRaterId;
     private String secondRaterId;
-    private List<String> colleagueRaterIds;
+    private Set<String> colleagueRaterIds;
 
-    public RateeMapping(String rateeId, String type, String firstRaterId, String secondRaterId, String ... colleagueRaterIds) {
+    public RateeMapping(String rateeId, RateeType type, String firstRaterId, String secondRaterId, String... colleagueRaterIds) {
         this.rateeId = rateeId;
         this.type = type;
         this.firstRaterId = firstRaterId;
         this.secondRaterId = secondRaterId;
-        this.colleagueRaterIds = Arrays.asList(colleagueRaterIds);
+        this.colleagueRaterIds = new HashSet<>(Arrays.asList(colleagueRaterIds));
     }
 
     public String getRateeId() {
         return rateeId;
     }
 
-    public String getType() {
+    public RateeType getType() {
         return type;
     }
 
@@ -31,12 +31,16 @@ public class RateeMapping {
         return firstRaterId;
     }
 
+    public boolean hasFirstRater() {
+        return firstRaterId != null;
+    }
+
     public String getSecondRaterId() {
         return secondRaterId;
     }
 
-    public List<String> getColleagueRaterIds() {
-        return Collections.unmodifiableList(colleagueRaterIds);
+    public Set<String> getColleagueRaterIds() {
+        return Collections.unmodifiableSet(colleagueRaterIds);
     }
 
     @Override
@@ -46,14 +50,18 @@ public class RateeMapping {
 
         RateeMapping that = (RateeMapping) o;
 
+        if (rateeId != null ? !rateeId.equals(that.rateeId) : that.rateeId != null) return false;
+        if (type != that.type) return false;
 
         if (colleagueRaterIds != null ? !colleagueRaterIds.equals(that.colleagueRaterIds) : that.colleagueRaterIds != null)
             return false;
-        if (firstRaterId != null ? !firstRaterId.equals(that.firstRaterId) : that.firstRaterId != null) return false;
-        if (rateeId != null ? !rateeId.equals(that.rateeId) : that.rateeId != null) return false;
+
+        if (firstRaterId != null || that.firstRaterId != null)
+            if (firstRaterId != null ? !firstRaterId.equals(that.firstRaterId) : that.firstRaterId != null)
+                return false;
+
         if (secondRaterId != null ? !secondRaterId.equals(that.secondRaterId) : that.secondRaterId != null)
             return false;
-        if (type != null ? !type.equals(that.type) : that.type != null) return false;
 
         return true;
     }

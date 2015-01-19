@@ -1,7 +1,9 @@
-package net.madvirus.eval.api;
+package net.madvirus.eval.api.evalseaon;
 
-public class EvaluationOpenedEvent {
+public class EvaluationOpenedEvent extends EvalSeasonEvent {
     private String id;
+
+    EvaluationOpenedEvent() {}
 
     public EvaluationOpenedEvent(String id) {
         this.id = id;

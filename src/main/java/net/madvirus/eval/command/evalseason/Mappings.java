@@ -1,8 +1,8 @@
 package net.madvirus.eval.command.evalseason;
 
-import net.madvirus.eval.api.MappingUpdatedEvent;
+import net.madvirus.eval.api.evalseaon.MappingUpdatedEvent;
 import net.madvirus.eval.api.RateeMapping;
-import net.madvirus.eval.api.UpdateMappingCommand;
+import net.madvirus.eval.api.evalseaon.UpdateMappingCommand;
 import org.apache.commons.collections.map.HashedMap;
 import org.axonframework.commandhandling.annotation.CommandHandler;
 import org.axonframework.eventsourcing.annotation.AbstractAnnotatedEntity;
