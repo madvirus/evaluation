@@ -6,11 +6,15 @@ public class OpenEvaluationCommand {
     @TargetAggregateIdentifier
     private String id;
 
+    public OpenEvaluationCommand(String id) {
+        this.id = id;
+    }
+
+    public OpenEvaluationCommand() {
+    }
+
     public String getId() {
         return id;
     }
 
-    public void setId(String id) {
-        this.id = id;
-    }
 }

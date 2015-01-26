@@ -5,6 +5,7 @@
 
     <bean id="evalSeasonEventListener" class="net.madvirus.eval.query.evalseason.EvalSeasonEventListener">
         <constructor-arg ref="evalSeasonModelRepository" />
+        <constructor-arg ref="userModelRepository" />
     </bean>
 
     <bean class="net.madvirus.eval.query.evalseason.EvanSeasonModelInitializer">

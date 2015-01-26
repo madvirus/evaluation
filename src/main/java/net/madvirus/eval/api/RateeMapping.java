@@ -11,6 +11,9 @@ public class RateeMapping {
     private String secondRaterId;
     private Set<String> colleagueRaterIds;
 
+    public RateeMapping() {
+    }
+
     public RateeMapping(String rateeId, RateeType type, String firstRaterId, String secondRaterId, String... colleagueRaterIds) {
         this.rateeId = rateeId;
         this.type = type;
@@ -40,7 +43,10 @@ public class RateeMapping {
     }
 
     public Set<String> getColleagueRaterIds() {
-        return Collections.unmodifiableSet(colleagueRaterIds);
+        if (colleagueRaterIds == null)
+            return Collections.emptySet();
+        else
+            return Collections.unmodifiableSet(colleagueRaterIds);
     }
 
     @Override

@@ -3,6 +3,7 @@ package net.madvirus.eval.command.evalseason;
 import net.madvirus.eval.api.evalseaon.EvalSeasonCreatedEvent;
 import net.madvirus.eval.api.evalseaon.EvaluationOpenedEvent;
 import net.madvirus.eval.api.evalseaon.OpenEvaluationCommand;
+import net.madvirus.eval.api.evalseaon.UpdateMappingCommand;
 import org.axonframework.commandhandling.annotation.CommandHandler;
 import org.axonframework.commandhandling.annotation.CommandHandlingMember;
 import org.axonframework.eventsourcing.annotation.AbstractAnnotatedAggregateRoot;
@@ -35,12 +36,6 @@ public class EvalSeason extends AbstractAnnotatedAggregateRoot<String> {
         return id;
     }
 
-    @CommandHandler
-    public void open(OpenEvaluationCommand command) {
-        if (open) throw new AleadyEvaluationOpenedException();
-        apply(new EvaluationOpenedEvent(id));
-    }
-
     @EventSourcingHandler
     protected void on(EvalSeasonCreatedEvent event) {
         this.id = event.getEvalSeasonId();
@@ -48,6 +43,16 @@ public class EvalSeason extends AbstractAnnotatedAggregateRoot<String> {
         this.open = false;
         this.creationDate = event.getCreationDate();
         this.mappings = new Mappings(this);
+    }
+
+    public void updateMapping(UpdateMappingCommand command) {
+        mappings.updateMapping(command);
+    }
+
+    @CommandHandler
+    public void open(OpenEvaluationCommand command) {
+        if (open) throw new AleadyEvaluationOpenedException();
+        apply(new EvaluationOpenedEvent(id));
     }
 
     @EventSourcingHandler

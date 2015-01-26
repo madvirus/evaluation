@@ -10,6 +10,11 @@
         <constructor-arg ref="evalSeasonRepository"/>
     </bean>
 
+    <bean class="net.madvirus.eval.command.evalseason.UpdateMappingCommandHandler">
+        <constructor-arg ref="evalSeasonRepository" />
+        <constructor-arg ref="userModelRepository" />
+    </bean>
+
     <axon:aggregate-command-handler id="evaluationCommandHandler"
                                     aggregate-type="net.madvirus.eval.command.evalseason.EvalSeason"
                                     repository="evalSeasonRepository"

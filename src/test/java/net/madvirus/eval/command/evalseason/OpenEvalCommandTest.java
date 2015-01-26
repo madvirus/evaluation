@@ -10,8 +10,7 @@ import java.util.Date;
 public class OpenEvalCommandTest extends AbstractEvalSeasonCommandTest {
     @Test
     public void open() throws Exception {
-        OpenEvaluationCommand command = new OpenEvaluationCommand();
-        command.setId("eval-2014");
+        OpenEvaluationCommand command = new OpenEvaluationCommand("eval-2014");
 
         fixture.given(new EvalSeasonCreatedEvent("eval-2014", "평가", new Date()))
                 .when(command)
@@ -20,8 +19,7 @@ public class OpenEvalCommandTest extends AbstractEvalSeasonCommandTest {
 
     @Test
     public void whenAleadyOpend_throwEx() throws Exception {
-        OpenEvaluationCommand command = new OpenEvaluationCommand();
-        command.setId("eval-2014");
+        OpenEvaluationCommand command = new OpenEvaluationCommand("eval-2014");
 
         fixture.given(new EvalSeasonCreatedEvent("eval-2014", "평가", new Date()), new EvaluationOpenedEvent("eval-2014"))
                 .when(command)

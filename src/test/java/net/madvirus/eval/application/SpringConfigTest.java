@@ -1,5 +1,6 @@
 package net.madvirus.eval.application;
 
+import net.madvirus.eval.Application;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.SpringApplicationConfiguration;

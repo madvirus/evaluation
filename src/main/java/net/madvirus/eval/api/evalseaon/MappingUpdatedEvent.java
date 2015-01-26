@@ -2,23 +2,25 @@ package net.madvirus.eval.api.evalseaon;
 
 import net.madvirus.eval.api.RateeMapping;
 
+import java.util.List;
+
 public class MappingUpdatedEvent extends EvalSeasonEvent {
     private String evalSeasonId;
-    private RateeMapping mapping;
+    private List<RateeMapping> mappings;
 
     MappingUpdatedEvent() {}
 
-    public MappingUpdatedEvent(String id, RateeMapping mapping) {
+    public MappingUpdatedEvent(String id, List<RateeMapping> mappings) {
         this.evalSeasonId = id;
-        this.mapping = mapping;
+        this.mappings = mappings;
     }
 
     public String getEvalSeasonId() {
         return evalSeasonId;
     }
 
-    public RateeMapping getMapping() {
-        return mapping;
+    public List<RateeMapping> getMappings() {
+        return mappings;
     }
 
     @Override
@@ -29,7 +31,7 @@ public class MappingUpdatedEvent extends EvalSeasonEvent {
         MappingUpdatedEvent that = (MappingUpdatedEvent) o;
 
         if (evalSeasonId != null ? !evalSeasonId.equals(that.evalSeasonId) : that.evalSeasonId != null) return false;
-        if (mapping != null ? !mapping.equals(that.mapping) : that.mapping != null) return false;
+        if (mappings != null ? !mappings.equals(that.mappings) : that.mappings != null) return false;
 
         return true;
     }
@@ -37,7 +39,7 @@ public class MappingUpdatedEvent extends EvalSeasonEvent {
     @Override
     public int hashCode() {
         int result = evalSeasonId != null ? evalSeasonId.hashCode() : 0;
-        result = 31 * result + (mapping != null ? mapping.hashCode() : 0);
+        result = 31 * result + (mappings != null ? mappings.hashCode() : 0);
         return result;
     }
 }

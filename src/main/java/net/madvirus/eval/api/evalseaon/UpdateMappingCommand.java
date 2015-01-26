@@ -10,6 +10,13 @@ public class UpdateMappingCommand {
     private String evalSeasonId;
     private List<RateeMapping> rateeMappings;
 
+    public UpdateMappingCommand(String evalSeasonId, List<RateeMapping> rateeMappings) {
+        this.evalSeasonId = evalSeasonId;
+        this.rateeMappings = rateeMappings;
+    }
+
+    public UpdateMappingCommand() {}
+
     public void setEvalSeasonId(String evalSeasonId) {
         this.evalSeasonId = evalSeasonId;
     }

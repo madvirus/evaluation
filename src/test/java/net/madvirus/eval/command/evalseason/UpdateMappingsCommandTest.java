@@ -9,6 +9,7 @@ import org.axonframework.repository.AggregateNotFoundException;
 import org.junit.Test;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -27,11 +28,9 @@ public class UpdateMappingsCommandTest extends AbstractEvalSeasonCommandTest {
         fixture.given(new EvalSeasonCreatedEvent(EVALSEASON_ID, "평가", new Date()))
                 .when(createUpdateMappingsCommand())
                 .expectEvents(
-                        new MappingUpdatedEvent(EVALSEASON_ID, createRateeMapping1()),
-                        new MappingUpdatedEvent(EVALSEASON_ID, createRateeMapping2())
+                        new MappingUpdatedEvent(EVALSEASON_ID, Arrays.asList(createRateeMapping1(), createRateeMapping2()))
                 );
     }
-
     private UpdateMappingCommand createUpdateMappingsCommand() {
         UpdateMappingCommand cmd = new UpdateMappingCommand();
         cmd.setEvalSeasonId(EVALSEASON_ID);
@@ -44,11 +43,11 @@ public class UpdateMappingsCommandTest extends AbstractEvalSeasonCommandTest {
     }
 
     private RateeMapping createRateeMapping1() {
-        return new RateeMapping("ratee1", RateeType.LEADER, "firstRater", "secondRater", "colleague1", "colleague2");
+        return new RateeMapping("ratee1", RateeType.TEAM_LEADER, "firstRater", "secondRater", "colleague1", "colleague2");
     }
 
     private RateeMapping createRateeMapping2() {
-        return new RateeMapping("ratee2", RateeType.LEADER, "firstRater1", "secondRater1", "colleague1");
+        return new RateeMapping("ratee2", RateeType.TEAM_LEADER, "firstRater1", "secondRater1", "colleague1");
     }
 
 }

@@ -1,9 +1,9 @@
 package net.madvirus.eval.command.evalseason;
 
-import net.madvirus.eval.testhelper.ESIntTestSetup;
 import net.madvirus.eval.api.evalseaon.CreateEvalSeasonCommand;
 import net.madvirus.eval.query.evalseason.EvalSeasonModel;
-import net.madvirus.eval.query.evalseason.EvalSeasonModelRepositoryImpl;
+import net.madvirus.eval.query.evalseason.EvalSeasonModelRepository;
+import net.madvirus.eval.testhelper.ESIntTestSetup;
 import org.axonframework.commandhandling.gateway.CommandGateway;
 import org.axonframework.repository.Repository;
 import org.axonframework.unitofwork.DefaultUnitOfWork;
@@ -23,18 +23,19 @@ import static org.junit.Assert.assertThat;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ESIntTestSetup
 public class EvalSeasonSpringIntTest {
-    @Resource(name="evalSeasonRepository")
+
+    @Resource(name = "evalSeasonRepository")
     private Repository<EvalSeason> evalSeasonRepository;
 
     @Autowired
-    private EvalSeasonModelRepositoryImpl queryModelRepository;
+    private EvalSeasonModelRepository queryModelRepository;
 
     @Autowired
     private CommandGateway gateway;
 
     @Test
     public void creationCommandIntTest() throws Exception {
-        String id = "ID" + Double.toHexString(Math.random());
+        String id = "EVAL-2013";
         gateway.sendAndWait(new CreateEvalSeasonCommand(id, "이름"));
 
         runInUOW(() -> {
@@ -51,7 +52,7 @@ public class EvalSeasonSpringIntTest {
         try {
             runnable.run();
             uow.commit();
-        } catch(Exception ex) {
+        } catch (Exception ex) {
             uow.rollback(ex);
             throw ex;
         }
