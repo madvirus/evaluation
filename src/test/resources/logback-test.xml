@@ -12,6 +12,14 @@
         <appender-ref ref="STDOUT" />
     </root>
     <logger name="org.springframework" level="DEBUG" />
+    <logger name="org.springframework.beans" level="INFO" />
+    <logger name="org.springframework.aop.framework" level="INFO" />
+    <logger name="org.springframework.context.annotation" level="INFO" />
     <logger name="org.springframework.core" level="INFO" />
-    <logger name="org.springframework.test" level="TRACE" />
+    <logger name="org.springframework.ldap" level="INFO" />
+    <logger name="org.springframework.web.context" level="INFO" />
+    <logger name="org.springframework.orm.jpa" level="INFO" />
+    <logger name="org.axonframework.eventsourcing" level="DEBUG" />
+    <logger name="org.axonframework.eventhandling.replay" level="TRACE" />
+
 </configuration>

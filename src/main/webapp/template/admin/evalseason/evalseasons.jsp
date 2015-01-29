@@ -1,4 +1,4 @@
-<%@ page contentType="text/html;charset=UTF-8" %>
+<%@ page contentType="text/html;charset=UTF-8" session="false" %>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 <h2>평가 시즌 관리</h2>
 
@@ -18,7 +18,7 @@
     </thead>
     <tbody>
     <tr ng-repeat="evalSeason in evalSeasons">
-        <td><a href="#/admin/evalseasons/{{evalSeason.id}}">{{evalSeason.id}}</a></td>
+        <td><a href="#/{{evalSeason.id}}">{{evalSeason.id}}</a></td>
         <td>{{evalSeason.name}}</td>
         <td>{{evalSeason.opened ? '평가 시작함' : '평가 시작 전'}}</td>
     </tr>

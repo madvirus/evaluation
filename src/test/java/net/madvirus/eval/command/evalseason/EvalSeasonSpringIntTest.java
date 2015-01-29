@@ -1,13 +1,12 @@
 package net.madvirus.eval.command.evalseason;
 
 import net.madvirus.eval.api.evalseaon.CreateEvalSeasonCommand;
-import net.madvirus.eval.query.evalseason.EvalSeasonModel;
-import net.madvirus.eval.query.evalseason.EvalSeasonModelRepository;
+import net.madvirus.eval.api.evalseaon.OpenEvaluationCommand;
+import net.madvirus.eval.query.evalseason.EvalSeasonMappingModel;
+import net.madvirus.eval.query.evalseason.EvalSeasonMappingModelRepository;
 import net.madvirus.eval.testhelper.ESIntTestSetup;
 import org.axonframework.commandhandling.gateway.CommandGateway;
 import org.axonframework.repository.Repository;
-import org.axonframework.unitofwork.DefaultUnitOfWork;
-import org.axonframework.unitofwork.UnitOfWork;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +15,7 @@ import scala.Option;
 
 import javax.annotation.Resource;
 
+import static net.madvirus.eval.axon.AxonUtil.runInUOW;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertThat;
@@ -28,7 +28,7 @@ public class EvalSeasonSpringIntTest {
     private Repository<EvalSeason> evalSeasonRepository;
 
     @Autowired
-    private EvalSeasonModelRepository queryModelRepository;
+    private EvalSeasonMappingModelRepository queryModelRepository;
 
     @Autowired
     private CommandGateway gateway;
@@ -38,23 +38,25 @@ public class EvalSeasonSpringIntTest {
         String id = "EVAL-2013";
         gateway.sendAndWait(new CreateEvalSeasonCommand(id, "이름"));
 
-        runInUOW(() -> {
+        Runnable runnable = () -> {
             EvalSeason evalSeason = evalSeasonRepository.load(id);
             assertThat(evalSeason, notNullValue());
-        });
+        };
+        runInUOW(runnable);
 
-        Option<EvalSeasonModel> modelOption = queryModelRepository.findById(id);
+        Option<EvalSeasonMappingModel> modelOption = queryModelRepository.findById(id);
         assertThat(modelOption.nonEmpty(), equalTo(true));
     }
 
-    public void runInUOW(Runnable runnable) throws Exception {
-        UnitOfWork uow = DefaultUnitOfWork.startAndGet();
-        try {
-            runnable.run();
-            uow.commit();
-        } catch (Exception ex) {
-            uow.rollback(ex);
-            throw ex;
-        }
+    @Test
+    public void openCommand() throws Exception {
+        gateway.sendAndWait(new OpenEvaluationCommand("EVAL-001"));
+        Runnable runnable = () -> {
+            EvalSeason evalSeason = evalSeasonRepository.load("EVAL-001");
+            assertThat(evalSeason.isOpened(), equalTo(true));
+        };
+        runInUOW(runnable);
+
     }
+
 }

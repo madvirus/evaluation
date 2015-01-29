@@ -2,23 +2,34 @@ package net.madvirus.eval.query.user
 
 import javax.persistence.{Column, Entity, Id, Table}
 
+import org.springframework.security.crypto.password.StandardPasswordEncoder
+
 @Entity
-@Table(name="User")
-class UserModel(userId: String, userName: String, pwd: String) {
+@Table(name="user")
+class UserModel(userId: String, userName: String, pwd: String, dirId: java.lang.Long) {
 
     @Id
-    @Column(name="USER_ID")
+    @Column(name="user_id")
     private var id: String = userId
 
-    @Column(name="NAME")
+    @Column(name="name")
     private var name: String = userName
 
-    @Column(name="PASSWORD")
-    private var password: String = pwd
+    @Column(name="password")
+    private var password: String = encrypt(pwd)
 
-    def this() = this(null, null, null)
+    @Column(name="user_directory_id")
+    private var directoryId: java.lang.Long = dirId
+
+    def this(userId:String, userName:String, pwd:String) = this(userId, userName, pwd, null)
+    def this() = this(null, null, null, null)
 
     def getId() = id
     def getName() = name
-    def mathPassword(pwd: String) = password.equals(pwd)
+    def getDirectoryId() = directoryId
+    def mathPassword(pwd: String) = new StandardPasswordEncoder().matches(pwd, password)
+
+    private def encrypt(pwd: String): String = if (pwd == null) null else new StandardPasswordEncoder().encode(pwd)
+
+    def equalDirectoryId(dirId: Long): Boolean = directoryId == dirId
 }

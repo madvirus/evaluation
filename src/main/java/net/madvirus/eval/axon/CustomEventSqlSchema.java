@@ -20,8 +20,8 @@ public class CustomEventSqlSchema<T> implements EventSqlSchema<T> {
                     "payloadType, payloadRevision, payload, metaData";
 
     private Class<T> dataType;
-    private String snapshotEventEntryTable = "SnapshotEventEntry";
-    private String domainEventEntryTable = "DomainEventEntry";
+    private String snapshotEventEntryTable = "snapshot_event";
+    private String domainEventEntryTable = "domain_event";
     private boolean forceUtc = false;
 
     public CustomEventSqlSchema() {

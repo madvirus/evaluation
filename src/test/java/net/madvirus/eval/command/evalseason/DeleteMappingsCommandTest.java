@@ -32,8 +32,7 @@ public class DeleteMappingsCommandTest extends AbstractEvalSeasonCommandTest {
     }
 
     private DeleteMappingCommand createDeleteMappingsCommand() {
-        DeleteMappingCommand cmd = new DeleteMappingCommand(EVALSEASON_ID, Arrays.asList("ratee1", "ratee2"));
-        return cmd;
+        return new DeleteMappingCommand(EVALSEASON_ID, Arrays.asList("ratee1", "ratee2"));
     }
 
 }

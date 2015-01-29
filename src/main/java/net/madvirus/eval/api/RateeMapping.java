@@ -11,7 +11,7 @@ public class RateeMapping {
     private String secondRaterId;
     private Set<String> colleagueRaterIds;
 
-    public RateeMapping() {
+    protected RateeMapping() {
     }
 
     public RateeMapping(String rateeId, RateeType type, String firstRaterId, String secondRaterId, String... colleagueRaterIds) {
@@ -47,6 +47,17 @@ public class RateeMapping {
             return Collections.emptySet();
         else
             return Collections.unmodifiableSet(colleagueRaterIds);
+    }
+
+    @Override
+    public String toString() {
+        return "RateeMapping{" +
+                "rateeId='" + rateeId + '\'' +
+                ", type=" + type +
+                ", firstRaterId='" + firstRaterId + '\'' +
+                ", secondRaterId='" + secondRaterId + '\'' +
+                ", colleagueRaterIds=" + colleagueRaterIds +
+                '}';
     }
 
     @Override
