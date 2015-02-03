@@ -21,5 +21,6 @@
     <logger name="org.springframework.orm.jpa" level="INFO" />
     <logger name="org.axonframework.eventsourcing" level="DEBUG" />
     <logger name="org.axonframework.eventhandling.replay" level="TRACE" />
+    <logger name="org.springframework.test.context.jdbc" level="TRACE" />
 
 </configuration>

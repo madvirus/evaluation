@@ -39,13 +39,11 @@ import java.util.stream.Collectors;
 @Configuration
 @EnableWebMvcSecurity
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
-    @Autowired
-    private UserDirectoryRepository userDirectoryRepository;
 
     @Bean
-    public UserDirectoryAuthenticationProvider userDirectoryAuthenticationProvider() {
+    public UserDirectoryAuthenticationProvider userDirectoryAuthenticationProvider(UserDirectoryRepository userDirRepo) {
         UserDirectoryAuthenticationProvider provider = new UserDirectoryAuthenticationProvider();
-        provider.setUserDirectoryRepository(userDirectoryRepository);
+        provider.setUserDirectoryRepository(userDirRepo);
         return provider;
     }
 
@@ -109,6 +107,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/loggedOut").permitAll()
                 .antMatchers("/loginForm").permitAll()
                 .antMatchers("/admin").hasAnyRole("SYSTEMADMIN", "HRADMIN")
+                .antMatchers("/admin/system").hasAnyRole("SYSTEMADMIN")
+                .antMatchers("/admin/evalseasons").hasAnyRole("HRADMIN")
                 .anyRequest().authenticated();
     }
 
@@ -133,7 +133,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         }
     }
 
-    private static class CustomAuthSuccessHandler implements AuthenticationSuccessHandler {
+    public static class CustomAuthSuccessHandler implements AuthenticationSuccessHandler {
         private CookieValueEncryptor cookieValueEncryptor;
 
         public CustomAuthSuccessHandler(CookieValueEncryptor cookieValueEncryptor) {
@@ -158,7 +158,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         }
     }
 
-    private static class CustomSecurityContextRepository implements SecurityContextRepository {
+    public static class CustomSecurityContextRepository implements SecurityContextRepository {
 
         private JdbcTemplate jdbcTemplate;
         private UserModelRepository userModelRepository;

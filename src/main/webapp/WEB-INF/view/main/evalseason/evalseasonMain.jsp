@@ -11,32 +11,51 @@
 </head>
 <body>
 
-<nav class="navbar navbar-inverse">
-    <div class="container">
-        <div class="navbar-header">
-            <a class="navbar-brand" href="/main">
-                평가 홈
-            </a>
-        </div>
-
-        <div>
-            <ul class="nav navbar-nav">
-                <sec:authorize url="/admin">
-                    <li><a href="/admin">관리자</a></li>
-                </sec:authorize>
-            </ul>
-            <ul class="nav navbar-nav navbar-right">
-                <li>
-                    <a href="/logout"><sec:authentication property="principal.name"/> 로그아웃</a>
-                </li>
-            </ul>
-        </div>
-    </div>
-</nav>
+<jsp:include page="/WEB-INF/view/main/layout/navi.jsp"/>
 
 <div class="container">
-    <h1>${evalSeason.name}</h1>
+    <div class="page-header">
+        <h2>${evalSeason.name}
+            <small>Subtext for header</small>
+        </h2>
+    </div>
+
+    <%--<c:if test="${evalUserRole.noRole}">--%>
+    <%--평가에서 할 일이 없는 사용자--%>
+    <%--</c:if>--%>
+
+    <c:if test="${evalUserRole.rateeRole}">
+        <div class="page-header">
+            <h3><sec:authentication property="principal.name"/>님의 ${evalSeason.name}본인 평가</h3>
+        </div>
+        <c:if test="${!myPersonalEval.started}">
+            <div class="alert alert-warning" role="alert">
+                아직 본인 평가를 시작하지 않았습니다. <em>본인 평가를 시작하세요.</em>
+            </div>
+            <p>
+                <a class="btn btn-default btn-xs" href="/main/evalseasons/${evalSeason.id}/selfeval/performance"
+                   role="button">본인 성과 평가 시작하기</a>
+                <a class="btn btn-default btn-xs" href="/main/evalseasons/${evalSeason.id}/selfeval/competency"
+                   role="button">본인 역량 평가 시작하기</a>
+            </p>
+        </c:if>
+        <c:if test="${myPersonalEval.started}">
+            <ul>
+                <li><a href="/main/evalseasons/${evalSeason.id}/selfeval/performance">본인 성과 평가하기</a></li>
+                <li><a href=/main/evalseasons/${evalSeason.id}/selfeval/competency>본인 역량 평가하기</a></li>
+            </ul>
+        </c:if>
+    </c:if>
+
+    <c:if test="${evalUserRole.colleagueRaterRole && evalSeason.colleagueEvalutionStarted}">
+        <div class="page-header">
+            <h3><sec:authentication property="principal.name"/>님의 ${evalSeason.name}동료 평가</h3>
+        </div>
+        동료 평가 내용
+    </c:if>
+
 </div>
+
 
 <script src="/webjars/jquery/1.9.0/jquery.js"></script>
 <script src="/webjars/bootstrap/3.1.1/js/bootstrap.js"></script>

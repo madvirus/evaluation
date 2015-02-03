@@ -5,13 +5,13 @@ import net.madvirus.eval.query.evalseason.EvalSeasonMappingModel;
 import net.madvirus.eval.query.evalseason.EvalSeasonMappingModelRepository;
 import org.axonframework.repository.AggregateNotFoundException;
 import org.axonframework.repository.Repository;
-import org.axonframework.unitofwork.DefaultUnitOfWork;
-import org.axonframework.unitofwork.UnitOfWork;
 import scala.Option;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
+import static net.madvirus.eval.axon.AxonUtil.runInUOW;
 
 public class EvalSeasonDataLoaderImpl implements EvalSeasonDataLoader {
     private Repository<EvalSeason> evalSeasonRepository;
@@ -24,39 +24,27 @@ public class EvalSeasonDataLoaderImpl implements EvalSeasonDataLoader {
     }
 
     @Override
-    public Optional<EvalSeasonData> load(String id1) {
-        UnitOfWork uow = DefaultUnitOfWork.startAndGet();
-        try {
-            EvalSeason evalSeason = evalSeasonRepository.load(id1);
-            Option<EvalSeasonMappingModel> model = evalSeasonMappingModelRepository.findById(id1);
-            uow.commit();
-            return Optional.of(new EvalSeasonData(evalSeason, model.get()));
-        } catch (AggregateNotFoundException ex) {
-            uow.rollback(ex);
-            return Optional.empty();
-        } catch (Exception ex) {
-            uow.rollback(ex);
-            throw ex;
-        }
+    public Optional<EvalSeasonData> load(String id) {
+        return runInUOW(() -> {
+            try {
+                EvalSeason evalSeason = evalSeasonRepository.load(id);
+                Option<EvalSeasonMappingModel> model = evalSeasonMappingModelRepository.findById(id);
+                return Optional.of(new EvalSeasonData(evalSeason, model.get()));
+            } catch (AggregateNotFoundException ex) {
+                return Optional.empty();
+            }
+        });
     }
 
     @Override
     public List<EvalSeasonSimpleData> loadAll() {
-        UnitOfWork uow = DefaultUnitOfWork.startAndGet();
-        try {
+        return runInUOW(() -> {
             List<EvalSeasonMappingModel> all = evalSeasonMappingModelRepository.findAll();
             List<EvalSeasonSimpleData> dataList = all.stream()
                     .map(x -> evalSeasonRepository.load(x.getId()))
                     .map(ev -> new EvalSeasonSimpleData(ev))
                     .collect(Collectors.toList());
-            uow.commit();
             return dataList;
-        } catch (AggregateNotFoundException ex) {
-            uow.rollback(ex);
-            throw ex;
-        } catch (Exception ex) {
-            uow.rollback(ex);
-            throw ex;
-        }
+        });
     }
 }

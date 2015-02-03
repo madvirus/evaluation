@@ -3,10 +3,12 @@ package net.madvirus.eval.springconfig;
 import net.madvirus.eval.query.evalseason.EvalSeasonMappingEventListener;
 import net.madvirus.eval.query.evalseason.EvalSeasonMappingModelRepository;
 import net.madvirus.eval.query.evalseason.EvanSeasonMappingModelInitializer;
+import net.madvirus.eval.query.evalseason.EvanSeasonMappingModelInitializerImpl;
 import net.madvirus.eval.query.user.UserModelRepository;
 import org.axonframework.eventhandling.replay.ReplayingCluster;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -31,7 +33,8 @@ public class AxonEventListenerConfig {
     }
 
     @Bean
+    @ConditionalOnMissingBean(EvanSeasonMappingModelInitializer.class)
     public EvanSeasonMappingModelInitializer mappingModelInitializer() {
-        return new EvanSeasonMappingModelInitializer(evalSeasonCluster);
+        return new EvanSeasonMappingModelInitializerImpl(evalSeasonCluster);
     }
 }

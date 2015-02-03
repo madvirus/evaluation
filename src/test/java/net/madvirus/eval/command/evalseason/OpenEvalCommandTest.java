@@ -8,6 +8,7 @@ import org.junit.Test;
 import java.util.Date;
 
 public class OpenEvalCommandTest extends AbstractEvalSeasonCommandTest {
+
     @Test
     public void open() throws Exception {
         OpenEvaluationCommand command = new OpenEvaluationCommand("eval-2014");

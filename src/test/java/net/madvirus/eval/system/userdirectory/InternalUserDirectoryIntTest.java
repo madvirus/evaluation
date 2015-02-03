@@ -1,18 +1,14 @@
 package net.madvirus.eval.system.userdirectory;
 
 import net.madvirus.eval.query.user.UserModel;
-import net.madvirus.eval.testhelper.ESIntTestSetup;
+import net.madvirus.eval.testhelper.AbstractIntTest;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertThat;
 
-@ESIntTestSetup
-@RunWith(SpringJUnit4ClassRunner.class)
-public class InternalUserDirectoryIntTest {
+public class InternalUserDirectoryIntTest extends AbstractIntTest {
     @Autowired
     private UserDirectoryRepository userDirectoryRepository;
 

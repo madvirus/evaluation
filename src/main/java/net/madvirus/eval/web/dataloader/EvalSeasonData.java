@@ -21,4 +21,5 @@ public class EvalSeasonData extends EvalSeasonSimpleData {
     public List<RateeMappingModel> getMappings() {
         return evalSeasonMappingModel.getRateeMappingModels();
     }
+
 }

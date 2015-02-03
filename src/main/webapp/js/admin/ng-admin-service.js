@@ -1,16 +1,5 @@
 var evalAppService = angular.module('evalService', []);
 
-
-var createParams = function (pNum, added) {
-    var params = {offset: (pNum - 1) * 10, size: 10};
-    if (added) {
-        angular.forEach(added, function (value, key) {
-            params[key] = value;
-        });
-    }
-    return params;
-};
-
 function runHttpAndGetPromise($q, executedHttp) {
     var deferred = $q.defer();
     executedHttp.success(function (data, status, headers, config) {
@@ -60,3 +49,5 @@ evalAppService.factory('userService',
             return userService;
         }
     ]);
+
+evalAppService.factory('personalEvalService', []);

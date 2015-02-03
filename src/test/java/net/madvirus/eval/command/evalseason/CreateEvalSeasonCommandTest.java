@@ -3,16 +3,10 @@ package net.madvirus.eval.command.evalseason;
 import net.madvirus.eval.api.DuplicateIdException;
 import net.madvirus.eval.api.evalseaon.CreateEvalSeasonCommand;
 import net.madvirus.eval.api.evalseaon.EvalSeasonCreatedEvent;
-import org.axonframework.domain.GenericDomainEventMessage;
-import org.hamcrest.BaseMatcher;
-import org.hamcrest.Description;
+import net.madvirus.eval.command.EventCaptureMatcher;
 import org.junit.Test;
-import org.mockito.internal.matchers.CapturingMatcher;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 import static org.axonframework.test.matchers.Matchers.equalTo;
 import static org.junit.Assert.assertThat;
@@ -23,13 +17,13 @@ public class CreateEvalSeasonCommandTest extends AbstractEvalSeasonCommandTest {
     @Test
     public void createNewEvalSeason() throws Exception {
 
-        CaptureMatcher<EvalSeasonCreatedEvent> captureMatcher = new CaptureMatcher<>();
+        EventCaptureMatcher captureMatcher = new EventCaptureMatcher();
 
         fixture.given()
                 .when(createCommand())
                 .expectEventsMatching(captureMatcher);
 
-        EvalSeasonCreatedEvent event = captureMatcher.getValue();
+        EvalSeasonCreatedEvent event = (EvalSeasonCreatedEvent) captureMatcher.getValue().getPayload();
         assertThat(event.getEvalSeasonId(), equalTo(EVALSEASON_ID));
         assertThat(event.getName(), equalTo("2014 평가"));
     }
@@ -46,21 +40,4 @@ public class CreateEvalSeasonCommandTest extends AbstractEvalSeasonCommandTest {
                 .expectException(DuplicateIdException.class);
     }
 
-    private class CaptureMatcher<T> extends BaseMatcher<Iterable<T>> {
-        private List<GenericDomainEventMessage> values = new ArrayList<>();
-
-        @Override
-        public boolean matches(Object o) {
-            for (GenericDomainEventMessage t : (Iterable<GenericDomainEventMessage>)o) values.add(t);
-            return true;
-        }
-
-        @Override
-        public void describeTo(Description description) {
-        }
-
-        public T getValue() {
-            return (T) values.get(0).getPayload();
-        }
-    }
 }

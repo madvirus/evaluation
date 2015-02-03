@@ -1,10 +1,8 @@
 package net.madvirus.eval.web.dataloader;
 
-import net.madvirus.eval.testhelper.ESIntTestSetup;
+import net.madvirus.eval.testhelper.AbstractRunReplayTest;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.util.List;
 import java.util.Optional;
@@ -13,9 +11,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.junit.Assert.assertThat;
 
-@RunWith(SpringJUnit4ClassRunner.class)
-@ESIntTestSetup
-public class EvalSeasonDataLoaderIntTest {
+public class EvalSeasonDataLoaderIntTest extends AbstractRunReplayTest {
     @Autowired
     private EvalSeasonDataLoader loader;
 
@@ -27,7 +23,7 @@ public class EvalSeasonDataLoaderIntTest {
 
     @Test
     public void shouldGetEmpty_nonExstingEvalSeason() throws Exception {
-        Optional<EvalSeasonData> load = loader.load("EVAL-002");
+        Optional<EvalSeasonData> load = loader.load("EVAL-003");
         assertThat(load.isPresent(), equalTo(false));
     }
 

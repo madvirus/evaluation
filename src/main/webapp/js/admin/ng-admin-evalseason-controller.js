@@ -1,5 +1,5 @@
 var adminEvalSeasonController = angular.module(
-    'adminEvalSeasonController', ['evalService', 'adminEvalSeasonsApp', 'ui.bootstrap']);
+    'adminEvalSeasonController', ['evalService', 'adminEvalSeasonsApp', 'ui.bootstrap', 'dialogModule']);
 
 adminEvalSeasonController.controller('adminEvalSeasonListCtrl',
     ['$scope', '$modal', 'evalSeasonService',
@@ -162,7 +162,7 @@ adminEvalSeasonController.controller('adminEvalSeasonDetailCtrl',
                         .then(function(result) {
                             load();
                         }, function(result) {
-                            if (result.status == 409) {
+                            if (result.status == 409) { // aleady opened
                                 load();
                             }
                         });

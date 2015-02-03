@@ -3,6 +3,7 @@ package net.madvirus.eval.springconfig;
 import net.madvirus.eval.axon.CustomEventSqlSchema;
 import net.madvirus.eval.axon.ObjectMapperFactory;
 import net.madvirus.eval.command.evalseason.EvalSeason;
+import net.madvirus.eval.command.personaleval.PersonalEval;
 import org.axonframework.commandhandling.CommandBus;
 import org.axonframework.commandhandling.SimpleCommandBus;
 import org.axonframework.commandhandling.annotation.AnnotationCommandHandlerBeanPostProcessor;
@@ -111,6 +112,21 @@ public class AxonInfraConfig implements BeanClassLoaderAware {
         trigger.setSnapshotter(aggregateSnapshotter());
         return trigger;
     }
+
+
+    @Bean
+    @Qualifier(Constants.PERSONAL_EVAL_REPO_QUALIFIER)
+    public EventSourcingRepository personalEvalRepository() {
+        EventSourcingRepository repository = new EventSourcingRepository(personalEvalAggregateFactory(), jdbcEventStore());
+        repository.setEventBus(eventBus());
+        return repository;
+    }
+
+    @Bean
+    public GenericAggregateFactory personalEvalAggregateFactory() {
+        return new GenericAggregateFactory(PersonalEval.class);
+    }
+
 
     @Bean
     public SpringAggregateSnapshotter aggregateSnapshotter() {

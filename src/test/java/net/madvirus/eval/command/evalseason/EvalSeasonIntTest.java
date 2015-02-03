@@ -4,13 +4,12 @@ import net.madvirus.eval.api.evalseaon.CreateEvalSeasonCommand;
 import net.madvirus.eval.api.evalseaon.OpenEvaluationCommand;
 import net.madvirus.eval.query.evalseason.EvalSeasonMappingModel;
 import net.madvirus.eval.query.evalseason.EvalSeasonMappingModelRepository;
-import net.madvirus.eval.testhelper.ESIntTestSetup;
+import net.madvirus.eval.testhelper.AbstractIntTest;
+import net.madvirus.eval.testhelper.AbstractRunReplayTest;
 import org.axonframework.commandhandling.gateway.CommandGateway;
 import org.axonframework.repository.Repository;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import scala.Option;
 
 import javax.annotation.Resource;
@@ -20,9 +19,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertThat;
 
-@RunWith(SpringJUnit4ClassRunner.class)
-@ESIntTestSetup
-public class EvalSeasonSpringIntTest {
+public class EvalSeasonIntTest extends AbstractRunReplayTest {
 
     @Resource(name = "evalSeasonRepository")
     private Repository<EvalSeason> evalSeasonRepository;

@@ -1,12 +1,10 @@
 package net.madvirus.eval.web.security;
 
-import net.madvirus.eval.testhelper.ESIntTestSetup;
+import net.madvirus.eval.testhelper.AbstractIntTest;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.web.FilterChainProxy;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -17,10 +15,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@RunWith(SpringJUnit4ClassRunner.class)
-@ESIntTestSetup
 @WebAppConfiguration
-public class LoginTest {
+public class LoginTest extends AbstractIntTest {
     // http://stackoverflow.com/questions/23335200/spring-boot-setup-security-for-testing
     @Autowired
     private FilterChainProxy filterChainProxy;

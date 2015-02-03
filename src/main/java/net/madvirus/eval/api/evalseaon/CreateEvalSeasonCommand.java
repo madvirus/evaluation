@@ -13,7 +13,7 @@ public class CreateEvalSeasonCommand {
         this.name = name;
     }
 
-    public CreateEvalSeasonCommand() {
+    protected CreateEvalSeasonCommand() {
     }
 
     public String getEvalSeasonId() {

@@ -25,10 +25,6 @@ public class UpdateMappingCommand {
         return evalSeasonId;
     }
 
-    public void setRateeMappings(List<RateeMapping> rateeMappings) {
-        this.rateeMappings = rateeMappings;
-    }
-
     public List<RateeMapping> getRateeMappings() {
         return rateeMappings;
     }

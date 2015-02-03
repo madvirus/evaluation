@@ -5,7 +5,9 @@ import net.madvirus.eval.api.evalseaon.EvalSeasonCreatedEvent;
 import net.madvirus.eval.api.evalseaon.MappingUpdatedEvent;
 import net.madvirus.eval.api.evalseaon.RateeType;
 import net.madvirus.eval.api.evalseaon.UpdateMappingCommand;
+import net.madvirus.eval.query.user.UserModelRepository;
 import org.axonframework.repository.AggregateNotFoundException;
+import org.junit.Before;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -13,8 +15,19 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
+import static org.mockito.Mockito.mock;
+
 public class UpdateMappingsCommandTest extends AbstractEvalSeasonCommandTest {
     public static final String EVALSEASON_ID = "eval-2014";
+    protected UserModelRepository mockUserModelRepository;
+
+    @Override
+    @Before
+    public void setUp() throws Exception {
+        super.setUp();
+        mockUserModelRepository = mock(UserModelRepository.class);
+        fixture.registerAnnotatedCommandHandler(new UpdateMappingCommandHandler(fixture.getRepository(), mockUserModelRepository));
+    }
 
     @Test
     public void notFound_throwEx() throws Exception {
@@ -32,13 +45,10 @@ public class UpdateMappingsCommandTest extends AbstractEvalSeasonCommandTest {
                 );
     }
     private UpdateMappingCommand createUpdateMappingsCommand() {
-        UpdateMappingCommand cmd = new UpdateMappingCommand();
-        cmd.setEvalSeasonId(EVALSEASON_ID);
         List<RateeMapping> rateeMappings = new ArrayList<>();
-
         rateeMappings.add(createRateeMapping1());
         rateeMappings.add(createRateeMapping2());
-        cmd.setRateeMappings(rateeMappings);
+        UpdateMappingCommand cmd = new UpdateMappingCommand(EVALSEASON_ID, rateeMappings);
         return cmd;
     }
 
