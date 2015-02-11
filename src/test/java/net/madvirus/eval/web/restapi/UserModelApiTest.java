@@ -1,9 +1,9 @@
 package net.madvirus.eval.web.restapi;
 
+import net.madvirus.eval.web.MockMvcUtil;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.util.Arrays;
 
@@ -25,7 +25,7 @@ public class UserModelApiTest {
         mockUserFinder = mock(UserFinder.class);
         api.setUserFinder(mockUserFinder);
 
-        mockMvc = MockMvcBuilders.standaloneSetup(api).build();
+        mockMvc = MockMvcUtil.mockMvc(api);
     }
 
     @Test

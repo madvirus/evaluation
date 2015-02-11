@@ -13,7 +13,15 @@ case class RateeMappingModel(@BeanProperty ratee: UserModel,
                              @BeanProperty secondRater: UserModel,
                              colleagueRaters: Set[UserModel]
                               ) {
+  def this(ratee: UserModel, `type`: RateeType, firstRater: UserModel, secondRater: UserModel) =
+    this(ratee, `type`, firstRater, secondRater, Set())
+
   def getColleagueRaters: java.util.List[UserModel] = colleagueRaters.toList.sortBy(x => x.getName())
+
+  def containsColleagueRater(raterId: String): Boolean = {
+    val userModelOpt = colleagueRaters.find(userModel => userModel.getId() == raterId)
+    return userModelOpt.nonEmpty
+  }
 }
 
 case class EvalSeasonMappingModel(
@@ -30,14 +38,13 @@ case class EvalSeasonMappingModel(
   def getRateeMappingModels(): java.util.List[RateeMappingModel] =
     rateeToMappingMap.values.toList.sortBy(x => x.ratee.getName())
 
-
-  def getRateesOfFirstRater(firstRaterId: String): Set[UserModel] =
+  def getRateesOfFirstRater(firstRaterId: String): java.util.Set[UserModel] =
     firstRaterToRateesMap.getRatees(firstRaterId)
 
-  def getRateesOfSecondRater(secondRaterId: String): Set[UserModel] =
+  def getRateesOfSecondRater(secondRaterId: String): java.util.Set[UserModel] =
     secondRaterToRateesMap.getRatees(secondRaterId)
 
-  def getRateesOfColleague(colleagueId: String): Set[UserModel] =
+  def getRateesOfColleague(colleagueId: String): java.util.Set[UserModel] =
     colleagueRaterToRateesMap.getRatees(colleagueId)
 
   def updateMapping(mapping: RateeMappingModel, seqNumber: Long): EvalSeasonMappingModel = {

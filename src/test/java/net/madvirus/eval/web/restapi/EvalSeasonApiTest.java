@@ -1,12 +1,11 @@
 package net.madvirus.eval.web.restapi;
 
 import net.madvirus.eval.api.DuplicateIdException;
-import net.madvirus.eval.api.evalseaon.RateeType;
-import net.madvirus.eval.command.evalseason.AleadyEvaluationOpenedException;
-import net.madvirus.eval.command.evalseason.EvalSeason;
+import net.madvirus.eval.api.evalseaon.*;
 import net.madvirus.eval.query.evalseason.EvalSeasonMappingModel;
 import net.madvirus.eval.query.evalseason.RateeMappingModel;
 import net.madvirus.eval.query.user.UserModel;
+import net.madvirus.eval.web.MockMvcUtil;
 import net.madvirus.eval.web.dataloader.EvalSeasonData;
 import net.madvirus.eval.web.dataloader.EvalSeasonDataLoader;
 import net.madvirus.eval.web.dataloader.EvalSeasonSimpleData;
@@ -16,11 +15,9 @@ import org.junit.Before;
 import org.junit.Test;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import scala.collection.immutable.Set;
 
 import java.util.Arrays;
-import java.util.Optional;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.Matchers.any;
@@ -45,11 +42,11 @@ public class EvalSeasonApiTest {
 
         api.setEvalSeasonDataLoader(mockEvalSeaonModelDataLoader);
         api.setGateway(mockCommandGateway);
-        mockMvc = MockMvcBuilders.standaloneSetup(api).build();
+        mockMvc = MockMvcUtil.mockMvc(api);
     }
 
     @Test
-    public void get_ShouldResponseJsonFormattedList() throws Exception {
+    public void getEvalseasons_Should_Response_JsonFormattedList() throws Exception {
         when(mockEvalSeaonModelDataLoader.loadAll()).thenReturn(
                 Arrays.asList(
                         dto("ID1", "이름1", false),
@@ -89,14 +86,14 @@ public class EvalSeasonApiTest {
     }
 
     @Test
-    public void post_ShouldResponseCreated_When_Successful() throws Exception {
+    public void postEvalseasons_Should_Response_Created_When_success() throws Exception {
         mockMvc.perform(post("/api/evalseasons").contentType(MediaType.APPLICATION_JSON).content("{\"evalSeasonId\": \"ID1\", \"name\": \"이름1\"}"))
                 .andExpect(status().isCreated())
         ;
     }
 
     @Test
-    public void post_ShouldResponseConflict_When_Duplicated() throws Exception {
+    public void postEvalSeasons_Should_Response_Conflict_When_dup() throws Exception {
         when(mockCommandGateway.sendAndWait(any())).thenThrow(new DuplicateIdException(""));
 
         mockMvc.perform(post("/api/evalseasons").contentType(MediaType.APPLICATION_JSON).content("{\"evalSeasonId\": \"ID1\", \"name\": \"이름1\"}"))
@@ -105,15 +102,15 @@ public class EvalSeasonApiTest {
     }
 
     @Test
-    public void getDetail_ShouldResponse404_whenEvalSeasonNotFound() throws Exception {
-        when(mockEvalSeaonModelDataLoader.load("EVAL2014")).thenReturn(Optional.<EvalSeasonData>empty());
+    public void getDetail_Should_Response_404_When_EvalSeasonNotFound() throws Exception {
+        when(mockEvalSeaonModelDataLoader.load("EVAL2014")).thenThrow(new EvalSeasonNotFoundException());
 
         mockMvc.perform(get("/api/evalseasons/EVAL2014"))
                 .andExpect(status().isNotFound());
     }
 
     @Test
-    public void getDetail_ShouldResponseJson_whenEvalSeasonFound() throws Exception {
+    public void getDetail_Should_Response_Json_when_EvalSeasonFound() throws Exception {
         EvalSeasonMappingModel mappingModel = new EvalSeasonMappingModel("EVAL2014", 0L)
                 .updateMapping(new RateeMappingModel(
                         userModel("ratee2", "피평가자2"), RateeType.MEMBER, userModel("rater1", "평가자1"), userModel("rater2", "평가자2"),
@@ -123,7 +120,7 @@ public class EvalSeasonApiTest {
                         new Set.Set2<UserModel>(userModel("colleague2", "동료2"), userModel("colleague1", "동료1"))), 2L);
 
         EvalSeasonData value = new EvalSeasonData(evalSeason("EVAL2014", "이름", false), mappingModel);
-        when(mockEvalSeaonModelDataLoader.load("EVAL2014")).thenReturn(Optional.of(value));
+        when(mockEvalSeaonModelDataLoader.load("EVAL2014")).thenReturn(value);
 
         mockMvc.perform(get("/api/evalseasons/EVAL2014"))
                 .andExpect(jsonPath("$.id").value("EVAL2014"))
@@ -145,7 +142,7 @@ public class EvalSeasonApiTest {
     }
 
     @Test
-    public void putOpen_shouldReturn404_whenNotFound() throws Exception {
+    public void putOpen_Should_Return_404_when_NotFound() throws Exception {
         when(mockCommandGateway.sendAndWait(any())).thenThrow(new AggregateNotFoundException("NOID", "NOT FOUND"));
 
         mockMvc.perform(put("/api/evalseasons/EVAL2014?action=open"))
@@ -153,16 +150,36 @@ public class EvalSeasonApiTest {
     }
 
     @Test
-    public void putOpen_shouldReturn404_whenAleadyOpened() throws Exception {
-        when(mockCommandGateway.sendAndWait(any())).thenThrow(new AleadyEvaluationOpenedException());
+    public void putOpen_should_Return_Ok_when_AlreadyOpened() throws Exception {
+        when(mockCommandGateway.sendAndWait(any())).thenThrow(new AlreadyEvaluationOpenedException());
 
         mockMvc.perform(put("/api/evalseasons/EVAL2014?action=open"))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    public void putOpen_should_Return_Ok_when_NotYetOpened() throws Exception {
+        mockMvc.perform(put("/api/evalseasons/EVAL2014?action=open"))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    public void putStartColleagueEval_should_Return_Ok_when_Success() throws Exception {
+        mockMvc.perform(put("/api/evalseasons/EVAL2014?action=startColleagueEval"))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    public void putStartColleagueEval_should_Return_Conflict_when_NotYetOpened() throws Exception {
+        when(mockCommandGateway.sendAndWait(any())).thenThrow(new EvalSeasonNotYetOpenedException());
+        mockMvc.perform(put("/api/evalseasons/EVAL2014?action=startColleagueEval"))
                 .andExpect(status().isConflict());
     }
 
     @Test
-    public void putOpen_shouldReturn200_whenNotYetOpened() throws Exception {
-        mockMvc.perform(put("/api/evalseasons/EVAL2014?action=open"))
+    public void putStartColleagueEval_should_Return_Conflict_when_AlreadyStarted() throws Exception {
+        when(mockCommandGateway.sendAndWait(any())).thenThrow(new ColleagueEvalAlreadyStartedException());
+        mockMvc.perform(put("/api/evalseasons/EVAL2014?action=startColleagueEval"))
                 .andExpect(status().isOk());
     }
 }

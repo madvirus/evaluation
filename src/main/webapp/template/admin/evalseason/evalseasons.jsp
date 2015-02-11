@@ -1,5 +1,4 @@
 <%@ page contentType="text/html;charset=UTF-8" session="false" %>
-<%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 <h2>평가 시즌 관리</h2>
 
 <p>
@@ -13,7 +12,8 @@
     <tr>
         <th>ID</th>
         <th>이름</th>
-        <th>상태</th>
+        <th>평가 오픈</th>
+        <th>동료 평가 오픈</th>
     </tr>
     </thead>
     <tbody>
@@ -21,6 +21,7 @@
         <td><a href="#/{{evalSeason.id}}">{{evalSeason.id}}</a></td>
         <td>{{evalSeason.name}}</td>
         <td>{{evalSeason.opened ? '평가 시작함' : '평가 시작 전'}}</td>
+        <td>{{evalSeason.colleagueEvalutionStarted ? '평가 시작함' : '시작 전'}}</td>
     </tr>
     </tbody>
 </table>

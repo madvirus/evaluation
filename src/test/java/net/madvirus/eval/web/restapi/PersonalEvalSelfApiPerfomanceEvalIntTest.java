@@ -3,8 +3,7 @@ package net.madvirus.eval.web.restapi;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import net.madvirus.eval.api.personaleval.UpdateSelfPerformanceEvalCommand;
-import net.madvirus.eval.query.evalseason.EvanSeasonMappingModelInitializer;
+import net.madvirus.eval.api.personaleval.self.UpdateSelfPerformanceEvalCommand;
 import net.madvirus.eval.testhelper.AbstractRunReplayTest;
 import net.madvirus.eval.testhelper.CreationHelper;
 import org.junit.Before;
@@ -30,25 +29,20 @@ public class PersonalEvalSelfApiPerfomanceEvalIntTest extends AbstractRunReplayT
 
     private MockMvc mockMvc;
 
-    @Autowired
-    private EvanSeasonMappingModelInitializer initializer;
-
-
     @Before
     public void setUp() throws Exception {
         mockMvc = MockMvcBuilders.webAppContextSetup(context).addFilter(filterChainProxy).build();
-        initializer.replay();
     }
 
     @Test
     public void when_RateeUser_updateSelfPerfEval_then_ResponseShouldBe_OK() throws Exception {
         UpdateSelfPerformanceEvalCommand command = CreationHelper.updateSelfPerfEvalCommand(
-                "EVAL-002-ratee11", "EVAL-002", "ratee11", false, 10, 20);
+                "EVAL-002", "ratee11", false, 10, 20);
         ObjectMapper mapper = new ObjectMapper();
         mapper.setVisibility(PropertyAccessor.GETTER, JsonAutoDetect.Visibility.NONE);
         String json = mapper.writeValueAsString(command);
 
-        mockMvc.perform(post("/api/personalevals/EVAL-002-ratee11/selfPerfEval")
+        mockMvc.perform(post("/api/evalseasons/EVAL-002/currentuser/personaleval/selfPerfEval")
                 .contentType(MediaType.APPLICATION_JSON).content(json)
                 .cookie(CreationHelper.authCookie("ratee11")))
                 .andExpect(status().isOk());
@@ -57,12 +51,12 @@ public class PersonalEvalSelfApiPerfomanceEvalIntTest extends AbstractRunReplayT
     @Test
     public void when_NoRateeUser_UpdateSelfPerfEval_then_ResponseShouldBe_404() throws Exception {
         UpdateSelfPerformanceEvalCommand command = CreationHelper.updateSelfPerfEvalCommand(
-                "EVAL-002-ratee21", "EVAL-002", "ratee21", false, 10, 20);
+                "EVAL-002", "ratee21", false, 10, 20);
         ObjectMapper mapper = new ObjectMapper();
         mapper.setVisibility(PropertyAccessor.GETTER, JsonAutoDetect.Visibility.NONE);
         String json = mapper.writeValueAsString(command);
 
-        mockMvc.perform(post("/api/personalevals/EVAL-002-ratee21/selfPerfEval")
+        mockMvc.perform(post("/api/evalseasons/EVAL-002/currentuser/personaleval/selfPerfEval")
                 .contentType(MediaType.APPLICATION_JSON).content(json)
                 .cookie(CreationHelper.authCookie("ratee21")))
                 .andExpect(status().isNotFound());
@@ -71,12 +65,12 @@ public class PersonalEvalSelfApiPerfomanceEvalIntTest extends AbstractRunReplayT
     @Test
     public void when_User_UpdateSelfPerfEval_To_NoEvalSeason_then_ResponseShouldBe_404() throws Exception {
         UpdateSelfPerformanceEvalCommand command = CreationHelper.updateSelfPerfEvalCommand(
-                "EVAL-003-ratee11", "EVAL-003", "ratee11", false, 10, 20);
+                "EVAL-003", "ratee11", false, 10, 20);
         ObjectMapper mapper = new ObjectMapper();
         mapper.setVisibility(PropertyAccessor.GETTER, JsonAutoDetect.Visibility.NONE);
         String json = mapper.writeValueAsString(command);
 
-        mockMvc.perform(post("/api/personalevals/EVAL-003-ratee11/selfPerfEval")
+        mockMvc.perform(post("/api/evalseasons/EVAL-003/currentuser/personaleval/selfPerfEval")
                 .contentType(MediaType.APPLICATION_JSON).content(json)
                 .cookie(CreationHelper.authCookie("ratee11")))
                 .andExpect(status().isNotFound());

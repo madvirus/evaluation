@@ -1,8 +1,9 @@
 package net.madvirus.eval.web.dataloader;
 
-import net.madvirus.eval.command.evalseason.EvalSeason;
+import net.madvirus.eval.api.evalseaon.EvalSeason;
 import net.madvirus.eval.query.evalseason.EvalSeasonMappingModel;
 import net.madvirus.eval.query.evalseason.RateeMappingModel;
+import scala.Option;
 
 import java.util.List;
 
@@ -22,4 +23,13 @@ public class EvalSeasonData extends EvalSeasonSimpleData {
         return evalSeasonMappingModel.getRateeMappingModels();
     }
 
+    public boolean containsRatee(String rateeId) {
+        return evalSeasonMappingModel.containsRatee(rateeId);
+    }
+
+    public boolean checkColleagueRater(String rateeId, String colleagueRaterId) {
+        Option<RateeMappingModel> mappingOpt = evalSeasonMappingModel.getRateeMappingOf(rateeId);
+        return mappingOpt.isEmpty() ? false :
+                mappingOpt.get().containsColleagueRater(colleagueRaterId);
+    }
 }

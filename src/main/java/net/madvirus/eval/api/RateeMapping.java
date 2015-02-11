@@ -49,6 +49,11 @@ public class RateeMapping {
             return Collections.unmodifiableSet(colleagueRaterIds);
     }
 
+    public boolean hasColleagueRater(String colleagueRaterId) {
+        if (colleagueRaterIds == null) return false;
+        return colleagueRaterIds.contains(colleagueRaterId);
+    }
+
     @Override
     public String toString() {
         return "RateeMapping{" +

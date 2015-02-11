@@ -1,10 +1,10 @@
 package net.madvirus.eval.command.evalseason;
 
 import net.madvirus.eval.api.evalseaon.CreateEvalSeasonCommand;
+import net.madvirus.eval.api.evalseaon.EvalSeason;
 import net.madvirus.eval.api.evalseaon.OpenEvaluationCommand;
 import net.madvirus.eval.query.evalseason.EvalSeasonMappingModel;
 import net.madvirus.eval.query.evalseason.EvalSeasonMappingModelRepository;
-import net.madvirus.eval.testhelper.AbstractIntTest;
 import net.madvirus.eval.testhelper.AbstractRunReplayTest;
 import org.axonframework.commandhandling.gateway.CommandGateway;
 import org.axonframework.repository.Repository;

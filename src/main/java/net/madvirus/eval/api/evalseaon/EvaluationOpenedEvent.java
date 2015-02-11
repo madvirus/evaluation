@@ -1,15 +1,15 @@
 package net.madvirus.eval.api.evalseaon;
 
 public class EvaluationOpenedEvent extends EvalSeasonEvent {
-    private String id;
+    private String evalSeasonId;
 
     EvaluationOpenedEvent() {}
 
     public EvaluationOpenedEvent(String id) {
-        this.id = id;
+        this.evalSeasonId = id;
     }
 
-    public String getId() {
-        return id;
+    public String getEvalSeasonId() {
+        return evalSeasonId;
     }
 }

@@ -1,5 +1,6 @@
 package net.madvirus.eval.command.evalseason;
 
+import net.madvirus.eval.api.evalseaon.EvalSeason;
 import org.axonframework.commandhandling.annotation.AggregateAnnotationCommandHandler;
 import org.axonframework.test.FixtureConfiguration;
 import org.axonframework.test.Fixtures;

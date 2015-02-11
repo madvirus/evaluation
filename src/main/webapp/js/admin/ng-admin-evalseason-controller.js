@@ -165,10 +165,25 @@ adminEvalSeasonController.controller('adminEvalSeasonDetailCtrl',
                             if (result.status == 409) { // aleady opened
                                 load();
                             }
+                            // TODO 평가 오픈 요청 실패 시 에러 치리
                         });
                 });
             };
 
+            $scope.startColleagueEvaluation = function() {
+                var confirmDialogInstance = dialogService.confirm("확인", "동료 평가를 오픈하시겠습니까?");
+                confirmDialogInstance.result.then(function () {
+                    evalSeasonService.startColleagueEvaluation($scope.evalSeasonId)
+                        .then(function(result) {
+                            load();
+                        }, function(result) {
+                            if (result.status == 409) { // aleady opened
+                                load();
+                            }
+                            //  TODO 동료 평가 오픈 요청 실패 시 에러 처리
+                        });
+                });
+            }
         }
     ]);
 

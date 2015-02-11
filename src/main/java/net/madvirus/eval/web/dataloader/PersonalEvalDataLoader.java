@@ -1,11 +1,23 @@
 package net.madvirus.eval.web.dataloader;
 
+import net.madvirus.eval.api.personaleval.PersonalEvalNotFoundException;
+
+import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 public interface PersonalEvalDataLoader {
-    Optional<PersonalEvalState> getPersonalEvalStateOf(String evalSeasonId, String userId);
+    PersonalEvalState getPersonalEvalStateOf(String evalSeasonId, String rateeId);
 
-    Optional<SelfPerfEvalData> getSelfPerfEval(String personalEvalId);
+    SelfPerfEvalData getSelfPerfEvalDataForSelfEvalForm(String evalSeasonId, String rateeId);
 
-    Optional<SelfCompeEvalData> getSelfCompeEval(String personalEvalId);
+    CompeEvalData getSelfCompeEvalDataForSelfEvalForm(String evalSeasonId, String rateeId);
+
+    PersonalEvalData getPersonalEval(String evalSeasonId, String rateeId) throws PersonalEvalNotFoundException;
+
+    List<ColleagueEvalState> getColleagueEvalStates(String evalSeasonId, String colleagueId, Set<String> rateeIds);
+
+    CompeEvalData getColleagueCompeEvalDataForEvalForm(String evalSeasonId, String rateeId, String colleagueId);
+
+    public FirstTotalEvalData getFirstTotalEvalData(String evalSeasonId, String firstRaterId);
 }

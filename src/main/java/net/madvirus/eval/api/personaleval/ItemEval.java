@@ -21,4 +21,28 @@ public class ItemEval {
     public Grade getGrade() {
         return grade;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        ItemEval itemEval = (ItemEval) o;
+
+        if (comment != null ? !comment.equals(itemEval.comment) : itemEval.comment != null) return false;
+        if (grade != itemEval.grade) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = comment != null ? comment.hashCode() : 0;
+        result = 31 * result + (grade != null ? grade.hashCode() : 0);
+        return result;
+    }
+
+    public static ItemEval empty() {
+        return new ItemEval("", Grade.A);
+    }
 }

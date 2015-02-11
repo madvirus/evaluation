@@ -1,25 +1,30 @@
 package net.madvirus.eval.command.personaleval;
 
-import net.madvirus.eval.api.evalseaon.EvalSeasonNotFoundException;
-import net.madvirus.eval.api.evalseaon.RateeNotFoundException;
-import net.madvirus.eval.api.personaleval.*;
+import net.avh4.test.junit.Nested;
+import net.madvirus.eval.api.RateeMapping;
+import net.madvirus.eval.api.evalseaon.*;
+import net.madvirus.eval.api.personaleval.InvalidWeightSumException;
+import net.madvirus.eval.api.personaleval.PerformanceItemAndSelfEval;
+import net.madvirus.eval.api.personaleval.PersonalEval;
+import net.madvirus.eval.api.personaleval.PersonalEvaluationCreatedEvent;
+import net.madvirus.eval.api.personaleval.self.SelfPerformanceEvaluatedEvent;
+import net.madvirus.eval.api.personaleval.self.UpdateSelfPerformanceEvalCommand;
 import net.madvirus.eval.command.EventCaptureMatcher;
-import net.madvirus.eval.query.evalseason.EvalSeasonMappingModel;
 import net.madvirus.eval.testhelper.CreationHelper;
-import net.madvirus.eval.web.dataloader.EvalSeasonData;
-import net.madvirus.eval.web.dataloader.EvalSeasonDataLoader;
-import org.axonframework.commandhandling.annotation.AggregateAnnotationCommandHandler;
+import org.axonframework.repository.AggregateNotFoundException;
 import org.axonframework.repository.Repository;
 import org.axonframework.test.FixtureConfiguration;
 import org.axonframework.test.Fixtures;
+import org.axonframework.test.TestExecutor;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
-import java.util.Optional;
 
 import static net.madvirus.eval.axon.AxonUtil.runInUOW;
-import static net.madvirus.eval.command.personaleval.NestedContext.nestedRun;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertThat;
@@ -27,27 +32,23 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+@RunWith(Nested.class)
 public class UpdateSelfPerformanceEvalCommandTest {
     protected FixtureConfiguration fixture;
-    private Repository<PersonalEval> repository;
-    private EvalSeasonDataLoader mockEvalSeasonDataLoader = mock(EvalSeasonDataLoader.class);
+    private Repository<PersonalEval> personalEvalRepository;
+    private Repository<EvalSeason> mockEvalSeasonRepository;
 
     @Before
     public void setUp() throws Exception {
-        initFixture();
-    }
-
-    private void initFixture() {
         fixture = Fixtures.newGivenWhenThenFixture(PersonalEval.class);
-        repository = fixture.getRepository();
-        fixture.registerAnnotatedCommandHandler(new CreatePersonalEvalCommandHandler(repository));
-        fixture.registerAnnotatedCommandHandler(new UpdateSelfEvalCommandHandler(repository, mockEvalSeasonDataLoader));
-        fixture.registerAnnotatedCommandHandler(new AggregateAnnotationCommandHandler(PersonalEval.class, repository));
+        personalEvalRepository = fixture.getRepository();
+        mockEvalSeasonRepository = mock(Repository.class);
+        fixture.registerAnnotatedCommandHandler(new UpdateSelfEvalCommandHandler(personalEvalRepository, mockEvalSeasonRepository));
     }
 
     @Test
     public void givenNoEvalSeason_thenThrow_ex() throws Exception {
-        when(mockEvalSeasonDataLoader.load(any())).thenReturn(Optional.<EvalSeasonData>empty());
+        givenNoEvalSeason();
         fixture.given()
                 .when(updateSelfPerfEvalCmdWithDraft())
                 .expectException(EvalSeasonNotFoundException.class);
@@ -62,17 +63,8 @@ public class UpdateSelfPerformanceEvalCommandTest {
                 .expectException(RateeNotFoundException.class);
     }
 
-    private void givenEvalSeasonData(String evalSeasonId, String... rateeIds) {
-        EvalSeasonData mockEvalSeasonData = mock(EvalSeasonData.class);
-        EvalSeasonMappingModel mockMappingModel = mock(EvalSeasonMappingModel.class);
-        when(mockEvalSeasonData.getMappingModel()).thenReturn(mockMappingModel);
-        for (String rateeId : rateeIds)
-            when(mockMappingModel.containsRatee(rateeId)).thenReturn(true);
-        when(mockEvalSeasonDataLoader.load(evalSeasonId)).thenReturn(Optional.of(mockEvalSeasonData));
-    }
-
     @Test
-    public void givenEvalSeason_and_ContainingRatee_and_PersnalEvalNotFound() throws Exception {
+    public void givenEvalSeason_and_Ratee_and_NoPersnalEval() throws Exception {
         givenEvalSeasonData("EVAL1024", "bkchoi");
 
         EventCaptureMatcher captureMatcher = new EventCaptureMatcher();
@@ -83,17 +75,25 @@ public class UpdateSelfPerformanceEvalCommandTest {
 
         List<Object> events = captureMatcher.getPayloads();
         PersonalEvaluationCreatedEvent createdEvent = (PersonalEvaluationCreatedEvent) events.get(0);
+        assertThat(createdEvent.getRateeType(), equalTo(RateeType.MEMBER));
         SelfPerformanceEvaluatedEvent updatedEvent = (SelfPerformanceEvaluatedEvent) events.get(1);
     }
 
-    @Test
-    public void givenEvalSeason_and_ContainingRatee_and_PersnalEvalExist() throws Exception {
-        givenEvalSeasonData("EVAL1024", "bkchoi");
+    public class GivenEvalSeason_Ratee_And_PersonalEval {
 
-        nestedRun("임시 보관 상태 업데이트면 업데이트 되어야 함", () -> {
+        private TestExecutor testExecutor;
+
+        @Before
+        public void setUp() throws Exception {
+            givenEvalSeasonData("EVAL1024", "bkchoi");
+            testExecutor = fixture.given(createEvent());
+        }
+
+        @Test
+        public void when_Update_SelfEvalDraft_then_Should_Updated() {
             EventCaptureMatcher captureMatcher = new EventCaptureMatcher();
 
-            fixture.given(createEvent())
+            testExecutor
                     .when(updateSelfPerfEvalCmdWithDraft())
                     .expectEventsMatching(captureMatcher);
 
@@ -104,31 +104,48 @@ public class UpdateSelfPerformanceEvalCommandTest {
             assertThat(evals, hasSize(2));
 
             runInUOW(() -> {
-                PersonalEval personalEval = repository.load("EVAL1024-bkchoi");
+                PersonalEval personalEval = personalEvalRepository.load("EVAL1024-bkchoi");
                 assertThat(personalEval.isSelfPerfEvalDone(), equalTo(false));
             });
-        });
+        }
 
-        nestedRun("완료 상태 업데이트 요청인데 가중치 합이 100이 아니면, 익셉션 발생함", () -> {
-            initFixture();
-            fixture.given(createEvent())
+        @Test
+        public void when_Update_SelfEvalDone_with_noSum100_then_Should_Throw_Exception() {
+            testExecutor
                     .when(updateSelfPerfEvalCmdWithNot100Done())
                     .expectException(InvalidWeightSumException.class);
-        });
+        }
 
-        nestedRun("가중치 합이 100인 완료 상태 업데이트 요청이면, 업데이트 됨", () -> {
-            initFixture();
+        @Test
+        public void when_Update_SelfEvalDone_with_Sum100_then_Should_Update() {
             EventCaptureMatcher captureMatcher = new EventCaptureMatcher();
 
-            fixture.given(createEvent())
+            testExecutor
                     .when(updateSelfPerfEvalCmdWith100Done())
                     .expectEventsMatching(captureMatcher);
 
             runInUOW(() -> {
-                PersonalEval personalEval = repository.load("EVAL1024-bkchoi");
+                PersonalEval personalEval = personalEvalRepository.load("EVAL1024-bkchoi");
                 assertThat(personalEval.isSelfPerfEvalDone(), equalTo(true));
             });
-        });
+        }
+    }
+
+    private void givenNoEvalSeason() {
+        when(mockEvalSeasonRepository.load(any())).thenThrow(new AggregateNotFoundException("no", "no"));
+    }
+
+    private void givenEvalSeasonData(String evalSeasonId, String... rateeIds) {
+        EvalSeason evalSeason = new EvalSeason();
+        evalSeason.on(new EvalSeasonCreatedEvent("EVAL1024", "평가", new Date()));
+        if (rateeIds.length > 0) {
+            List<RateeMapping> mappings = new ArrayList<>();
+            for (String rateeId : rateeIds) {
+                mappings.add(new RateeMapping(rateeId, RateeType.MEMBER, "first", "second"));
+            }
+            evalSeason.on(new MappingUpdatedEvent("EVAL1024", mappings));
+        }
+        when(mockEvalSeasonRepository.load(evalSeasonId)).thenReturn(evalSeason);
     }
 
     private UpdateSelfPerformanceEvalCommand updateSelfPerfEvalCmdWithNot100Done() {
@@ -144,7 +161,7 @@ public class UpdateSelfPerformanceEvalCommandTest {
     }
 
     private UpdateSelfPerformanceEvalCommand createUpdateCommand(boolean done, int... weights) {
-        return CreationHelper.updateSelfPerfEvalCommand("EVAL1024-bkchoi", "EVAL1024", "bkchoi", done, weights);
+        return CreationHelper.updateSelfPerfEvalCommand("EVAL1024", "bkchoi", done, weights);
     }
 
     private UpdateSelfPerformanceEvalCommand createUpdateCommand(boolean done) {
@@ -152,7 +169,7 @@ public class UpdateSelfPerformanceEvalCommandTest {
     }
 
     private PersonalEvaluationCreatedEvent createEvent() {
-        return new PersonalEvaluationCreatedEvent("EVAL1024-bkchoi", "EVAL1024", "bkchoi");
+        return new PersonalEvaluationCreatedEvent("EVAL1024-bkchoi", "EVAL1024", "bkchoi", RateeType.MEMBER, "first", "second");
     }
 
 }

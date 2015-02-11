@@ -5,36 +5,12 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title><spring:message code="admin.tool.title"/></title>
+    <title>관리도구</title>
     <link rel="stylesheet" href="/webjars/bootstrap/3.1.1/css/bootstrap.css"/>
 </head>
 <body>
 
-<nav class="navbar navbar-inverse">
-    <div class="container">
-        <div class="navbar-header">
-            <a class="navbar-brand" href="/main">
-                평가 홈
-            </a>
-        </div>
-
-        <div>
-            <ul class="nav navbar-nav">
-                <sec:authorize access="hasAuthority('ROLE_HRADMIN')">
-                <li><a href="/admin/evalseasons">평가 관리</a></li>
-                </sec:authorize>
-                <sec:authorize access="hasAuthority('ROLE_SYSTEMADMIN')">
-                <li><a href="/admin/system">시스템 관리</a></li>
-                </sec:authorize>
-            </ul>
-            <ul class="nav navbar-nav navbar-right">
-                <li>
-                    <a href="/logout"><spring:message code="navigation.logout"/></a>
-                </li>
-            </ul>
-        </div>
-    </div>
-</nav>
+<jsp:include page="admin-navi.jsp" />
 
 <div class="container">
     평가 메인

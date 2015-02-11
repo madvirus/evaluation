@@ -1,6 +1,6 @@
 package net.madvirus.eval.web.dataloader;
 
-import net.madvirus.eval.command.evalseason.EvalSeason;
+import net.madvirus.eval.api.evalseaon.EvalSeason;
 
 public class EvalSeasonSimpleData {
     private EvalSeason evalSeason;

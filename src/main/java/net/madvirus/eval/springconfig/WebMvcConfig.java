@@ -2,6 +2,7 @@ package net.madvirus.eval.springconfig;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
+import org.springframework.web.servlet.config.annotation.ViewResolverRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
 @Configuration
@@ -14,5 +15,10 @@ public class WebMvcConfig extends WebMvcConfigurerAdapter {
         registry.addViewController("/").setViewName("redirect:/main");
         registry.addViewController("/loginForm").setViewName("auth/loginForm");
         registry.addViewController("/loggedOut").setViewName("auth/loggedOut");
+    }
+
+    @Override
+    public void configureViewResolvers(ViewResolverRegistry registry) {
+        registry.jsp("/WEB-INF/view/", ".jsp");
     }
 }

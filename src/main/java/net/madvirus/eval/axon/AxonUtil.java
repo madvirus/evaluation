@@ -23,6 +23,9 @@ public abstract class AxonUtil {
             T result = callable.call();
             uow.commit();
             return result;
+        } catch (RuntimeException ex) {
+            uow.rollback();
+            throw ex;
         } catch (Exception ex) {
             uow.rollback();
             throw new RuntimeException(ex);

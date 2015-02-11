@@ -1,13 +1,13 @@
 package net.madvirus.eval.web.restapi;
 
-import net.madvirus.eval.api.user.NotFoundUserIdException;
+import net.madvirus.eval.api.user.MappingUserIdNotFoundException;
+import net.madvirus.eval.web.MockMvcUtil;
 import org.axonframework.commandhandling.gateway.CommandGateway;
 import org.axonframework.repository.AggregateNotFoundException;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.Matchers.any;
@@ -29,7 +29,7 @@ public class EvalSeasonMappingApiTest {
         api = new EvalSeasonMappingApi();
         mockGateway = mock(CommandGateway.class);
         api.setGateway(mockGateway);
-        mockMvc = MockMvcBuilders.standaloneSetup(api).build();
+        mockMvc = MockMvcUtil.mockMvc(api);
     }
 
     @Test
@@ -43,7 +43,7 @@ public class EvalSeasonMappingApiTest {
     @Test
     public void post_shouldReturn400_whenFoundSeason_butNotFoundUser() throws Exception {
         when(mockGateway.sendAndWait(any()))
-                .thenThrow(new NotFoundUserIdException("noRatee"));
+                .thenThrow(new MappingUserIdNotFoundException("noRatee"));
         String content = "{\"rateeMappings\": [" +
                 "{\"rateeId\": \"noRatee\", \"type\":\"MEMBER\", \"firstRaterId\":\"rater1\", \"secondRaterId\":\"rater2\"}" +
                 "]}";

@@ -1,6 +1,7 @@
 package net.madvirus.eval.query.evalseason
 
 trait EvalSeasonMappingModelRepository {
+  def clear(): Unit
 
   def add(model: EvalSeasonMappingModel): Unit
 
@@ -15,6 +16,8 @@ class EvalSeasonMappingModelRepositoryImpl extends EvalSeasonMappingModelReposit
   import scala.collection.mutable.Map
 
   private val map: Map[String, EvalSeasonMappingModel] = Map()
+
+  override def clear(): Unit = map.clear()
 
   override def add(model: EvalSeasonMappingModel): Unit = map += (model.id -> model)
 

@@ -1,9 +1,12 @@
 package net.madvirus.eval.springconfig;
 
+import net.madvirus.eval.api.evalseaon.EvalSeason;
+import net.madvirus.eval.api.personaleval.PersonalEval;
 import net.madvirus.eval.command.evalseason.CreateEvalSeasonCommandHandler;
-import net.madvirus.eval.command.evalseason.EvalSeason;
 import net.madvirus.eval.command.evalseason.UpdateMappingCommandHandler;
-import net.madvirus.eval.command.personaleval.PersonalEval;
+import net.madvirus.eval.command.personaleval.RejectEvalCommandHandler;
+import net.madvirus.eval.command.personaleval.UpdateColleagueEvalCommandHandler;
+import net.madvirus.eval.command.personaleval.UpdateFirstEvalCommandHandler;
 import net.madvirus.eval.command.personaleval.UpdateSelfEvalCommandHandler;
 import net.madvirus.eval.query.user.UserModelRepository;
 import net.madvirus.eval.web.dataloader.EvalSeasonDataLoader;
@@ -59,8 +62,8 @@ public class AxonCommandHandlerConfig {
     }
 
     @Bean
-    public UpdateSelfEvalCommandHandler handler() {
-        return new UpdateSelfEvalCommandHandler(personalEvalRepository, evalSeasonDataLoader);
+    public UpdateSelfEvalCommandHandler updateSelfEvalCommandHandler() {
+        return new UpdateSelfEvalCommandHandler(personalEvalRepository, evalSeasonRepository);
     }
 
     @Bean
@@ -72,5 +75,20 @@ public class AxonCommandHandlerConfig {
         factory.setCommandBus(commandBus);
         factory.setParameterResolverFactory(parameterResolverFactory);
         return factory;
+    }
+
+    @Bean
+    public UpdateFirstEvalCommandHandler updateFirstEvalCommandHandler() {
+        return new UpdateFirstEvalCommandHandler(personalEvalRepository);
+    }
+
+    @Bean
+    public RejectEvalCommandHandler rejectEvalCommandHandler() {
+        return new RejectEvalCommandHandler(personalEvalRepository);
+    }
+
+    @Bean
+    public UpdateColleagueEvalCommandHandler updateColleagueEvalCommandHandler() {
+        return new UpdateColleagueEvalCommandHandler(personalEvalRepository, evalSeasonRepository);
     }
 }

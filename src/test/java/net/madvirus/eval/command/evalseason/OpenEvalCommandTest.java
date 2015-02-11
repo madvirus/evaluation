@@ -1,5 +1,6 @@
 package net.madvirus.eval.command.evalseason;
 
+import net.madvirus.eval.api.evalseaon.AlreadyEvaluationOpenedException;
 import net.madvirus.eval.api.evalseaon.EvalSeasonCreatedEvent;
 import net.madvirus.eval.api.evalseaon.EvaluationOpenedEvent;
 import net.madvirus.eval.api.evalseaon.OpenEvaluationCommand;
@@ -24,7 +25,7 @@ public class OpenEvalCommandTest extends AbstractEvalSeasonCommandTest {
 
         fixture.given(new EvalSeasonCreatedEvent("eval-2014", "평가", new Date()), new EvaluationOpenedEvent("eval-2014"))
                 .when(command)
-                .expectException(AleadyEvaluationOpenedException.class);
+                .expectException(AlreadyEvaluationOpenedException.class);
     }
 
 }

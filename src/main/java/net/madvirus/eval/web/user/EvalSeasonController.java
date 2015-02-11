@@ -2,10 +2,7 @@ package net.madvirus.eval.web.user;
 
 import net.madvirus.eval.query.evalseason.EvalSeasonMappingModel;
 import net.madvirus.eval.query.user.UserModel;
-import net.madvirus.eval.web.dataloader.EvalSeasonData;
-import net.madvirus.eval.web.dataloader.EvalSeasonDataLoader;
-import net.madvirus.eval.web.dataloader.PersonalEvalDataLoader;
-import net.madvirus.eval.web.dataloader.PersonalEvalState;
+import net.madvirus.eval.web.dataloader.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.web.bind.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
@@ -15,7 +12,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.Optional;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Controller
 public class EvalSeasonController {
@@ -27,13 +26,7 @@ public class EvalSeasonController {
     public String main(@PathVariable("seasonId") String evalSeasonId, Model model,
                        @AuthenticationPrincipal UserModel currentUser,
                        HttpServletResponse response) throws IOException {
-        Optional<EvalSeasonData> evalSeasonDataOptional = evalSeasonDataLoader.load(evalSeasonId);
-        if (!evalSeasonDataOptional.isPresent()) {
-            response.sendError(HttpServletResponse.SC_NOT_FOUND);
-            return null;
-        }
-        EvalSeasonData evalSeasonData = evalSeasonDataOptional.get();
-
+        EvalSeasonData evalSeasonData = evalSeasonDataLoader.load(evalSeasonId);
         model.addAttribute("evalSeason", evalSeasonData);
 
         EvalSeasonMappingModel evalSeasonMappingModel = evalSeasonData.getMappingModel();
@@ -41,32 +34,53 @@ public class EvalSeasonController {
         EvalSeasonUserRole evalUserRole = new EvalSeasonUserRole();
 
         if (evalSeasonMappingModel.containsRatee(currentUser.getId())) {
-            // 피평가자에 알맞은 모델을 추가
-            // 본인 평가 상태 구함
             evalUserRole.addRateeRole();
             populateUserPersonalEvalState(evalSeasonData.getId(), currentUser, model);
         }
         if (evalSeasonMappingModel.containsFirstRater(currentUser.getId())) {
-            // 1차 평가자에 알맞은 모델을 추가
-            // 피평가자들의 평가 상태 목록 구함
             evalUserRole.addFirstRaterRole();
+            populateFirstRatersRateePersonalEvalState(evalSeasonId, evalSeasonMappingModel.getRateesOfFirstRater(currentUser.getId()), model);
         }
-        if (evalSeasonMappingModel.containsFirstRater(currentUser.getId())) {
+        if (evalSeasonMappingModel.containsSecondRater(currentUser.getId())) {
             // 2차 평가자에 알맞은 모델을 추가
             // 피평가자들의 평가 상태 목록 구함
             evalUserRole.addSecondRaterRole();
         }
-        if (evalSeasonMappingModel.containsColleaguRater(currentUser.getId())) {
-            // 동료 평가자에 알맞은 모델을 추가
+
+        if (evalSeasonData.isColleagueEvalutionStarted() && evalSeasonMappingModel.containsColleaguRater(currentUser.getId())) {
             evalUserRole.addColleagueRaterRole();
+            populateColleagueEvalState(
+                    evalSeasonData.getId(), currentUser,
+                    evalSeasonMappingModel.getRateesOfColleague(currentUser.getId()),
+                    model);
+
         }
         model.addAttribute("evalUserRole", evalUserRole);
         return "main/evalseason/evalseasonMain";
     }
 
     private void populateUserPersonalEvalState(String evalSeasonId, UserModel currentUser, Model model) {
-        Optional<PersonalEvalState> personalEval = personalEvalDataLoader.getPersonalEvalStateOf(evalSeasonId, currentUser.getId());
-        personalEval.ifPresent(pe -> model.addAttribute("myPersonalEval", pe));
+        PersonalEvalState personalEval = personalEvalDataLoader.getPersonalEvalStateOf(evalSeasonId, currentUser.getId());
+        model.addAttribute("myPersonalEval", personalEval);
+    }
+
+    private void populateColleagueEvalState(String evalSeasonDataId, UserModel currentUser, Set<UserModel> rateesOfColleague, Model model) {
+        List<ColleagueEvalState> states = personalEvalDataLoader.getColleagueEvalStates(
+                evalSeasonDataId,
+                currentUser.getId(),
+                rateesOfColleague.stream().map(x -> x.getId()).collect(Collectors.toSet()));
+        model.addAttribute("colleagueEvalStates", states);
+
+    }
+
+    private void populateFirstRatersRateePersonalEvalState(String evalSeasonId, Set<UserModel> rateesOfFirstRater, Model model) {
+        List<UserEvalState> userEvalStates = rateesOfFirstRater.stream()
+                .map(userModel -> {
+                    PersonalEvalState evalState = personalEvalDataLoader.getPersonalEvalStateOf(evalSeasonId, userModel.getId());
+                    return new UserEvalState(userModel, evalState);
+                })
+                .collect(Collectors.toList());
+        model.addAttribute("firstRateeEvalStates", userEvalStates);
     }
 
     @Autowired
@@ -78,4 +92,5 @@ public class EvalSeasonController {
     public void setPersonalEvalDataLoader(PersonalEvalDataLoader personalEvalDataLoader) {
         this.personalEvalDataLoader = personalEvalDataLoader;
     }
+
 }

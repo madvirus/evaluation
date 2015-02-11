@@ -1,6 +1,7 @@
 package net.madvirus.eval.command.evalseason;
 
 import net.madvirus.eval.api.RateeMapping;
+import net.madvirus.eval.api.evalseaon.EvalSeason;
 import net.madvirus.eval.api.evalseaon.UpdateMappingCommand;
 import net.madvirus.eval.query.user.UserModelRepository;
 import org.axonframework.commandhandling.annotation.CommandHandler;

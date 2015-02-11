@@ -39,4 +39,12 @@ public enum RateeType {
     public BigDecimal getAmRatio() {
         return amRatio;
     }
+
+    public boolean hasLeadership() {
+        return leadershipRatio.doubleValue() > 0.0;
+    }
+
+    public boolean hasAm() {
+        return amRatio.doubleValue() > 0.0;
+    }
 }

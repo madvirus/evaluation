@@ -2,6 +2,7 @@ package net.madvirus.eval.command.evalseason;
 
 import net.madvirus.eval.api.evalseaon.CreateEvalSeasonCommand;
 import net.madvirus.eval.api.DuplicateIdException;
+import net.madvirus.eval.api.evalseaon.EvalSeason;
 import org.axonframework.commandhandling.annotation.CommandHandler;
 import org.axonframework.repository.AggregateNotFoundException;
 import org.axonframework.repository.Repository;

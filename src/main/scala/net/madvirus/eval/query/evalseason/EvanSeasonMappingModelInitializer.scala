@@ -9,7 +9,8 @@ trait EvanSeasonMappingModelInitializer {
   def replay()
 }
 
-class EvanSeasonMappingModelInitializerImpl(val cluster: ReplayingCluster)
+class EvanSeasonMappingModelInitializerImpl(val cluster: ReplayingCluster,
+                                            val evalSeasonMappingModelRepository: EvalSeasonMappingModelRepository)
   extends ApplicationListener[ContextRefreshedEvent] with EvanSeasonMappingModelInitializer {
 
   override def onApplicationEvent(event: ContextRefreshedEvent): Unit = {
@@ -17,6 +18,7 @@ class EvanSeasonMappingModelInitializerImpl(val cluster: ReplayingCluster)
   }
 
   def replay(): Unit = {
+    evalSeasonMappingModelRepository.clear();
     val criteria:Criteria = cluster.newCriteriaBuilder().property("type").is("EvalSeason")
     cluster.startReplay(criteria)
   }

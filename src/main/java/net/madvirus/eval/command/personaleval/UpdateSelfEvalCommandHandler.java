@@ -1,59 +1,66 @@
 package net.madvirus.eval.command.personaleval;
 
+import net.madvirus.eval.api.RateeMapping;
 import net.madvirus.eval.api.evalseaon.EvalSeasonNotFoundException;
 import net.madvirus.eval.api.evalseaon.RateeNotFoundException;
-import net.madvirus.eval.api.personaleval.UpdateSelfCompetencyEvalCommand;
-import net.madvirus.eval.api.personaleval.UpdateSelfPerformanceEvalCommand;
-import net.madvirus.eval.web.dataloader.EvalSeasonData;
-import net.madvirus.eval.web.dataloader.EvalSeasonDataLoader;
+import net.madvirus.eval.api.personaleval.PersonalEval;
+import net.madvirus.eval.api.personaleval.self.UpdateSelfCompetencyEvalCommand;
+import net.madvirus.eval.api.personaleval.self.UpdateSelfPerformanceEvalCommand;
+import net.madvirus.eval.api.evalseaon.EvalSeason;
 import org.axonframework.commandhandling.annotation.CommandHandler;
 import org.axonframework.repository.AggregateNotFoundException;
 import org.axonframework.repository.Repository;
 
-import java.util.Optional;
+import static net.madvirus.eval.api.personaleval.PersonalEval.createId;
 
 public class UpdateSelfEvalCommandHandler {
     private Repository<PersonalEval> personalEvalRepository;
-    private EvalSeasonDataLoader evalSeasonDataLoader;
+    private Repository<EvalSeason> evalSeasonRepository;
 
-    public UpdateSelfEvalCommandHandler(Repository<PersonalEval> personalEvalRepository, EvalSeasonDataLoader evalSeasonDataLoader) {
+    public UpdateSelfEvalCommandHandler(Repository<PersonalEval> personalEvalRepository, Repository<EvalSeason> evalSeasonRepository) {
         this.personalEvalRepository = personalEvalRepository;
-        this.evalSeasonDataLoader = evalSeasonDataLoader;
+        this.evalSeasonRepository = evalSeasonRepository;
     }
 
     @CommandHandler
     public void handle(UpdateSelfPerformanceEvalCommand command) {
         PersonalEval personalEval = getPersonalEvalOrThrowExIfInvalid(
                 command.getEvalSeasonId(),
-                command.getUserId(),
-                command.getPersonalEvalId());
-        personalEval.updateSelfPerfomanceEvaluation(command);
+                command.getUserId());
+        personalEval.getSelfRaterOperator().updateSelfPerfomanceEvaluation(command);
     }
 
     @CommandHandler
     public void handle(UpdateSelfCompetencyEvalCommand command) {
         PersonalEval personalEval = getPersonalEvalOrThrowExIfInvalid(
                 command.getEvalSeasonId(),
-                command.getUserId(),
-                command.getPersonalEvalId());
-        personalEval.updateSelfCompetencyEvaluation(command);
+                command.getRateeId());
+        personalEval.getSelfRaterOperator().updateSelfCompetencyEvaluation(command);
     }
 
-    private PersonalEval getPersonalEvalOrThrowExIfInvalid(String evalSeasonId, String userId, String personalEvalId) {
-        Optional<EvalSeasonData> evalSeaon = evalSeasonDataLoader.load(evalSeasonId);
-        if (!evalSeaon.isPresent()) {
+    private PersonalEval getPersonalEvalOrThrowExIfInvalid(String evalSeasonId, String userId) {
+        EvalSeason evalSeason = null;
+        try {
+            evalSeason = evalSeasonRepository.load(evalSeasonId);
+        } catch (AggregateNotFoundException e) {
             throw new EvalSeasonNotFoundException();
         }
 
-        if (!evalSeaon.get().getMappingModel().containsRatee(userId)) {
+        if (!evalSeason.containsRatee(userId)) {
             throw new RateeNotFoundException();
         }
 
+        String personalEvalId = createId(evalSeasonId, userId);
         PersonalEval personalEval = null;
         try {
             personalEval = personalEvalRepository.load(personalEvalId);
         } catch (AggregateNotFoundException e) {
-            personalEval = new PersonalEval(evalSeasonId, userId);
+            RateeMapping rateeMapping = evalSeason.getRateeMapping(userId);
+
+            personalEval = new PersonalEval(evalSeasonId, userId,
+                    rateeMapping.getType(),
+                    rateeMapping.getFirstRaterId(),
+                    rateeMapping.getSecondRaterId());
             personalEvalRepository.add(personalEval);
         }
         return personalEval;

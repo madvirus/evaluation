@@ -1,5 +1,4 @@
 <%@ page contentType="text/html;charset=UTF-8" session="false" %>
-<%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 
 <div ng-show="found">
     <h2>평가 시즌 정보</h2>
@@ -15,8 +14,25 @@
             <span ng-class="{label: true, 'label-primary': evalSeason.opened, 'label-default': !evalSeason.opened}">
             {{evalSeason.opened ? '평가 진행중' : '평가 시작 전'}}
             </span>
-            <br />
-            <a href="" ng-click="openEvaluation()" ng-show="!evalSeason.opened">평가를 오픈하려면 여기를 클릭하세요.</a>
+            <span class="help-block text-warning" ng-show="!evalSeason.opened">
+            <a href="" ng-click="openEvaluation()">평가를 오픈하려면 여기를 클릭하세요.</a>
+            </span>
+        </dd>
+        <dt>동료 평가</dt>
+        <dd>
+            <span ng-class="{label: true, 'label-primary': evalSeason.colleagueEvalutionStarted, 'label-default': !evalSeason.colleagueEvalutionStarted}">
+            {{evalSeason.colleagueEvalutionStarted ? '평가 진행중' : '평가 시작 전'}}
+            </span>
+
+            <span class="help-block text-warning" ng-show="evalSeason.opened && !evalSeason.colleagueEvalutionStarted">
+            <a href="" ng-click="startColleagueEvaluation()">동료 평가를 오픈하려면 여기를 클릭하세요.</a>
+            </span>
+
+            <span class="help-block text-warning" ng-show="!evalSeason.opened">
+            평가를 오픈한 이후에 동료 평가를 오픈할 수 있습니다.
+            </span>
+
+            </a>
         </dd>
     </dl>
     <dl class="dl-horizontal">

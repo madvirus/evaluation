@@ -1,6 +1,7 @@
 package net.madvirus.eval.web.dataloader;
 
-import net.madvirus.eval.command.evalseason.EvalSeason;
+import net.madvirus.eval.api.evalseaon.EvalSeason;
+import net.madvirus.eval.api.evalseaon.EvalSeasonNotFoundException;
 import net.madvirus.eval.query.evalseason.EvalSeasonMappingModel;
 import net.madvirus.eval.query.evalseason.EvalSeasonMappingModelRepository;
 import org.axonframework.repository.AggregateNotFoundException;
@@ -24,14 +25,14 @@ public class EvalSeasonDataLoaderImpl implements EvalSeasonDataLoader {
     }
 
     @Override
-    public Optional<EvalSeasonData> load(String id) {
+    public EvalSeasonData load(String id) {
         return runInUOW(() -> {
             try {
                 EvalSeason evalSeason = evalSeasonRepository.load(id);
                 Option<EvalSeasonMappingModel> model = evalSeasonMappingModelRepository.findById(id);
-                return Optional.of(new EvalSeasonData(evalSeason, model.get()));
+                return new EvalSeasonData(evalSeason, model.get());
             } catch (AggregateNotFoundException ex) {
-                return Optional.empty();
+                throw new EvalSeasonNotFoundException();
             }
         });
     }

@@ -2,8 +2,8 @@ package net.madvirus.eval.springconfig;
 
 import net.madvirus.eval.axon.CustomEventSqlSchema;
 import net.madvirus.eval.axon.ObjectMapperFactory;
-import net.madvirus.eval.command.evalseason.EvalSeason;
-import net.madvirus.eval.command.personaleval.PersonalEval;
+import net.madvirus.eval.api.evalseaon.EvalSeason;
+import net.madvirus.eval.api.personaleval.PersonalEval;
 import org.axonframework.commandhandling.CommandBus;
 import org.axonframework.commandhandling.SimpleCommandBus;
 import org.axonframework.commandhandling.annotation.AnnotationCommandHandlerBeanPostProcessor;

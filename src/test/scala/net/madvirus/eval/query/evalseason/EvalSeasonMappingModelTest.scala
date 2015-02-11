@@ -34,11 +34,11 @@ class EvalSeasonMappingModelTest {
       .updateMapping(new RateeMappingModel(ratee3, RateeType.TEAM_LEADER, first1, second1, Set(colleague3, colleague4)), 0L)
   }
 
-  private def assertContains(list: Set[UserModel], contained:List[UserModel]): Unit = {
+  private def assertContains(list: java.util.Set[UserModel], contained:List[UserModel]): Unit = {
     contained.foreach(x => assertTrue(s"list must contains $x", list contains x))
   }
 
-  private def assertNotContains(list: Set[UserModel], noContained:List[UserModel]): Unit = {
+  private def assertNotContains(list: java.util.Set[UserModel], noContained:List[UserModel]): Unit = {
     noContained.foreach(x => assertFalse(s"list don't have to contains $x", list contains x))
   }
 
@@ -51,7 +51,7 @@ class EvalSeasonMappingModelTest {
 
     assertThat(model.getRateeMappingOf("noRatee").isEmpty, equalTo(true))
 
-    val list: Set[UserModel] = model.getRateesOfFirstRater(first1.getId)
+    val list = model.getRateesOfFirstRater(first1.getId)
     assertContains(list, List(ratee3, ratee1))
     assertNotContains(list, List(ratee2))
 

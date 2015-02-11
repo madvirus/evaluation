@@ -34,6 +34,9 @@ evalAppService.factory('evalSeasonService',
             evalSeasonService.open = function(evalSeasonId) {
                 return runHttpAndGetPromise($q, $http.put("/api/evalseasons/"+evalSeasonId+"?action=open") );
             };
+            evalSeasonService.startColleagueEvaluation = function(evalSeasonId) {
+                return runHttpAndGetPromise($q, $http.put("/api/evalseasons/"+evalSeasonId+"?action=startColleagueEval") );
+            };
 
             return evalSeasonService;
         }

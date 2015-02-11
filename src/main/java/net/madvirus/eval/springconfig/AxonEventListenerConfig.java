@@ -35,6 +35,6 @@ public class AxonEventListenerConfig {
     @Bean
     @ConditionalOnMissingBean(EvanSeasonMappingModelInitializer.class)
     public EvanSeasonMappingModelInitializer mappingModelInitializer() {
-        return new EvanSeasonMappingModelInitializerImpl(evalSeasonCluster);
+        return new EvanSeasonMappingModelInitializerImpl(evalSeasonCluster, mappingModelRepository);
     }
 }
