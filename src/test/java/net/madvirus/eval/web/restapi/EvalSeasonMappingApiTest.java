@@ -20,13 +20,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 public class EvalSeasonMappingApiTest {
 
-    private EvalSeasonMappingApi api;
     private MockMvc mockMvc;
     private CommandGateway mockGateway;
 
     @Before
     public void setUp() throws Exception {
-        api = new EvalSeasonMappingApi();
+        EvalSeasonMappingApi api = new EvalSeasonMappingApi();
         mockGateway = mock(CommandGateway.class);
         api.setGateway(mockGateway);
         mockMvc = MockMvcUtil.mockMvc(api);

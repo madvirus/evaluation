@@ -1,6 +1,7 @@
 package net.madvirus.eval.axon;
 
 import org.axonframework.unitofwork.DefaultUnitOfWork;
+import org.axonframework.unitofwork.TransactionManager;
 import org.axonframework.unitofwork.UnitOfWork;
 
 import java.util.concurrent.Callable;
@@ -11,6 +12,23 @@ public abstract class AxonUtil {
         try {
             runnable.run();
             uow.commit();
+        } catch (RuntimeException ex) {
+            uow.rollback(ex);
+            throw ex;
+        } catch (Exception ex) {
+            uow.rollback(ex);
+            throw ex;
+        }
+    }
+
+    public static void runInUOW(TransactionManager tx, Runnable runnable) {
+        UnitOfWork uow = DefaultUnitOfWork.startAndGet(tx);
+        try {
+            runnable.run();
+            uow.commit();
+        } catch (RuntimeException ex) {
+            uow.rollback(ex);
+            throw ex;
         } catch (Exception ex) {
             uow.rollback(ex);
             throw ex;
@@ -24,10 +42,10 @@ public abstract class AxonUtil {
             uow.commit();
             return result;
         } catch (RuntimeException ex) {
-            uow.rollback();
+            uow.rollback(ex);
             throw ex;
         } catch (Exception ex) {
-            uow.rollback();
+            uow.rollback(ex);
             throw new RuntimeException(ex);
         }
     }

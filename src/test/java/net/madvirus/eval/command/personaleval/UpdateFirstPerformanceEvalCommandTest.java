@@ -1,12 +1,22 @@
 package net.madvirus.eval.command.personaleval;
 
 import net.avh4.test.junit.Nested;
-import net.madvirus.eval.api.personaleval.*;
-import net.madvirus.eval.api.personaleval.first.*;
+import net.madvirus.eval.api.personaleval.Grade;
+import net.madvirus.eval.api.personaleval.PersonalEvalNotFoundException;
+import net.madvirus.eval.api.personaleval.PersonalEvaluationCreatedEvent;
+import net.madvirus.eval.api.personaleval.SelfEvalNotYetFinishedException;
+import net.madvirus.eval.api.personaleval.first.FirstPerformanceEvaluatedEvent;
+import net.madvirus.eval.api.personaleval.first.SelfPerformanceEvalRejectedEvent;
+import net.madvirus.eval.api.personaleval.first.YouAreNotFirstRaterException;
 import net.madvirus.eval.api.personaleval.self.SelfPerformanceEvaluatedEvent;
 import net.madvirus.eval.axon.AxonUtil;
 import net.madvirus.eval.command.EventCaptureMatcher;
-import net.madvirus.eval.testhelper.CreationHelper;
+import net.madvirus.eval.command.personaleval.first.RejectSelfPerformanceEvalCommand;
+import net.madvirus.eval.command.personaleval.first.UpdateFirstPerformanceEvalCommand;
+import net.madvirus.eval.domain.personaleval.ItemEval;
+import net.madvirus.eval.domain.personaleval.PersonalEval;
+import net.madvirus.eval.testhelper.CommandHelper;
+import net.madvirus.eval.testhelper.EventHelper;
 import org.axonframework.repository.Repository;
 import org.axonframework.test.FixtureConfiguration;
 import org.axonframework.test.Fixtures;
@@ -15,7 +25,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import java.util.Arrays;
 import java.util.List;
 
 import static org.hamcrest.Matchers.*;
@@ -23,6 +32,10 @@ import static org.junit.Assert.assertThat;
 
 @RunWith(Nested.class)
 public class UpdateFirstPerformanceEvalCommandTest {
+    public static final String FIRST_ID = "first";
+    public static final String EVAL_SEASON_ID = "EVAL2014";
+    public static final String RATEE_ID = "ratee";
+    public static final String SECOND_ID = "second";
     protected FixtureConfiguration fixture;
     private Repository<PersonalEval> repository;
 
@@ -45,7 +58,7 @@ public class UpdateFirstPerformanceEvalCommandTest {
         @Test
         public void when_Evaluate_then_Should_Throw_Ex() throws Exception {
             testExecutor
-                    .when(updateFirstPerfEvalCommandWithFirstRater("first"))
+                    .when(updateFirstPerfEvalCommandWithFirstRater(FIRST_ID))
                     .expectException(PersonalEvalNotFoundException.class);
         }
     }
@@ -55,7 +68,7 @@ public class UpdateFirstPerformanceEvalCommandTest {
 
         @Before
         public void setUp() throws Exception {
-            testExecutor = fixture.given(createEventWithFirstRater("first"));
+            testExecutor = fixture.given(createEventWithFirstRater(FIRST_ID));
         }
 
         @Test
@@ -68,7 +81,7 @@ public class UpdateFirstPerformanceEvalCommandTest {
         @Test
         public void when_FirstRater_Evaluates_then_Should_Throw_Ex() throws Exception {
             testExecutor
-                    .when(updateFirstPerfEvalCommandWithFirstRater("first"))
+                    .when(updateFirstPerfEvalCommandWithFirstRater(FIRST_ID))
                     .expectException(SelfEvalNotYetFinishedException.class);
         }
 
@@ -81,7 +94,7 @@ public class UpdateFirstPerformanceEvalCommandTest {
         @Before
         public void setUp() throws Exception {
             testExecutor = fixture.given(
-                    createEventWithFirstRater("first"),
+                    createEventWithFirstRater(FIRST_ID),
                     selfPerfEvaluatedEventWithDone());
         }
 
@@ -89,7 +102,7 @@ public class UpdateFirstPerformanceEvalCommandTest {
         public void when_FirstRater_Evaluates_then_Should_Publish_EvaluatedEvent() {
             EventCaptureMatcher capture = new EventCaptureMatcher();
             testExecutor
-                    .when(updateFirstPerfEvalCommandWithFirstRater("first"))
+                    .when(updateFirstPerfEvalCommandWithFirstRater(FIRST_ID))
                     .expectEventsMatching(capture);
             FirstPerformanceEvaluatedEvent event = (FirstPerformanceEvaluatedEvent) capture.getPayload();
 
@@ -105,37 +118,34 @@ public class UpdateFirstPerformanceEvalCommandTest {
         public void when_FirstRater_Return_then_SelfPerfEval_Should_Return_To_Progressing() {
             EventCaptureMatcher capture = new EventCaptureMatcher();
             testExecutor
-                    .when(rejectSelfPerfEvalCommandWithFirstRater("first"))
+                    .when(rejectSelfPerfEvalCommandWithFirstRater(FIRST_ID))
                     .expectEventsMatching(capture);
 
             SelfPerformanceEvalRejectedEvent event = (SelfPerformanceEvalRejectedEvent) capture.getPayload();
-            assertThat(event.getPersonalEvalId(), equalTo(PersonalEval.createId("EVAL2014", "ratee")));
+            assertThat(event.getPersonalEvalId(), equalTo(PersonalEval.createId(EVAL_SEASON_ID, RATEE_ID)));
 
             AxonUtil.runInUOW(() -> {
-                PersonalEval personalEval = repository.load(PersonalEval.createId("EVAL2014", "ratee"));
+                PersonalEval personalEval = repository.load(PersonalEval.createId(EVAL_SEASON_ID, RATEE_ID));
                 assertThat(personalEval.isSelfPerfEvalDone(), equalTo(false));
             });
         }
 
         private RejectSelfPerformanceEvalCommand rejectSelfPerfEvalCommandWithFirstRater(String first) {
-            return new RejectSelfPerformanceEvalCommand("EVAL2014", "ratee", first);
+            return new RejectSelfPerformanceEvalCommand(EVAL_SEASON_ID, RATEE_ID, first);
         }
     }
 
 
     private UpdateFirstPerformanceEvalCommand updateFirstPerfEvalCommandWithFirstRater(String firstRaterId) {
-        return new UpdateFirstPerformanceEvalCommand(
-                "EVAL2014", "ratee", firstRaterId,
-                Arrays.asList(new ItemEval("first comment", Grade.B)),
-                new ItemEval("total comment", Grade.B));
+        return CommandHelper.updateFirstPerfEvalCommandWithRater(firstRaterId);
     }
 
     private PersonalEvaluationCreatedEvent createEventWithFirstRater(String firstRaterId) {
-        return CreationHelper.personalEvalCreatedEvent("EVAL2014", "ratee", firstRaterId, "second");
+        return EventHelper.personalEvalCreatedEvent(EVAL_SEASON_ID, RATEE_ID, firstRaterId, SECOND_ID);
     }
 
     private SelfPerformanceEvaluatedEvent selfPerfEvaluatedEventWithDone() {
-        return CreationHelper.selfPerfEvaluatedEvent("EVAL2014", "ratee", true);
+        return EventHelper.selfPerfEvaluatedEvent(EVAL_SEASON_ID, RATEE_ID, true);
     }
 
 }

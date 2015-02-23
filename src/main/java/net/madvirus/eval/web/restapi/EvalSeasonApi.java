@@ -1,6 +1,10 @@
 package net.madvirus.eval.web.restapi;
 
-import net.madvirus.eval.api.evalseaon.*;
+import net.madvirus.eval.api.evalseaon.AlreadyEvaluationOpenedException;
+import net.madvirus.eval.api.evalseaon.ColleagueEvalAlreadyStartedException;
+import net.madvirus.eval.command.evalseason.CreateEvalSeasonCommand;
+import net.madvirus.eval.command.evalseason.OpenEvaluationCommand;
+import net.madvirus.eval.command.evalseason.StartColleagueEvalCommand;
 import net.madvirus.eval.web.dataloader.EvalSeasonDataLoader;
 import net.madvirus.eval.web.dataloader.EvalSeasonSimpleData;
 import org.axonframework.commandhandling.gateway.CommandGateway;

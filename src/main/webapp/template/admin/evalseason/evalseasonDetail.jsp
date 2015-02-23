@@ -1,6 +1,11 @@
-<%@ page contentType="text/html;charset=UTF-8" session="false" %>
+<%@ page contentType="text/html;charset=UTF-8" session="false" deferredSyntaxAllowedAsLiteral="true" %>
 
 <div ng-show="found">
+    <ol class="breadcrumb">
+        <li><a href="#/">평가관리</a></li>
+        <li class="active">평가 시즌 정보</li>
+    </ol>
+
     <h2>평가 시즌 정보</h2>
 
     <dl class="dl-horizontal">
@@ -36,6 +41,12 @@
         </dd>
     </dl>
     <dl class="dl-horizontal">
+        <dt>배분 규칙</dt>
+        <dd>
+            <p>
+                <a href="#{{evalSeason.id}}/distrule">[배분 규칙 관리 화면으로 이동하기]</a>
+            </p>
+        </dd>
         <dt>피평가자 매핑</dt>
         <dd>
             <p>
@@ -60,8 +71,9 @@
                 <tr ng-repeat="mapping in evalSeason.mappings">
                     <td>
                         <label>
-                        <input type="checkbox" ng-model="selected[mapping.ratee.id]"/>{{mapping.ratee.name}}</td>
+                        <input type="checkbox" ng-model="selected[mapping.ratee.id]"/>{{mapping.ratee.name}}[{{mapping.ratee.id}}]
                         </label>
+                    </td>
                     <td>{{mapping.type}}</td>
                     <td>{{mapping.firstRater == null ? '-' : mapping.firstRater.name}}</td>
                     <td>{{mapping.secondRater.name}}</td>

@@ -1,9 +1,9 @@
 package net.madvirus.eval.command.personaleval;
 
-import net.madvirus.eval.api.personaleval.PersonalEval;
 import net.madvirus.eval.api.personaleval.PersonalEvalNotFoundException;
-import net.madvirus.eval.api.personaleval.first.RejectSelfCompetencyEvalCommand;
-import net.madvirus.eval.api.personaleval.first.RejectSelfPerformanceEvalCommand;
+import net.madvirus.eval.command.personaleval.first.RejectSelfCompetencyEvalCommand;
+import net.madvirus.eval.command.personaleval.first.RejectSelfPerformanceEvalCommand;
+import net.madvirus.eval.domain.personaleval.PersonalEval;
 import org.axonframework.commandhandling.annotation.CommandHandler;
 import org.axonframework.repository.AggregateNotFoundException;
 import org.axonframework.repository.Repository;

@@ -21,6 +21,7 @@
     <input type="hidden" ng-init="hasAm = ${personalEval.rateeType.hasAm()}"/>
     <input type="hidden" ng-init="selfEvalDone = ${personalEval.selfCompeEvalDone}" />
     <input type="hidden" ng-init="firstTotalEvalDone = ${personalEval.firstTotalEvalDone}" />
+    <input type="hidden" ng-init="allColleagueEvalDone = ${allColleagueEvalDone}" />
     <c:set var="firstEvalSetJson"><tf:toJson value="${firstEvalSet}"/></c:set>
     <input type="hidden" ng-init="evalSet = <c:out value="${firstEvalSetJson}" escapeXml="true"/>" />
 
@@ -45,7 +46,11 @@
         평가 대상가자 아직 본인 역량 평가를 완료하지 않았습니다.
     </div>
 
-    <div class="alert alert-warning" role="alert" ng-show="firstTotalEvalDone">
+    <div class="alert alert-warning" role="alert" ng-show="!allColleagueEvalDone">
+        아직 완료하지 않은 동료 평가가 존재합니다.
+    </div>
+
+    <div class="alert alert-info" role="alert" ng-show="firstTotalEvalDone">
         1차 종합 평가를 완료했습니다.
     </div>
 
@@ -74,10 +79,10 @@
             <tbody>
 
             <c:forEach var="idx" begin="0" end="4">
-                <tr ng-form='itemForm${idx}'>
+                <tr ng-form='itemFormC${idx}'>
                     <td rowspan="2" class="col-md-1">{{competencyItems.common[${idx}].name}}</td>
                     <td rowspan="2" class="col-md-3">
-                        <span ng-show="descCollapsed">내용 숨기</span>
+                        <span ng-show="descCollapsed">내용 감춤</span>
                         <div collapse="descCollapsed">
                             <small ng-bind-html="competencyItems.common[${idx}].description | nl2br"></small>
                         </div>
@@ -86,14 +91,14 @@
                         <tf:pre value="${allCompeEvals.selfEvalSet.commonsEvals[idx].comment}"/>
                     </td>
                     <td class="col-md-1">${allCompeEvals.selfEvalSet.commonsEvals[idx].grade}</td>
-                    <td rowspan="2" class="col-md-3" ng-class="{'has-error': showError && !itemForm${idx}.comment.$valid}">
+                    <td rowspan="2" class="col-md-3" ng-class="{'has-error': showError && !itemFormC${idx}.comment.$valid}">
                         <textarea ng-model="evalSet.commonsEvals[${idx}].comment"
                                   ng-readonly="readonly()"
                                   class="form-control input-sm msd-elastic: \n;"
                                   name="comment"
                                   required></textarea>
                     </td>
-                    <td rowspan="2" class="col-md-1" ng-class="{'has-error': showError && !itemForm${idx}.grade.$valid}">
+                    <td rowspan="2" class="col-md-1" ng-class="{'has-error': showError && !itemFormC${idx}.grade.$valid}">
                         <select ng-model="evalSet.commonsEvals[${idx}].grade"
                                 ng-readonly="readonly()"
                                 class="form-control input-sm"
@@ -130,10 +135,10 @@
                 <tbody>
 
                 <c:forEach var="idx" begin="0" end="4">
-                    <tr ng-form='itemForm${idx}'>
+                    <tr ng-form='itemFormL${idx}'>
                         <td rowspan="2" class="col-md-1">{{competencyItems.leadership[${idx}].name}}</td>
                         <td rowspan="2" class="col-md-3">
-                            <span ng-show="descCollapsed">내용 숨기</span>
+                            <span ng-show="descCollapsed">내용 감춤</span>
                             <div collapse="descCollapsed">
                                 <small ng-bind-html="competencyItems.leadership[${idx}].description | nl2br"></small>
                             </div>
@@ -142,14 +147,14 @@
                             <tf:pre value="${allCompeEvals.selfEvalSet.leadershipEvals[idx].comment}"/>
                         </td>
                         <td class="col-md-1">${allCompeEvals.selfEvalSet.leadershipEvals[idx].grade}</td>
-                        <td rowspan="2" class="col-md-3" ng-class="{'has-error': showError && !itemForm${idx}.comment.$valid}">
+                        <td rowspan="2" class="col-md-3" ng-class="{'has-error': showError && !itemFormL${idx}.comment.$valid}">
                         <textarea ng-model="evalSet.leadershipEvals[${idx}].comment"
                                   ng-readonly="readonly()"
                                   class="form-control input-sm msd-elastic: \n;"
                                   name="comment"
                                   required></textarea>
                         </td>
-                        <td rowspan="2" class="col-md-1" ng-class="{'has-error': showError && !itemForm${idx}.grade.$valid}">
+                        <td rowspan="2" class="col-md-1" ng-class="{'has-error': showError && !itemFormL${idx}.grade.$valid}">
                             <select ng-model="evalSet.leadershipEvals[${idx}].grade"
                                     ng-readonly="readonly()"
                                     ng-options="grade for grade in grades"
@@ -188,10 +193,10 @@
                 <tbody>
 
                 <c:forEach var="idx" begin="0" end="3">
-                    <tr ng-form='itemForm${idx}'>
+                    <tr ng-form='itemFormA${idx}'>
                         <td rowspan="2" class="col-md-1">{{competencyItems.am[${idx}].name}}</td>
                         <td rowspan="2" class="col-md-3">
-                            <span ng-show="descCollapsed">내용 숨기</span>
+                            <span ng-show="descCollapsed">내용 감춤</span>
                             <div collapse="descCollapsed">
                                 <small ng-bind-html="competencyItems.am[${idx}].description | nl2br"></small>
                             </div>
@@ -200,14 +205,14 @@
                             <tf:pre value="${allCompeEvals.selfEvalSet.amEvals[idx].comment}"/>
                         </td>
                         <td class="col-md-1">${allCompeEvals.selfEvalSet.amEvals[idx].grade}</td>
-                        <td rowspan="2" class="col-md-3" ng-class="{'has-error': showError && !itemForm${idx}.comment.$valid}">
+                        <td rowspan="2" class="col-md-3" ng-class="{'has-error': showError && !itemFormA${idx}.comment.$valid}">
                         <textarea ng-model="evalSet.amEvals[${idx}].comment"
                                   ng-readonly="readonly()"
                                   class="form-control input-sm msd-elastic: \n;"
                                   name="comment"
                                   required></textarea>
                         </td>
-                        <td rowspan="2" class="col-md-1" ng-class="{'has-error': showError && !itemForm${idx}.grade.$valid}">
+                        <td rowspan="2" class="col-md-1" ng-class="{'has-error': showError && !itemFormA${idx}.grade.$valid}">
                             <select ng-model="evalSet.amEvals[${idx}].grade"
                                     ng-readonly="readonly()"
                                     ng-options="grade for grade in grades"
@@ -238,7 +243,7 @@
         <table class="table table-bordered table-condensed">
             <tbody>
             <tr>
-                <td class="col-md-2 success">동료 종합 평가</td>
+                <td class="col-md-2 success">동료 종합 의견</td>
                 <td colspan="3">
                     <ul class="list-unstyled">
                         <c:forEach var="collEval" items="${personalEval.allCompeEvals.colleagueEvals}">
@@ -248,14 +253,13 @@
                 </td>
             </tr>
             <tr>
-                <td class="col-md-2 success">1차 역량 종합 평가</td>
+                <td class="col-md-2 success">1차 역량 종합 의견/평가</td>
                 <td class="col-md-6" ng-class="{'has-error': showError && !compeEvalForm.firstCompeEvalComment.$valid}">
                     <textarea ng-model="evalSet.totalEval.comment"
                               class="form-control input-sm msd-elastic: \n;"
                               name="firstCompeEvalComment"
                               ng-readonly="readonly()"
                               required></textarea>
-                </td>
                 </td>
                 <td class="col-md-1">
                     <select ng-model="evalSet.totalEval.grade"

@@ -1,6 +1,6 @@
 package net.madvirus.eval.api.personaleval;
 
-import net.madvirus.eval.api.evalseaon.RateeType;
+import net.madvirus.eval.domain.evalseason.RateeType;
 
 public class PersonalEvaluationCreatedEvent {
     private String personalEvalId;

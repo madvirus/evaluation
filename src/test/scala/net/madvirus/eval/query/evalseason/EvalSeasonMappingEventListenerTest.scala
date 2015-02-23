@@ -2,7 +2,8 @@ package net.madvirus.eval.query.evalseason
 
 import java.util.Date
 
-import net.madvirus.eval.api.evalseaon.{RateeType, EvalSeasonCreatedEvent, MappingDeletedEvent}
+import net.madvirus.eval.api.evalseaon.{EvalSeasonCreatedEvent, MappingDeletedEvent}
+import net.madvirus.eval.domain.evalseason.RateeType
 import net.madvirus.eval.query.user.{UserModel, UserModelRepository}
 import org.hamcrest.Matchers._
 import org.junit.Assert._

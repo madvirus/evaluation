@@ -1,6 +1,5 @@
 package net.madvirus.eval.web.user;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import net.madvirus.eval.query.user.UserModel;
 import net.madvirus.eval.web.dataloader.CompeEvalData;
 import net.madvirus.eval.web.dataloader.PersonalEvalDataLoader;
@@ -29,8 +28,6 @@ public class SelfEvaluationController {
                                       Model model) throws IOException {
         SelfPerfEvalData selfPerfEvalData = personalEvalDataLoader.getSelfPerfEvalDataForSelfEvalForm(evalSeasonId, userModel.getId());
         model.addAttribute("selfPerfEvalData", selfPerfEvalData);
-        ObjectMapper mapper = new ObjectMapper();
-        model.addAttribute("itemAndEvalsJson", mapper.writeValueAsString(selfPerfEvalData.getItemAndEvals()));
         return "main/personaleval/selfPerformanceEval";
     }
 
@@ -40,8 +37,6 @@ public class SelfEvaluationController {
                                       Model model) throws IOException {
         CompeEvalData compeEvalData = personalEvalDataLoader.getSelfCompeEvalDataForSelfEvalForm(evalSeasonId, userModel.getId());
         model.addAttribute("compeEvalData", compeEvalData);
-        ObjectMapper mapper = new ObjectMapper();
-        model.addAttribute("evalSetJson", mapper.writeValueAsString(compeEvalData.getEvalSet()));
         return "main/personaleval/selfCompetencyEval";
     }
 

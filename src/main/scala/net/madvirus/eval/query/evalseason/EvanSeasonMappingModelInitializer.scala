@@ -18,7 +18,7 @@ class EvanSeasonMappingModelInitializerImpl(val cluster: ReplayingCluster,
   }
 
   def replay(): Unit = {
-    evalSeasonMappingModelRepository.clear();
+    evalSeasonMappingModelRepository.clear()
     val criteria:Criteria = cluster.newCriteriaBuilder().property("type").is("EvalSeason")
     cluster.startReplay(criteria)
   }

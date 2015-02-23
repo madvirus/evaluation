@@ -1,7 +1,7 @@
 package net.madvirus.eval.web.restapi;
 
-import net.madvirus.eval.api.evalseaon.DeleteMappingCommand;
-import net.madvirus.eval.api.evalseaon.UpdateMappingCommand;
+import net.madvirus.eval.command.evalseason.DeleteMappingCommand;
+import net.madvirus.eval.command.evalseason.UpdateMappingCommand;
 import org.axonframework.commandhandling.gateway.CommandGateway;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;

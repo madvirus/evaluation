@@ -1,5 +1,5 @@
 var adminEvalSeasonController = angular.module(
-    'adminEvalSeasonController', ['evalService', 'adminEvalSeasonsApp', 'ui.bootstrap', 'dialogModule']);
+    'adminEvalSeasonController', ['evalService', 'adminEvalSeasonsApp', 'ui.bootstrap', 'dialogModule', "checklist-model"]);
 
 adminEvalSeasonController.controller('adminEvalSeasonListCtrl',
     ['$scope', '$modal', 'evalSeasonService',
@@ -20,7 +20,7 @@ adminEvalSeasonController.controller('adminEvalSeasonListCtrl',
                 });
 
                 newEvalSeasonDialogInstance.result.then(function () {
-                    load()
+                    load();
                 }, function () {
                 });
             };
@@ -28,22 +28,27 @@ adminEvalSeasonController.controller('adminEvalSeasonListCtrl',
     ]);
 
 adminEvalSeasonController.controller('newEvalSeasonDialogCtrl',
-    ['$scope', '$modalInstance', 'evalSeasonService',
-        function ($scope, $modalInstance, evalSeasonService) {
+    ['$scope', '$modalInstance', 'evalSeasonService', 'dialogService',
+        function ($scope, $modalInstance, evalSeasonService, dialogService) {
             $scope.evalSeasonId = "";
             $scope.evalSeasonName = "";
             $scope.duplicateId = "";
 
             $scope.ok = function () {
-                evalSeasonService.createNewSeason({
-                    evalSeasonId: $scope.evalSeasonId,
-                    name: $scope.evalSeasonName
-                }).then(function (result) {
-                    $modalInstance.close();
-                }, function(result) {
-                    if (result.status == 409) {
-                        $scope.duplicateId = $scope.evalSeasonId;
-                    }
+                var confirmDialogInstance = dialogService.confirm('확인', '평가를 생성하시겠습니까?')
+                confirmDialogInstance.result.then(function () {
+                    evalSeasonService.createNewSeason({
+                        evalSeasonId: $scope.evalSeasonId,
+                        name: $scope.evalSeasonName
+                    }).then(function (result) {
+                        $modalInstance.close();
+                        dialogService.success('평가 생성', '새로운 평가를 생성했습니다.');
+                    }, function(result) {
+                        if (result.status == 409) {
+                            $scope.duplicateId = $scope.evalSeasonId;
+                            return true;
+                        }
+                    });
                 });
             };
 
@@ -80,6 +85,7 @@ adminEvalSeasonController.controller('adminEvalSeasonDetailCtrl',
                     }, function(result) {
                         if (result.status == 404) {
                             $scope.notFound = true;
+                            return true;
                         }
                     });
             };
@@ -97,7 +103,8 @@ adminEvalSeasonController.controller('adminEvalSeasonDetailCtrl',
                 });
 
                 multipleMappingFormDialogInstance.result.then(function () {
-                    load()
+                    load();
+                    dialogService.success('매핑 변경', '매핑 정보를 변경했습니다.');
                 }, function () {
                 });
             };
@@ -151,6 +158,14 @@ adminEvalSeasonController.controller('adminEvalSeasonDetailCtrl',
                     evalSeasonService.deleteMappings($scope.evalSeasonId,ids)
                         .then(function(result) {
                             load();
+                            dialogService.success('매핑 삭제', '매핑 정보를 삭제했습니다.');
+                        }, function(result) {
+                            if (result.status == 500 && result.data) {
+                                if (result.data.exceptionType == 'FirstEvalDoneException') {
+                                    dialogService.error('에러', '1차 평가를 완료한 피평가자의 매핑은 삭제할 수 없습니다.');
+                                    return true;
+                                }
+                            }
                         });
                 });
             };
@@ -161,11 +176,12 @@ adminEvalSeasonController.controller('adminEvalSeasonDetailCtrl',
                     evalSeasonService.open($scope.evalSeasonId)
                         .then(function(result) {
                             load();
+                            dialogService.success('평가 오픈', '평가를 오픈했습니다.');
                         }, function(result) {
                             if (result.status == 409) { // aleady opened
                                 load();
+                                return true;
                             }
-                            // TODO 평가 오픈 요청 실패 시 에러 치리
                         });
                 });
             };
@@ -176,20 +192,22 @@ adminEvalSeasonController.controller('adminEvalSeasonDetailCtrl',
                     evalSeasonService.startColleagueEvaluation($scope.evalSeasonId)
                         .then(function(result) {
                             load();
+                            dialogService.success('평가 오픈', '동료 평가를 오픈했습니다.');
                         }, function(result) {
                             if (result.status == 409) { // aleady opened
                                 load();
+                                return true;
                             }
-                            //  TODO 동료 평가 오픈 요청 실패 시 에러 처리
                         });
                 });
             }
         }
     ]);
 
+
 adminEvalSeasonController.controller('multipleMappingFormDialogCtrl',
-    ['$scope', '$modalInstance', 'evalSeasonId', 'mappingInfo', 'userService', 'evalSeasonService',
-        function ($scope, $modalInstance, evalSeasonId, mappingInfo, userService, evalSeasonService) {
+    ['$scope', '$modalInstance', 'evalSeasonId', 'mappingInfo', 'userService', 'evalSeasonService', 'dialogService',
+        function ($scope, $modalInstance, evalSeasonId, mappingInfo, userService, evalSeasonService, dialogService) {
             $scope.errorLines = [];
             $scope.notFoundNames = [];
             $scope.evalSeasonId = evalSeasonId;
@@ -218,11 +236,8 @@ adminEvalSeasonController.controller('multipleMappingFormDialogCtrl',
                             }
                         });
                         if (notFoundNames.length > 0) {
-                            // 에러 메시지 출력
                             $scope.notFoundNames = notFoundNames;
                         } else {
-                            // 서버에 데이터 전송,
-                            // API 추가 필요
                             sendRequestAndHandleResponse(nameToIdMap);
                         }
                     },
@@ -281,13 +296,20 @@ adminEvalSeasonController.controller('multipleMappingFormDialogCtrl',
                     rateeMappings.push(mapping);
                 });
 
-                // 서버에 매핑 수정 요청 전송
                 evalSeasonService.updateMappings($scope.evalSeasonId, {rateeMappings: rateeMappings})
                     .then(function(result) {
                         $modalInstance.close(result);
                     }, function(result) {
-                        // TODO 에러 처리
-                        alert(result.status);
+                        if (result.status == 500 && result.data) {
+                            if (result.data.exceptionType == 'FirstEvalStartedException') {
+                                dialogService.error('에러', '1차 평가가 시작한 피평가자의 1차 평가자를 변경할 수 없습니다.');
+                                return true;
+                            }
+                            if (result.data.exceptionType == 'FirstEvalDoneException') {
+                                dialogService.error('에러', '1차 평가가 완료된 피평가자의 매핑을 변경할 수 없습니다.');
+                                return true;
+                            }
+                        }
                     });
             };
 

@@ -23,10 +23,13 @@
 <script src="/webjars/angularjs/1.2.16/angular-route.js"></script>
 <script src="/webjars/angular-ui-bootstrap/0.12.0/ui-bootstrap.js"></script>
 <script src="/webjars/angular-ui-bootstrap/0.12.0/ui-bootstrap-tpls.js"></script>
+<script src="/js/common/checklist-model.js"></script>
 <script src="/js/common/ng-dialog-module.js"></script>
+<script src="/js/common/ng-http-module.js"></script>
 <script src="/js/admin/ng-admin-service.js"></script>
 <script src="/js/admin/ng-admin-evanseason-app.js"></script>
 <script src="/js/admin/ng-admin-evalseason-controller.js"></script>
+<script src="/js/admin/ng-admin-evalseason-controller-distrule.js"></script>
 
 </body>
 </html>

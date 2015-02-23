@@ -16,12 +16,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 public class UserModelApiTest {
     private MockMvc mockMvc;
-    private UserModelApi api;
     private UserFinder mockUserFinder;
 
     @Before
     public void testCreate() throws Exception {
-        api = new UserModelApi();
+        UserModelApi api = new UserModelApi();
         mockUserFinder = mock(UserFinder.class);
         api.setUserFinder(mockUserFinder);
 

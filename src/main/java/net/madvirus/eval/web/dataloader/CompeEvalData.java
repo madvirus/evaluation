@@ -1,7 +1,7 @@
 package net.madvirus.eval.web.dataloader;
 
-import net.madvirus.eval.api.evalseaon.RateeType;
-import net.madvirus.eval.api.personaleval.CompetencyEvalSet;
+import net.madvirus.eval.domain.evalseason.RateeType;
+import net.madvirus.eval.domain.personaleval.CompetencyEvalSet;
 
 public class CompeEvalData {
     private String evalSeasonId;

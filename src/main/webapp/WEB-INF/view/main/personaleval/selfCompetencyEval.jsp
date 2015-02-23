@@ -1,6 +1,7 @@
 <%@ page contentType="text/html;charset=UTF-8" session="false" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
+<%@ taglib prefix="tf" tagdir="/WEB-INF/tags" %>
 <!DOCTYPE html>
 <html ng-app="mainApp">
 <head>
@@ -16,6 +17,7 @@
     <input type="hidden" ng-init="evalSeasonId = '${compeEvalData.evalSeasonId}'" />
     <input type="hidden" ng-init="hasLeadership = ${compeEvalData.rateeType.hasLeadership()}"/>
     <input type="hidden" ng-init="hasAm = ${compeEvalData.rateeType.hasAm()}"/>
+    <c:set var="evalSetJson"><tf:toJson value="${compeEvalData.evalSet}" /></c:set>
     <input type="hidden" ng-init="evalSet = <c:out value="${evalSetJson}" escapeXml="true"/>" />
     <input type="hidden" ng-init="selfEvalDone = ${compeEvalData.evalSet.done}" >
     <ol class="breadcrumb">
@@ -85,7 +87,9 @@
             <tbody>
             <tr ng-form='itemForm' ng-repeat="itemEval in evalSet.leadershipEvals">
                 <td class="col-md-1">{{competencyItems.leadership[$index].name}}</td>
-                <td class="col-md-4" ng-bind-html="competencyItems.leadership[$index].description | nl2br"></td>
+                <td class="col-md-4">
+                    <small ng-bind-html="competencyItems.leadership[$index].description | nl2br"></small>
+                </td>
                 <td class="col-md-3" ng-class="{'has-error': showError && !itemForm.comment.$valid}">
                     <textarea ng-model="itemEval.comment"
                               ng-readonly="evalDone()"
@@ -111,9 +115,11 @@
             </tr>
             </thead>
             <tbody>
-            <tr ng-form='itemForm' ng-repeat="itemEval in evalSet.leadershipEvals">
+            <tr ng-form='itemForm' ng-repeat="itemEval in evalSet.amEvals">
                 <td class="col-md-1">{{competencyItems.am[$index].name}}</td>
-                <td class="col-md-4" ng-bind-html="competencyItems.am[$index].description | nl2br"></td>
+                <td class="col-md-4">
+                    <small ng-bind-html="competencyItems.am[$index].description | nl2br"></small>
+                </td>
                 <td class="col-md-3" ng-class="{'has-error': showError && !itemForm.comment.$valid}">
                     <textarea ng-model="itemEval.comment"
                               ng-readonly="evalDone()"

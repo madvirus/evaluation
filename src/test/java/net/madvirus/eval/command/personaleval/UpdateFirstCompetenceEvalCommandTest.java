@@ -1,13 +1,21 @@
 package net.madvirus.eval.command.personaleval;
 
 import net.avh4.test.junit.Nested;
-import net.madvirus.eval.api.evalseaon.RateeType;
-import net.madvirus.eval.api.personaleval.*;
-import net.madvirus.eval.api.personaleval.first.*;
+import net.madvirus.eval.api.personaleval.Grade;
+import net.madvirus.eval.api.personaleval.PersonalEvalNotFoundException;
+import net.madvirus.eval.api.personaleval.PersonalEvaluationCreatedEvent;
+import net.madvirus.eval.api.personaleval.SelfEvalNotYetFinishedException;
+import net.madvirus.eval.api.personaleval.first.FirstCompetencyEvaluatedEvent;
+import net.madvirus.eval.api.personaleval.first.SelfCompetencyEvalRejectedEvent;
+import net.madvirus.eval.api.personaleval.first.YouAreNotFirstRaterException;
 import net.madvirus.eval.api.personaleval.self.SelfCompetencyEvaluatedEvent;
 import net.madvirus.eval.axon.AxonUtil;
 import net.madvirus.eval.command.EventCaptureMatcher;
-import net.madvirus.eval.testhelper.CreationHelper;
+import net.madvirus.eval.command.personaleval.common.UpdateRaterCompetencyEvalCommand;
+import net.madvirus.eval.command.personaleval.first.RejectSelfCompetencyEvalCommand;
+import net.madvirus.eval.domain.personaleval.PersonalEval;
+import net.madvirus.eval.testhelper.CommandHelper;
+import net.madvirus.eval.testhelper.EventHelper;
 import org.axonframework.repository.Repository;
 import org.axonframework.test.FixtureConfiguration;
 import org.axonframework.test.Fixtures;
@@ -21,6 +29,11 @@ import static org.junit.Assert.assertThat;
 
 @RunWith(Nested.class)
 public class UpdateFirstCompetenceEvalCommandTest {
+    public static final String FIRST_RATER = "first";
+    public static final String EVAL_SEASON_ID = "EVAL2014";
+    public static final String RATEE_ID = "ratee";
+    public static final String SECOND = "second";
+    public static final String PERSONAL_EVAL_ID = "EVAL2014-ratee";
     protected FixtureConfiguration fixture;
     private Repository<PersonalEval> repository;
 
@@ -43,7 +56,7 @@ public class UpdateFirstCompetenceEvalCommandTest {
         @Test
         public void when_Evaluate_then_Should_Throw_Ex() throws Exception {
             testExecutor
-                    .when(updateFirstCompeEvalCommandWithFirstRater("first"))
+                    .when(updateFirstCompeEvalCommandWithFirstRater(FIRST_RATER))
                     .expectException(PersonalEvalNotFoundException.class);
         }
     }
@@ -53,7 +66,7 @@ public class UpdateFirstCompetenceEvalCommandTest {
 
         @Before
         public void setUp() throws Exception {
-            testExecutor = fixture.given(createEventWithFirstRater("first"));
+            testExecutor = fixture.given(createEventWithFirstRater(FIRST_RATER));
         }
 
         @Test
@@ -66,7 +79,7 @@ public class UpdateFirstCompetenceEvalCommandTest {
         @Test
         public void when_FirstRater_Evaluates_then_Should_Throw_Ex() throws Exception {
             testExecutor
-                    .when(updateFirstCompeEvalCommandWithFirstRater("first"))
+                    .when(updateFirstCompeEvalCommandWithFirstRater(FIRST_RATER))
                     .expectException(SelfEvalNotYetFinishedException.class);
         }
     }
@@ -78,7 +91,7 @@ public class UpdateFirstCompetenceEvalCommandTest {
         @Before
         public void setUp() throws Exception {
             testExecutor = fixture.given(
-                    createEventWithFirstRater("first"),
+                    createEventWithFirstRater(FIRST_RATER),
                     selfCompeEvaluatedEventWithDone());
         }
 
@@ -86,11 +99,11 @@ public class UpdateFirstCompetenceEvalCommandTest {
         public void when_FirstRater_Evaluates_then_Should_Publish_EvaluatedEvent() {
             EventCaptureMatcher capture = new EventCaptureMatcher();
             testExecutor
-                    .when(updateFirstCompeEvalCommandWithFirstRater("first"))
+                    .when(updateFirstCompeEvalCommandWithFirstRater(FIRST_RATER))
                     .expectEventsMatching(capture);
             FirstCompetencyEvaluatedEvent event = (FirstCompetencyEvaluatedEvent) capture.getPayload();
 
-            assertThat(event.getPersonalEvalId(), equalTo("EVAL2014-ratee"));
+            assertThat(event.getPersonalEvalId(), equalTo(PERSONAL_EVAL_ID));
             assertThat(event.getEvalSet().getTotalEval().getGrade(), equalTo(Grade.A));
         }
 
@@ -98,35 +111,33 @@ public class UpdateFirstCompetenceEvalCommandTest {
         public void when_FirstRater_Reject_then_SelfCompeEval_Should_Return_To_Progressing() {
             EventCaptureMatcher capture = new EventCaptureMatcher();
             testExecutor
-                    .when(rejectSelfCompeEvalCommandWithFirstRater("first"))
+                    .when(rejectSelfCompeEvalCommandWithFirstRater(FIRST_RATER))
                     .expectEventsMatching(capture);
 
             SelfCompetencyEvalRejectedEvent event = (SelfCompetencyEvalRejectedEvent) capture.getPayload();
-            assertThat(event.getPersonalEvalId(), equalTo(PersonalEval.createId("EVAL2014", "ratee")));
+            assertThat(event.getPersonalEvalId(), equalTo(PersonalEval.createId(EVAL_SEASON_ID, RATEE_ID)));
 
             AxonUtil.runInUOW(() -> {
-                PersonalEval personalEval = repository.load(PersonalEval.createId("EVAL2014", "ratee"));
+                PersonalEval personalEval = repository.load(PersonalEval.createId(EVAL_SEASON_ID, RATEE_ID));
                 assertThat(personalEval.isSelfCompeEvalDone(), equalTo(false));
             });
         }
 
         private RejectSelfCompetencyEvalCommand rejectSelfCompeEvalCommandWithFirstRater(String first) {
-            return new RejectSelfCompetencyEvalCommand("EVAL2014", "ratee", first);
+            return new RejectSelfCompetencyEvalCommand(EVAL_SEASON_ID, RATEE_ID, first);
         }
     }
 
-    private UpdateFirstCompetencyEvalCommand updateFirstCompeEvalCommandWithFirstRater(String firstRaterId) {
-        return CreationHelper.updateFirstCompeEvalCommand("EVAL2014", "ratee", firstRaterId, false, false, false);
+    private UpdateRaterCompetencyEvalCommand updateFirstCompeEvalCommandWithFirstRater(String firstRaterId) {
+        return CommandHelper.updateFirstCompeEvalCommand(EVAL_SEASON_ID, RATEE_ID, firstRaterId, false, false, false);
     }
 
     private PersonalEvaluationCreatedEvent createEventWithFirstRater(String firstRaterId) {
-        return new PersonalEvaluationCreatedEvent("EVAL2014-ratee", "EVAL2014", "ratee", RateeType.MEMBER, firstRaterId, "second");
+        return EventHelper.personalEvalCreatedEvent(EVAL_SEASON_ID, RATEE_ID, firstRaterId, SECOND);
     }
 
     private SelfCompetencyEvaluatedEvent selfCompeEvaluatedEventWithDone() {
-        return new SelfCompetencyEvaluatedEvent(
-                "EVAL2014-ratee",new CompetencyEvalSet(null, null, null, null, true)
-        );
+        return EventHelper.selfCompeEvaluatedEvent(EVAL_SEASON_ID, RATEE_ID, true);
     }
 
 

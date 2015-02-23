@@ -1,7 +1,6 @@
 package net.madvirus.eval.command.evalseason;
 
 import net.madvirus.eval.api.DuplicateIdException;
-import net.madvirus.eval.api.evalseaon.CreateEvalSeasonCommand;
 import net.madvirus.eval.api.evalseaon.EvalSeasonCreatedEvent;
 import net.madvirus.eval.command.EventCaptureMatcher;
 import org.junit.Test;

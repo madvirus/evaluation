@@ -1,35 +1,44 @@
 package net.madvirus.eval.web.dataloader;
 
+import net.madvirus.eval.api.evalseaon.EvalSeasonNotFoundException;
 import net.madvirus.eval.api.evalseaon.RateeNotFoundException;
-import net.madvirus.eval.api.evalseaon.RateeType;
-import net.madvirus.eval.api.personaleval.*;
+import net.madvirus.eval.api.personaleval.PersonalEvalNotFoundException;
+import net.madvirus.eval.api.personaleval.YouAreNotRateeException;
 import net.madvirus.eval.api.personaleval.colleague.YouAreNotColleagueRaterException;
 import net.madvirus.eval.api.personaleval.first.YouAreNotFirstRaterException;
+import net.madvirus.eval.api.personaleval.second.YouAreNotSecondRaterException;
+import net.madvirus.eval.domain.evalseason.EvalSeason;
+import net.madvirus.eval.domain.evalseason.RateeType;
+import net.madvirus.eval.domain.personaleval.CompetencyEvalSet;
+import net.madvirus.eval.domain.personaleval.PersonalEval;
 import net.madvirus.eval.query.evalseason.EvalSeasonMappingModel;
+import net.madvirus.eval.query.evalseason.EvalSeasonMappingModelRepository;
 import net.madvirus.eval.query.user.UserModel;
 import net.madvirus.eval.query.user.UserModelRepository;
 import org.axonframework.repository.AggregateNotFoundException;
 import org.axonframework.repository.Repository;
+import scala.Option;
 
 import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
-import static net.madvirus.eval.api.personaleval.PersonalEval.createId;
 import static net.madvirus.eval.axon.AxonUtil.runInUOW;
+import static net.madvirus.eval.domain.personaleval.PersonalEval.createId;
 
 public class PersonalEvalDataLoaderImpl implements PersonalEvalDataLoader {
 
-    private EvalSeasonDataLoader evalSeasonDataLoader;
     private Repository<PersonalEval> personalEvalRepository;
+    private Repository<EvalSeason> evalSeasonRepository;
     private UserModelRepository userModelRepository;
+    private EvalSeasonMappingModelRepository evalSeasonMappingModelRepository;
 
     public PersonalEvalDataLoaderImpl(Repository<PersonalEval> personalEvalRepository,
-                                      EvalSeasonDataLoader evalSeasonDataLoader,
-                                      UserModelRepository userModelRepository) {
+                                      Repository<EvalSeason> evalSeasonRepository,
+                                      UserModelRepository userModelRepository,
+                                      EvalSeasonMappingModelRepository evalSeasonMappingModelRepository) {
         this.personalEvalRepository = personalEvalRepository;
-        this.evalSeasonDataLoader = evalSeasonDataLoader;
+        this.evalSeasonRepository = evalSeasonRepository;
         this.userModelRepository = userModelRepository;
+        this.evalSeasonMappingModelRepository = evalSeasonMappingModelRepository;
     }
 
     @Override
@@ -42,6 +51,20 @@ public class PersonalEvalDataLoaderImpl implements PersonalEvalDataLoader {
                 return new PersonalEvalData(personalEval, ratee);
             } catch (AggregateNotFoundException e) {
                 throw new PersonalEvalNotFoundException();
+            }
+        });
+    }
+
+    @Override
+    public PersonalEvalState getPersonalEvalStateOf(String evalSeasonId, String rateeId) {
+        return runInUOW(() -> {
+            checkEvalSeasonExistsAndUserIsRatee(evalSeasonId, rateeId);
+            UserModel ratee = userModelRepository.findOne(rateeId);
+            try {
+                PersonalEval personalEval = personalEvalRepository.load(createId(evalSeasonId, rateeId));
+                return new PersonalEvalData(personalEval, ratee);
+            } catch (AggregateNotFoundException e) {
+                return PersonalEvalStateBuilder.notStarted(ratee);
             }
         });
     }
@@ -66,35 +89,21 @@ public class PersonalEvalDataLoaderImpl implements PersonalEvalDataLoader {
     }
 
     @Override
-    public PersonalEvalState getPersonalEvalStateOf(String evalSeasonId, String rateeId) {
-        return runInUOW(() -> {
-            checkEvalSeasonExistsAndUserIsRatee(evalSeasonId, rateeId);
-            try {
-                PersonalEval personalEval = personalEvalRepository.load(createId(evalSeasonId, rateeId));
-                UserModel ratee = userModelRepository.findOne(personalEval.getUserId());
-                return new PersonalEvalData(personalEval, ratee);
-            } catch (AggregateNotFoundException e) {
-                return PersonalEvalStateBuilder.notStarted();
-            }
-        });
-    }
-
-    @Override
     public SelfPerfEvalData getSelfPerfEvalDataForSelfEvalForm(String evalSeasonId, String rateeId) {
         return runInUOW(() -> {
             checkEvalSeasonExistsAndUserIsRatee(evalSeasonId, rateeId);
 
             String personalEvalId = createId(evalSeasonId, rateeId);
             try {
-                PersonalEval personalEval = personalEvalRepository.load(personalEvalId);
+                PersonalEvalData personalEval = getPersonalEval(evalSeasonId, rateeId);
                 return new SelfPerfEvalData(
                         evalSeasonId,
                         personalEval.getId(),
-                        personalEval.getUserId(),
-                        personalEval.getPerfItemAndSelfEvals(),
+                        personalEval.getRatee().getId(),
+                        personalEval.getPerfItemAndAllEvals(),
                         personalEval.isSelfPerfEvalDone()
                 );
-            } catch (AggregateNotFoundException e) {
+            } catch (PersonalEvalNotFoundException e) {
                 return new SelfPerfEvalData(
                         evalSeasonId,
                         personalEvalId,
@@ -121,7 +130,8 @@ public class PersonalEvalDataLoaderImpl implements PersonalEvalDataLoader {
                         selfCompeEvalSet.orElse(CompetencyEvalSetUtil.createEmptyEvalSet(personalEval.getRateeType()))
                 );
             } catch (AggregateNotFoundException e) {
-                RateeType rateeType = evalSeasonDataLoader.load(evalSeasonId).getMappingModel().getRateeMappingOf(rateeId).get().getType();
+                RateeType rateeType = evalSeasonMappingModelRepository.findById(evalSeasonId)
+                        .get().getRateeMappingOf(rateeId).get().getType();
                 return new CompeEvalData(
                         evalSeasonId,
                         personalEvalId,
@@ -134,10 +144,18 @@ public class PersonalEvalDataLoaderImpl implements PersonalEvalDataLoader {
     }
 
     private void checkEvalSeasonExistsAndUserIsRatee(String evalSeasonId, String userId) {
-        EvalSeasonData evalSeasonDataOpt = evalSeasonDataLoader.load(evalSeasonId);
-        if (!evalSeasonDataOpt.getMappingModel().containsRatee(userId)) {
-            throw new YouAreNotRateeException();
+        EvalSeasonMappingModel mappingModel = getMappingModelOrThrowExIfNotFound(evalSeasonId);
+        if (!mappingModel.containsRatee(userId)) {
+            throw new YouAreNotRateeException(String.format("%s user is not ratee in %s evalseason", userId, evalSeasonId));
         }
+    }
+
+    private EvalSeasonMappingModel getMappingModelOrThrowExIfNotFound(String evalSeasonId) {
+        Option<EvalSeasonMappingModel> mappingModelOpt = evalSeasonMappingModelRepository.findById(evalSeasonId);
+        if (mappingModelOpt.isEmpty()) {
+            throw new EvalSeasonNotFoundException();
+        }
+        return mappingModelOpt.get();
     }
 
     @Override
@@ -162,10 +180,9 @@ public class PersonalEvalDataLoaderImpl implements PersonalEvalDataLoader {
     }
 
     private void checkEvalSeasonAndMatchRateeColleagueRater(String evalSeasonId, String rateeId, String colleagueRaterId) {
-        EvalSeasonData evalSeasonDataOpt = evalSeasonDataLoader.load(evalSeasonId);
-        EvalSeasonMappingModel mappingModel = evalSeasonDataOpt.getMappingModel();
+        EvalSeasonMappingModel mappingModel = getMappingModelOrThrowExIfNotFound(evalSeasonId);
         if (!mappingModel.containsRatee(rateeId)) {
-            throw new RateeNotFoundException();
+            throw new RateeNotFoundException(rateeId);
         }
         // TODO 동료 평가자 검사하는 코드 한 곳으로 몰 필요
         if (!mappingModel.getRateeMappingOf(rateeId).get().containsColleagueRater(colleagueRaterId)) {
@@ -176,11 +193,19 @@ public class PersonalEvalDataLoaderImpl implements PersonalEvalDataLoader {
     @Override
     public FirstTotalEvalData getFirstTotalEvalData(String evalSeasonId, String firstRaterId) {
         return runInUOW(() -> {
-            EvalSeasonData evalSeasonDataOpt = evalSeasonDataLoader.load(evalSeasonId);
-            if (!evalSeasonDataOpt.getMappingModel().containsFirstRater(firstRaterId)) {
+            EvalSeasonMappingModel mappingModel = getMappingModelOrThrowExIfNotFound(evalSeasonId);
+            if (!mappingModel.containsFirstRater(firstRaterId)) {
                 throw new YouAreNotFirstRaterException();
             }
-            Set<UserModel> users = evalSeasonDataOpt.getMappingModel().getRateesOfFirstRater(firstRaterId);
+            UserModel firstRater = userModelRepository.findOne(firstRaterId);
+            EvalSeason evalSeason = evalSeasonRepository.load(evalSeasonId);
+            FirstRaterRuleData firstRaterRuleData = evalSeason.populateRuleData(firstRaterId,
+                    (ruleList) -> new FirstRaterRuleData(
+                            firstRater,
+                            mappingModel.getRateesOfFirstRater(firstRaterId),
+                            ruleList));
+
+            Set<UserModel> users = mappingModel.getRateesOfFirstRater(firstRaterId);
             List<FirstTotalEvalSummary> evalSummaryList = new ArrayList<>();
             for (UserModel user : users) {
                 evalSummaryList.add(
@@ -188,16 +213,28 @@ public class PersonalEvalDataLoaderImpl implements PersonalEvalDataLoader {
                                 user,
                                 personalEvalRepository.load(PersonalEval.createId(evalSeasonId, user.getId()))));
             }
-            return new FirstTotalEvalData(evalSummaryList);
+            return new FirstTotalEvalData(firstRaterRuleData, evalSummaryList);
         });
     }
 
-    private boolean checkEvalSeasonExistsAndUserIsFirstRater(String evalSeasonId, String userId) {
-        EvalSeasonData evalSeasonDataOpt = evalSeasonDataLoader.load(evalSeasonId);
-        if (!evalSeasonDataOpt.getMappingModel().containsFirstRater(userId)) {
-            throw new YouAreNotFirstRaterException();
-        }
-        return false;
+    @Override
+    public SecondTotalEvalData getSecondTotalEvalData(String evalSeasonId, String secondRaterId) {
+        return runInUOW(() -> {
+            EvalSeasonMappingModel mappingModel = getMappingModelOrThrowExIfNotFound(evalSeasonId);
+            if (!mappingModel.containsSecondRater(secondRaterId)) {
+                throw new YouAreNotSecondRaterException();
+            }
+            Set<UserModel> users = mappingModel.getRateesOfSecondRater(secondRaterId);
+
+            List<SecondTotalEvalSummary> evalSummaryList = new ArrayList<>();
+            for (UserModel user : users) {
+                evalSummaryList.add(
+                        new SecondTotalEvalSummary(
+                                user,
+                                personalEvalRepository.load(PersonalEval.createId(evalSeasonId, user.getId()))));
+            }
+            return new SecondTotalEvalData(evalSummaryList);
+        });
     }
 
 }

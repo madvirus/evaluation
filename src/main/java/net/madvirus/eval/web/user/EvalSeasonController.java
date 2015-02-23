@@ -39,22 +39,26 @@ public class EvalSeasonController {
         }
         if (evalSeasonMappingModel.containsFirstRater(currentUser.getId())) {
             evalUserRole.addFirstRaterRole();
-            populateFirstRatersRateePersonalEvalState(evalSeasonId, evalSeasonMappingModel.getRateesOfFirstRater(currentUser.getId()), model);
+            populateFirstRatersRateePersonalEvalState(
+                    evalSeasonId,
+                    evalSeasonMappingModel.getRateesOfFirstRater(currentUser.getId()),
+                    model);
         }
-        if (evalSeasonMappingModel.containsSecondRater(currentUser.getId())) {
-            // 2차 평가자에 알맞은 모델을 추가
-            // 피평가자들의 평가 상태 목록 구함
-            evalUserRole.addSecondRaterRole();
-        }
-
         if (evalSeasonData.isColleagueEvalutionStarted() && evalSeasonMappingModel.containsColleaguRater(currentUser.getId())) {
             evalUserRole.addColleagueRaterRole();
             populateColleagueEvalState(
                     evalSeasonData.getId(), currentUser,
                     evalSeasonMappingModel.getRateesOfColleague(currentUser.getId()),
                     model);
-
         }
+        if (evalSeasonMappingModel.containsSecondRater(currentUser.getId())) {
+            evalUserRole.addSecondRaterRole();
+            populateSecondRaterRateePersonalEvalState(
+                    evalSeasonId,
+                    evalSeasonMappingModel.getRateesOfSecondRater(currentUser.getId()),
+                    model);
+        }
+
         model.addAttribute("evalUserRole", evalUserRole);
         return "main/evalseason/evalseasonMain";
     }
@@ -74,13 +78,19 @@ public class EvalSeasonController {
     }
 
     private void populateFirstRatersRateePersonalEvalState(String evalSeasonId, Set<UserModel> rateesOfFirstRater, Model model) {
-        List<UserEvalState> userEvalStates = rateesOfFirstRater.stream()
-                .map(userModel -> {
-                    PersonalEvalState evalState = personalEvalDataLoader.getPersonalEvalStateOf(evalSeasonId, userModel.getId());
-                    return new UserEvalState(userModel, evalState);
-                })
+        populateRateeEvalState(evalSeasonId, rateesOfFirstRater, model, "firstRateeEvalStates");
+    }
+
+    private void populateSecondRaterRateePersonalEvalState(String evalSeasonId, Set<UserModel> rateesOfSecondRater, Model model) {
+        populateRateeEvalState(evalSeasonId, rateesOfSecondRater, model, "secondRateeEvalStates");
+    }
+
+    private List<PersonalEvalState> populateRateeEvalState(String evalSeasonId, Set<UserModel> rateesOfFirstRater, Model model, String modelName) {
+        List<PersonalEvalState> rateeEvalStates = rateesOfFirstRater.stream()
+                .map(userModel -> personalEvalDataLoader.getPersonalEvalStateOf(evalSeasonId, userModel.getId()))
                 .collect(Collectors.toList());
-        model.addAttribute("firstRateeEvalStates", userEvalStates);
+        model.addAttribute(modelName, rateeEvalStates);
+        return rateeEvalStates;
     }
 
     @Autowired

@@ -1,6 +1,6 @@
 package net.madvirus.eval.api.personaleval.colleague;
 
-import net.madvirus.eval.api.personaleval.CompetencyEvalSet;
+import net.madvirus.eval.domain.personaleval.CompetencyEvalSet;
 
 public class ColleagueCompetencyEvaluatedEvent {
     private String personalEvalId;

@@ -1,6 +1,6 @@
 package net.madvirus.eval.api.personaleval.self;
 
-import net.madvirus.eval.api.personaleval.PerformanceItemAndSelfEval;
+import net.madvirus.eval.domain.personaleval.PerformanceItemAndSelfEval;
 
 import java.util.List;
 

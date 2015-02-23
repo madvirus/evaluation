@@ -1,6 +1,6 @@
 package net.madvirus.eval.web;
 
-import net.madvirus.eval.web.restapi.ExceptionHandlerAdvice;
+import net.madvirus.eval.web.errorhandler.ApiExceptionHandlerAdvice;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -19,8 +19,8 @@ public abstract class MockMvcUtil {
                     HandlerMethod handlerMethod, Exception exception) {
                 // 익셉션을 ExceptionHandlerAdvice가 처리하도록 설정
                 Method method = new ExceptionHandlerMethodResolver(
-                        ExceptionHandlerAdvice.class).resolveMethod(exception);
-                return new ServletInvocableHandlerMethod(new ExceptionHandlerAdvice(), method);
+                        ApiExceptionHandlerAdvice.class).resolveMethod(exception);
+                return new ServletInvocableHandlerMethod(new ApiExceptionHandlerAdvice(), method);
             }
         };
         exceptionResolver.getMessageConverters().add(new MappingJackson2HttpMessageConverter());

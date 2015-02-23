@@ -23,7 +23,7 @@ selfPerfEvalApp.controller('selfCompeEvalCtrl',
                     command.evalSet.leadershipEvals = $scope.evalSet.leadershipEvals
                 }
                 if ($scope.hasAm) {
-                    command.evalSet.amEvals = $scope.evalData.amEvals;
+                    command.evalSet.amEvals = $scope.evalSet.amEvals;
                 }
                 return command;
             };

@@ -20,8 +20,14 @@
     <tr ng-repeat="evalSeason in evalSeasons">
         <td><a href="#/{{evalSeason.id}}">{{evalSeason.id}}</a></td>
         <td>{{evalSeason.name}}</td>
-        <td>{{evalSeason.opened ? '평가 시작함' : '평가 시작 전'}}</td>
-        <td>{{evalSeason.colleagueEvalutionStarted ? '평가 시작함' : '시작 전'}}</td>
+        <td>
+            <span ng-show="evalSeason.opened" class="label label-success">평가 시작함</span>
+            <span ng-show="!evalSeason.opened" class="label label-default">평가 시작 전</span>
+        </td>
+        <td>
+            <span ng-show="evalSeason.colleagueEvalutionStarted" class="label label-success">동료 평가 시작함</span>
+            <span ng-show="!evalSeason.colleagueEvalutionStarted" class="label label-default">동료 평가 시작 전</span>
+        </td>
     </tr>
     </tbody>
 </table>

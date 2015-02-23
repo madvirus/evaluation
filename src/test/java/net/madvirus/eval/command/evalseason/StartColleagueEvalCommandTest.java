@@ -1,6 +1,9 @@
 package net.madvirus.eval.command.evalseason;
 
-import net.madvirus.eval.api.evalseaon.*;
+import net.madvirus.eval.api.evalseaon.ColleagueEvalStartedEvent;
+import net.madvirus.eval.api.evalseaon.EvalSeasonCreatedEvent;
+import net.madvirus.eval.api.evalseaon.EvalSeasonNotYetOpenedException;
+import net.madvirus.eval.api.evalseaon.EvaluationOpenedEvent;
 import net.madvirus.eval.command.EventCaptureMatcher;
 import org.junit.Test;
 

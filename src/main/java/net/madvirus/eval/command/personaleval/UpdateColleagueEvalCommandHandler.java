@@ -1,17 +1,17 @@
 package net.madvirus.eval.command.personaleval;
 
-import net.madvirus.eval.api.evalseaon.EvalSeason;
 import net.madvirus.eval.api.evalseaon.EvalSeasonNotFoundException;
 import net.madvirus.eval.api.evalseaon.RateeNotFoundException;
-import net.madvirus.eval.api.personaleval.PersonalEval;
 import net.madvirus.eval.api.personaleval.PersonalEvalNotFoundException;
-import net.madvirus.eval.api.personaleval.colleague.UpdateColleagueCompetencyEvalCommand;
 import net.madvirus.eval.api.personaleval.colleague.YouAreNotColleagueRaterException;
+import net.madvirus.eval.command.personaleval.colleague.UpdateColleagueCompetencyEvalCommand;
+import net.madvirus.eval.domain.evalseason.EvalSeason;
+import net.madvirus.eval.domain.personaleval.PersonalEval;
 import org.axonframework.commandhandling.annotation.CommandHandler;
 import org.axonframework.repository.AggregateNotFoundException;
 import org.axonframework.repository.Repository;
 
-import static net.madvirus.eval.api.personaleval.PersonalEval.createId;
+import static net.madvirus.eval.domain.personaleval.PersonalEval.createId;
 
 public class UpdateColleagueEvalCommandHandler {
     private Repository<PersonalEval> personalEvalRepository;
@@ -32,7 +32,7 @@ public class UpdateColleagueEvalCommandHandler {
         }
 
         if (!evalSeason.containsRatee(command.getRateeId())) {
-            throw new RateeNotFoundException();
+            throw new RateeNotFoundException(command.getRateeId());
         }
 
         // TODO 동료 평가자 여부 검사하는 코드를 PersonalEval로 넣기!

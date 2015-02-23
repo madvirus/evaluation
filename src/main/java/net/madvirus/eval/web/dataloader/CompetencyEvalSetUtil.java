@@ -1,9 +1,9 @@
 package net.madvirus.eval.web.dataloader;
 
-import net.madvirus.eval.api.evalseaon.RateeType;
-import net.madvirus.eval.api.personaleval.CompetencyEvalSet;
 import net.madvirus.eval.api.personaleval.Grade;
-import net.madvirus.eval.api.personaleval.ItemEval;
+import net.madvirus.eval.domain.evalseason.RateeType;
+import net.madvirus.eval.domain.personaleval.CompetencyEvalSet;
+import net.madvirus.eval.domain.personaleval.ItemEval;
 
 import java.util.List;
 import java.util.stream.Collectors;

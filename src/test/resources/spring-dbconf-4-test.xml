@@ -3,11 +3,15 @@
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
-    <bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
-        <property name="driverClassName" value="com.mysql.jdbc.Driver"/>
-        <property name="url" value="jdbc:mysql://localhost/compeval4test?characterEncoding=utf8"/>
-        <property name="username" value="evaluser"/>
+    <bean id="dataSource" class="org.apache.tomcat.jdbc.pool.DataSource" destroy-method="close">
+        <property name="driverClassName" value="com.mysql.jdbc.Driver" />
+        <property name="url" value="jdbc:mysql://localhost/compeval4test?characterEncoding=utf8" />
+        <property name="username" value="evaluser" />
         <property name="password" value="evalpass!!" />
+        <property name="initialSize" value="3" />
+        <property name="maxActive" value="5" />
+        <property name="maxIdle" value="2" />
+        <property name="minIdle" value="2" />
     </bean>
 
 </beans>

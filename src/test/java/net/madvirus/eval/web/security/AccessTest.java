@@ -1,7 +1,7 @@
 package net.madvirus.eval.web.security;
 
 import net.madvirus.eval.testhelper.AbstractIntTest;
-import net.madvirus.eval.testhelper.CreationHelper;
+import net.madvirus.eval.testhelper.AuthCookieHelper;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,19 +41,19 @@ public class AccessTest extends AbstractIntTest {
 
     @Test
     public void authUser_Access_Main_shouldAccessMain() throws Exception {
-        mockMvc.perform(get("/main").cookie(CreationHelper.authCookie("ratee11")))
+        mockMvc.perform(get("/main").cookie(AuthCookieHelper.authCookie("ratee11")))
                 .andExpect(status().isOk());
     }
 
     @Test
     public void notGrantedUser_Access_Admin_shouldResponseForbidden() throws Exception {
-        mockMvc.perform(get("/admin").cookie(CreationHelper.authCookie("ratee11")))
+        mockMvc.perform(get("/admin").cookie(AuthCookieHelper.authCookie("ratee11")))
                 .andExpect(status().isForbidden());
     }
 
     @Test
     public void userWithSystemAdminRole_Access_Admin_shouldAccess() throws Exception {
-        mockMvc.perform(get("/admin").cookie(CreationHelper.authCookie("systemadmin")))
+        mockMvc.perform(get("/admin").cookie(AuthCookieHelper.authCookie("systemadmin")))
                 .andExpect(status().isOk());
     }
 

@@ -2,11 +2,16 @@ package net.madvirus.eval.springconfig;
 
 import net.madvirus.eval.query.user.UserModel;
 import net.madvirus.eval.query.user.UserModelRepository;
+import net.madvirus.eval.system.security.Authority;
+import net.madvirus.eval.system.security.AuthorityDao;
+import net.madvirus.eval.system.security.AuthorityDaoImpl;
 import net.madvirus.eval.system.security.UserDirectoryAuthenticationProvider;
 import net.madvirus.eval.system.userdirectory.UserDirectoryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
+import org.springframework.http.HttpMethod;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -38,7 +43,10 @@ import java.util.stream.Collectors;
 
 @Configuration
 @EnableWebMvcSecurity
-public class SecurityConfig extends WebSecurityConfigurerAdapter {
+public class SecurityConfig {
+
+    @Autowired
+    private SecuritySetting securitySetting;
 
     @Bean
     public UserDirectoryAuthenticationProvider userDirectoryAuthenticationProvider(UserDirectoryRepository userDirRepo) {
@@ -46,9 +54,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         provider.setUserDirectoryRepository(userDirRepo);
         return provider;
     }
-
-    @Autowired
-    private SecuritySetting securitySetting;
 
     public static final String AUTHCOOKIENAME = "SEAT";
 
@@ -69,47 +74,95 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         return new CookieValueEncryptor(securitySetting.getAuthcookieKey(), securitySetting.getAuthcookieSalt());
     }
 
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
+
+    @Autowired
+    private UserModelRepository userModelRepository;
+
+    @Bean
+    public AuthorityDao authorityDao() {
+        return new AuthorityDaoImpl(jdbcTemplate);
+    }
+
     @Bean
     public SecurityContextRepository customContextRepository() {
-        return new CustomSecurityContextRepository(cookieValueEncryptor());
+        return new CustomSecurityContextRepository(authorityDao(), userModelRepository, cookieValueEncryptor());
     }
 
-    @Bean
-    public CustomAuthSuccessHandler customAuthSuccessHandler() {
-        return new CustomAuthSuccessHandler(cookieValueEncryptor());
+    @Configuration
+    @Order(1)
+    public static class ApiWebSecurity extends WebSecurityConfigurerAdapter {
+        @Autowired
+        private SecurityContextRepository customContextRepository;
+
+        @Override
+        protected void configure(HttpSecurity http) throws Exception {
+            http.csrf().disable();
+
+            http.requestCache()
+                    .requestCache(new NullRequestCache());
+
+            http.securityContext()
+                    .securityContextRepository(customContextRepository);
+
+            http
+                    .antMatcher("/api/**")
+                    .authorizeRequests()
+                    .antMatchers(HttpMethod.POST, "/api/evalseasons").hasRole("HRADMIN")
+                    .antMatchers(HttpMethod.PUT, "/api/evalseasons/*").hasRole("HRADMIN")
+                    .antMatchers(HttpMethod.PUT, "/api/evalseasons/*/mappings").hasRole("HRADMIN")
+                    .antMatchers(HttpMethod.DELETE, "/api/evalseasons/*/mappings").hasRole("HRADMIN")
+                    .antMatchers("/api/**").authenticated();
+        }
     }
 
-    @Override
-    protected void configure(HttpSecurity http) throws Exception {
-        http.csrf().disable();
+    @Configuration
+    public static class FormLoginWebSecurity extends WebSecurityConfigurerAdapter {
+        @Autowired
+        private CookieValueEncryptor cookieValueEncryptor;
 
-        http.requestCache()
-                .requestCache(new NullRequestCache());
+        @Autowired
+        private SecurityContextRepository customContextRepository;
 
-        http.securityContext()
-                .securityContextRepository(customContextRepository());
+        @Bean
+        public CustomAuthSuccessHandler customAuthSuccessHandler() {
+            return new CustomAuthSuccessHandler(cookieValueEncryptor);
+        }
 
-        http.formLogin()
-                .successHandler(customAuthSuccessHandler())
-                .loginPage("/loginForm")
-                .loginProcessingUrl("/login")
-                .failureUrl("/loginForm?error");
+        @Override
+        protected void configure(HttpSecurity http) throws Exception {
+            http.csrf().disable();
 
-        http.logout()
-                .logoutUrl("/logout")
-                .deleteCookies("SEAT")
-                .logoutSuccessUrl("/loggedOut");
+            http.requestCache()
+                    .requestCache(new NullRequestCache());
 
-        http.authorizeRequests()
-                .antMatchers("/user/**").permitAll()
-                .antMatchers("/webjars/**").permitAll()
-                .antMatchers("/js/**").permitAll()
-                .antMatchers("/loggedOut").permitAll()
-                .antMatchers("/loginForm").permitAll()
-                .antMatchers("/admin").hasAnyRole("SYSTEMADMIN", "HRADMIN")
-                .antMatchers("/admin/system").hasAnyRole("SYSTEMADMIN")
-                .antMatchers("/admin/evalseasons").hasAnyRole("HRADMIN")
-                .anyRequest().authenticated();
+            http.securityContext()
+                    .securityContextRepository(customContextRepository);
+
+            http.formLogin()
+                    .successHandler(customAuthSuccessHandler())
+                    .loginPage("/loginForm")
+                    .loginProcessingUrl("/login")
+                    .failureUrl("/loginForm?error");
+
+            http.logout()
+                    .logoutUrl("/logout")
+                    .deleteCookies("SEAT")
+                    .logoutSuccessUrl("/loggedOut");
+
+            http.authorizeRequests()
+                    .antMatchers("/error/**").permitAll()
+                    .antMatchers("/webjars/**").permitAll()
+                    .antMatchers("/js/**").permitAll()
+                    .antMatchers("/loggedOut").permitAll()
+                    .antMatchers("/loginForm").permitAll()
+                    .antMatchers("/admin").hasAnyRole("SYSTEMADMIN", "HRADMIN")
+                    .antMatchers("/admin/system").hasAnyRole("SYSTEMADMIN")
+                    .antMatchers("/admin/evalseasons").hasAnyRole("HRADMIN")
+                    .anyRequest().authenticated();
+        }
+
     }
 
     public static class CookieValueEncryptor {
@@ -160,22 +213,14 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     public static class CustomSecurityContextRepository implements SecurityContextRepository {
 
-        private JdbcTemplate jdbcTemplate;
+        private AuthorityDao authorityDao;
         private UserModelRepository userModelRepository;
         private CookieValueEncryptor cookieValueEncryptor;
 
-        public CustomSecurityContextRepository(CookieValueEncryptor cookieValueEncryptor) {
-            this.cookieValueEncryptor = cookieValueEncryptor;
-        }
-
-        @Autowired
-        public void setJdbcTemplate(JdbcTemplate jdbcTemplate) {
-            this.jdbcTemplate = jdbcTemplate;
-        }
-
-        @Autowired
-        public void setUserModelRepository(UserModelRepository userModelRepository) {
+        public CustomSecurityContextRepository(AuthorityDao authorityDao, UserModelRepository userModelRepository, CookieValueEncryptor cookieValueEncryptor) {
+            this.authorityDao = authorityDao;
             this.userModelRepository = userModelRepository;
+            this.cookieValueEncryptor = cookieValueEncryptor;
         }
 
         @Override
@@ -194,11 +239,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         private void populateAuthentication(SecurityContext sc, String id) {
             UserModel userModel = userModelRepository.findOne(id);
             if (userModel != null) {
-                List<String> authorities = jdbcTemplate.queryForList("select role from Authority where user_id = ?", String.class, id);
+                List<Authority> authorityList = authorityDao.selectByUserId(id);
                 List<SimpleGrantedAuthority> grantedAuthorities =
-                        authorities
+                        authorityList
                                 .stream()
-                                .map(authority -> new SimpleGrantedAuthority(authority))
+                                .map(authority -> new SimpleGrantedAuthority(authority.getRole()))
                                 .collect(Collectors.toList());
 
                 UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(userModel, "", grantedAuthorities);
@@ -209,7 +254,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         private String getUserId(Cookie cookie) {
             try {
                 return cookieValueEncryptor.decrypt(URLDecoder.decode(cookie.getValue(), "UTF-8"));
-            } catch(Exception ex) {
+            } catch (Exception ex) {
                 return null;
             }
         }

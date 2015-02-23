@@ -1,6 +1,6 @@
 package net.madvirus.eval.api.personaleval.first;
 
-import net.madvirus.eval.api.personaleval.CompetencyEvalSet;
+import net.madvirus.eval.domain.personaleval.CompetencyEvalSet;
 
 public class FirstCompetencyEvaluatedEvent {
     private String personalEvalId;

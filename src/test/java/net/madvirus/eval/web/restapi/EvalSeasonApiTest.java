@@ -1,7 +1,12 @@
 package net.madvirus.eval.web.restapi;
 
 import net.madvirus.eval.api.DuplicateIdException;
-import net.madvirus.eval.api.evalseaon.*;
+import net.madvirus.eval.api.evalseaon.AlreadyEvaluationOpenedException;
+import net.madvirus.eval.api.evalseaon.ColleagueEvalAlreadyStartedException;
+import net.madvirus.eval.api.evalseaon.EvalSeasonNotFoundException;
+import net.madvirus.eval.api.evalseaon.EvalSeasonNotYetOpenedException;
+import net.madvirus.eval.domain.evalseason.EvalSeason;
+import net.madvirus.eval.domain.evalseason.RateeType;
 import net.madvirus.eval.query.evalseason.EvalSeasonMappingModel;
 import net.madvirus.eval.query.evalseason.RateeMappingModel;
 import net.madvirus.eval.query.user.UserModel;
@@ -49,8 +54,8 @@ public class EvalSeasonApiTest {
     public void getEvalseasons_Should_Response_JsonFormattedList() throws Exception {
         when(mockEvalSeaonModelDataLoader.loadAll()).thenReturn(
                 Arrays.asList(
-                        dto("ID1", "이름1", false),
-                        dto("ID2", "이름2", false)
+                        dto("ID1", "이름1"),
+                        dto("ID2", "이름2")
                 )
         );
 
@@ -62,8 +67,8 @@ public class EvalSeasonApiTest {
         ;
     }
 
-    private EvalSeasonSimpleData dto(String id, String name, boolean opened) {
-        return new EvalSeasonSimpleData(evalSeason(id, name, opened));
+    private EvalSeasonSimpleData dto(String id, String name) {
+        return new EvalSeasonSimpleData(evalSeason(id, name, false));
     }
 
     private EvalSeason evalSeason(String id, String name, boolean opened) {

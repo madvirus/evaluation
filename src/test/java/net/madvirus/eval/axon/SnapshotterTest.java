@@ -1,9 +1,9 @@
 package net.madvirus.eval.axon;
 
 import net.madvirus.eval.api.RateeMapping;
-import net.madvirus.eval.api.evalseaon.EvalSeason;
-import net.madvirus.eval.api.evalseaon.RateeType;
-import net.madvirus.eval.api.evalseaon.UpdateMappingCommand;
+import net.madvirus.eval.command.evalseason.UpdateMappingCommand;
+import net.madvirus.eval.domain.evalseason.EvalSeason;
+import net.madvirus.eval.domain.evalseason.RateeType;
 import net.madvirus.eval.springconfig.Constants;
 import net.madvirus.eval.testhelper.AbstractRunReplayTest;
 import org.axonframework.commandhandling.gateway.CommandGateway;

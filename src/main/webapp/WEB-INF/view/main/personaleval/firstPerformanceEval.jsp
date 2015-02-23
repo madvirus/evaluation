@@ -12,13 +12,13 @@
 <body>
 
 <jsp:include page="/WEB-INF/view/main/common/navi.jsp"/>
-
-<div class="container" ng-controller="firstPerfEvalCtrl" ng-cloak
-     ng-init="init(${personalEval.perfItemAndAllEvals.size()})">
+<div class="container" ng-controller="firstPerfEvalCtrl" ng-cloak>
     <input type="hidden" ng-model="evalSeasonId" ng-initial value="${personalEval.evalSeasonId}"/>
     <input type="hidden" ng-model="rateeId" ng-initial value="${personalEval.ratee.id}"/>
     <input type="hidden" ng-init="selfEvalDone = ${personalEval.selfPerfEvalDone}" />
     <input type="hidden" ng-init="firstTotalEvalDone = ${personalEval.firstTotalEvalDone}" />
+    <c:set var="evalDataJson"><tf:toJson value="${evalData}" /></c:set>
+    <input type="hidden" ng-init="evalData = <c:out value="${evalDataJson}"/>" />
     <ol class="breadcrumb">
         <li><a href="/main">홈</a></li>
         <li><a href="/main/evalseasons/${personalEval.evalSeasonId}">평가 메인</a></li>
@@ -40,7 +40,7 @@
         평가 대상가자 아직 본인 성과 평가를 완료하지 않았습니다.
     </div>
 
-    <div class="alert alert-warning" role="alert" ng-show="firstTotalEvalDone">
+    <div class="alert alert-info" role="alert" ng-show="firstTotalEvalDone">
         1차 종합 평가를 완료했습니다.
     </div>
 
@@ -74,27 +74,16 @@
                         <textarea ng-model="evalData.itemEvals[${status.index}].comment"
                                   name="comment_${status.index}"
                                   class="form-control input-sm msd-elastic: \n;"
-                                  ng-initial
                                   ng-readonly="readonly()"
-                                  required>${itemAndEval.firstEval.comment}</textarea>
+                                  required></textarea>
                     </td>
-                    <td>
+                    <td ng-class="{'has-error': showError && !perfEvalForm.grade_${status.index}.$valid}">
                         <select ng-model="evalData.itemEvals[${status.index}].grade"
-                                ng-initial
+                                name="grade_${status.index}"
+                                ng-options="grade for grade in grades"
                                 ng-readonly="readonly()"
-                                class="form-control input-sm">
-                            <option value="S" <c:if test="${itemAndEval.firstEval.grade == 'S'}">selected</c:if>>S
-                            </option>
-                            <option value="A"
-                                    <c:if test="${itemAndEval.firstEval.grade == 'A' || empty itemAndEval.firstEval.grade}">selected="selected"</c:if>>
-                                A
-                            </option>
-                            <option value="B" <c:if test="${itemAndEval.firstEval.grade == 'B'}">selected</c:if>>B
-                            </option>
-                            <option value="C" <c:if test="${itemAndEval.firstEval.grade == 'C'}">selected</c:if>>C
-                            </option>
-                            <option value="D" <c:if test="${itemAndEval.firstEval.grade == 'D'}">selected</c:if>>D
-                            </option>
+                                class="form-control input-sm"
+                                required>
                         </select>
                     </td>
                 </tr>
@@ -104,38 +93,23 @@
         <table class="table table-bordered table-condensed">
             <tbody>
             <tr>
-                <td class="col-md-2 success">1차 성과 종합 평가</td>
+                <td class="col-md-2 success">1차 성과 종합 의견/평가</td>
                 <td class="col-md-6" ng-class="{'has-error': showError && !perfEvalForm.firstPerfEvalComment.$valid}">
                     <textarea ng-model="evalData.totalEval.comment"
                               class="form-control input-sm msd-elastic: \n;"
                               name="firstPerfEvalComment"
-                              ng-initial
                               ng-readonly="readonly()"
-                              required>${personalEval.firstPerfTotalEval.comment}</textarea>
+                              required></textarea>
                 </td>
 
                 </td>
-                <td class="col-md-1">
+                <td class="col-md-1" ng-class="{'has-error': showError && !perfEvalForm.firstPerfEvalGrade.$valid}">
                     <select ng-model="evalData.totalEval.grade"
-                            ng-initial
+                            name="firstPerfEvalGrade"
+                            ng-options="grade for grade in grades"
                             ng-readonly="readonly()"
-                            class="form-control input-sm">
-                        <option value="S" <c:if test="${personalEval.firstPerfTotalEval.grade == 'S'}">selected</c:if>>
-                            S
-                        </option>
-                        <option value="A"
-                                <c:if test="${personalEval.firstPerfTotalEval.grade == 'A' || empty personalEval.firstPerfTotalEval.grade}">selected</c:if>>
-                            A
-                        </option>
-                        <option value="B" <c:if test="${personalEval.firstPerfTotalEval.grade == 'B'}">selected</c:if>>
-                            B
-                        </option>
-                        <option value="C" <c:if test="${personalEval.firstPerfTotalEval.grade == 'C'}">selected</c:if>>
-                            C
-                        </option>
-                        <option value="D" <c:if test="${personalEval.firstPerfTotalEval.grade == 'D'}">selected</c:if>>
-                            D
-                        </option>
+                            class="form-control input-sm"
+                            required>
                     </select>
                 </td>
                 <td class="col-md-3"></td>

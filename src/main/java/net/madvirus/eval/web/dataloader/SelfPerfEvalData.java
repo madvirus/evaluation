@@ -1,21 +1,23 @@
 package net.madvirus.eval.web.dataloader;
 
-import net.madvirus.eval.api.personaleval.PerformanceItemAndSelfEval;
+import net.madvirus.eval.domain.personaleval.PerformanceItemAndAllEval;
+import net.madvirus.eval.domain.personaleval.PerformanceItemAndSelfEval;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class SelfPerfEvalData {
     private String evalSeasonId;
     private String personalEvalId;
     private String userId;
-    private List<PerformanceItemAndSelfEval> itemAndEvals;
+    private List<PerformanceItemAndAllEval> itemAndEvals;
     private boolean done;
 
     public SelfPerfEvalData(
             String evalSeasonId,
             String personalEvalId,
             String userId,
-            List<PerformanceItemAndSelfEval> itemAndEvals,
+            List<PerformanceItemAndAllEval> itemAndEvals,
             boolean done) {
         this.evalSeasonId = evalSeasonId;
         this.personalEvalId = personalEvalId;
@@ -37,7 +39,10 @@ public class SelfPerfEvalData {
     }
 
     public List<PerformanceItemAndSelfEval> getItemAndEvals() {
-        return itemAndEvals;
+        return itemAndEvals
+                .stream()
+                .map(ie -> new PerformanceItemAndSelfEval(ie.getItem(), ie.getSelfEval()))
+                .collect(Collectors.toList());
     }
 
     public boolean isDone() {

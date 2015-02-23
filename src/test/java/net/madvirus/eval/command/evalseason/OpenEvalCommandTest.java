@@ -3,7 +3,6 @@ package net.madvirus.eval.command.evalseason;
 import net.madvirus.eval.api.evalseaon.AlreadyEvaluationOpenedException;
 import net.madvirus.eval.api.evalseaon.EvalSeasonCreatedEvent;
 import net.madvirus.eval.api.evalseaon.EvaluationOpenedEvent;
-import net.madvirus.eval.api.evalseaon.OpenEvaluationCommand;
 import org.junit.Test;
 
 import java.util.Date;

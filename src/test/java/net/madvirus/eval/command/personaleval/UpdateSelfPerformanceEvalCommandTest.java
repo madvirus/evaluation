@@ -2,15 +2,20 @@ package net.madvirus.eval.command.personaleval;
 
 import net.avh4.test.junit.Nested;
 import net.madvirus.eval.api.RateeMapping;
-import net.madvirus.eval.api.evalseaon.*;
+import net.madvirus.eval.api.evalseaon.EvalSeasonCreatedEvent;
+import net.madvirus.eval.api.evalseaon.EvalSeasonNotFoundException;
+import net.madvirus.eval.api.evalseaon.MappingUpdatedEvent;
+import net.madvirus.eval.api.evalseaon.RateeNotFoundException;
 import net.madvirus.eval.api.personaleval.InvalidWeightSumException;
-import net.madvirus.eval.api.personaleval.PerformanceItemAndSelfEval;
-import net.madvirus.eval.api.personaleval.PersonalEval;
 import net.madvirus.eval.api.personaleval.PersonalEvaluationCreatedEvent;
 import net.madvirus.eval.api.personaleval.self.SelfPerformanceEvaluatedEvent;
-import net.madvirus.eval.api.personaleval.self.UpdateSelfPerformanceEvalCommand;
 import net.madvirus.eval.command.EventCaptureMatcher;
-import net.madvirus.eval.testhelper.CreationHelper;
+import net.madvirus.eval.command.personaleval.self.UpdateSelfPerformanceEvalCommand;
+import net.madvirus.eval.domain.evalseason.EvalSeason;
+import net.madvirus.eval.domain.evalseason.RateeType;
+import net.madvirus.eval.domain.personaleval.PerformanceItemAndSelfEval;
+import net.madvirus.eval.domain.personaleval.PersonalEval;
+import net.madvirus.eval.testhelper.CommandHelper;
 import org.axonframework.repository.AggregateNotFoundException;
 import org.axonframework.repository.Repository;
 import org.axonframework.test.FixtureConfiguration;
@@ -34,6 +39,11 @@ import static org.mockito.Mockito.when;
 
 @RunWith(Nested.class)
 public class UpdateSelfPerformanceEvalCommandTest {
+    public static final String EVALSEASON_ID = "EVAL1024";
+    public static final String FIRST_ID = "first";
+    public static final String SECOND_ID = "second";
+    public static final String RATEE_ID = "bkchoi";
+    public static final String PERSONAL_EVAL_ID = "EVAL1024-bkchoi";
     protected FixtureConfiguration fixture;
     private Repository<PersonalEval> personalEvalRepository;
     private Repository<EvalSeason> mockEvalSeasonRepository;
@@ -56,7 +66,7 @@ public class UpdateSelfPerformanceEvalCommandTest {
 
     @Test
     public void givenEvalSeason_but_notRatee_thenThrow_ex() throws Exception {
-        givenEvalSeasonData("EVAL1024");
+        givenEvalSeasonData(EVALSEASON_ID);
 
         fixture.given()
                 .when(updateSelfPerfEvalCmdWithDraft())
@@ -65,7 +75,7 @@ public class UpdateSelfPerformanceEvalCommandTest {
 
     @Test
     public void givenEvalSeason_and_Ratee_and_NoPersnalEval() throws Exception {
-        givenEvalSeasonData("EVAL1024", "bkchoi");
+        givenEvalSeasonData(EVALSEASON_ID, RATEE_ID);
 
         EventCaptureMatcher captureMatcher = new EventCaptureMatcher();
 
@@ -85,7 +95,7 @@ public class UpdateSelfPerformanceEvalCommandTest {
 
         @Before
         public void setUp() throws Exception {
-            givenEvalSeasonData("EVAL1024", "bkchoi");
+            givenEvalSeasonData(EVALSEASON_ID, RATEE_ID);
             testExecutor = fixture.given(createEvent());
         }
 
@@ -98,13 +108,13 @@ public class UpdateSelfPerformanceEvalCommandTest {
                     .expectEventsMatching(captureMatcher);
 
             SelfPerformanceEvaluatedEvent selfPerfEvalEvent = (SelfPerformanceEvaluatedEvent) captureMatcher.getPayload();
-            assertThat(selfPerfEvalEvent.getPersonalEvalId(), equalTo("EVAL1024-bkchoi"));
+            assertThat(selfPerfEvalEvent.getPersonalEvalId(), equalTo(PERSONAL_EVAL_ID));
             assertThat(selfPerfEvalEvent.isDone(), equalTo(false));
             List<PerformanceItemAndSelfEval> evals = selfPerfEvalEvent.getPerformanceItemAndSelfEval();
             assertThat(evals, hasSize(2));
 
             runInUOW(() -> {
-                PersonalEval personalEval = personalEvalRepository.load("EVAL1024-bkchoi");
+                PersonalEval personalEval = personalEvalRepository.load(PERSONAL_EVAL_ID);
                 assertThat(personalEval.isSelfPerfEvalDone(), equalTo(false));
             });
         }
@@ -125,7 +135,7 @@ public class UpdateSelfPerformanceEvalCommandTest {
                     .expectEventsMatching(captureMatcher);
 
             runInUOW(() -> {
-                PersonalEval personalEval = personalEvalRepository.load("EVAL1024-bkchoi");
+                PersonalEval personalEval = personalEvalRepository.load(PERSONAL_EVAL_ID);
                 assertThat(personalEval.isSelfPerfEvalDone(), equalTo(true));
             });
         }
@@ -137,13 +147,13 @@ public class UpdateSelfPerformanceEvalCommandTest {
 
     private void givenEvalSeasonData(String evalSeasonId, String... rateeIds) {
         EvalSeason evalSeason = new EvalSeason();
-        evalSeason.on(new EvalSeasonCreatedEvent("EVAL1024", "평가", new Date()));
+        evalSeason.on(new EvalSeasonCreatedEvent(EVALSEASON_ID, "평가", new Date()));
         if (rateeIds.length > 0) {
             List<RateeMapping> mappings = new ArrayList<>();
             for (String rateeId : rateeIds) {
-                mappings.add(new RateeMapping(rateeId, RateeType.MEMBER, "first", "second"));
+                mappings.add(new RateeMapping(rateeId, RateeType.MEMBER, FIRST_ID, SECOND_ID));
             }
-            evalSeason.on(new MappingUpdatedEvent("EVAL1024", mappings));
+            evalSeason.on(new MappingUpdatedEvent(EVALSEASON_ID, mappings));
         }
         when(mockEvalSeasonRepository.load(evalSeasonId)).thenReturn(evalSeason);
     }
@@ -161,7 +171,7 @@ public class UpdateSelfPerformanceEvalCommandTest {
     }
 
     private UpdateSelfPerformanceEvalCommand createUpdateCommand(boolean done, int... weights) {
-        return CreationHelper.updateSelfPerfEvalCommand("EVAL1024", "bkchoi", done, weights);
+        return CommandHelper.updateSelfPerfEvalCommand(EVALSEASON_ID, RATEE_ID, done, weights);
     }
 
     private UpdateSelfPerformanceEvalCommand createUpdateCommand(boolean done) {
@@ -169,7 +179,7 @@ public class UpdateSelfPerformanceEvalCommandTest {
     }
 
     private PersonalEvaluationCreatedEvent createEvent() {
-        return new PersonalEvaluationCreatedEvent("EVAL1024-bkchoi", "EVAL1024", "bkchoi", RateeType.MEMBER, "first", "second");
+        return new PersonalEvaluationCreatedEvent(PERSONAL_EVAL_ID, EVALSEASON_ID, RATEE_ID, RateeType.MEMBER, FIRST_ID, SECOND_ID);
     }
 
 }

@@ -13,7 +13,14 @@
 <jsp:include page="admin-navi.jsp" />
 
 <div class="container">
-    평가 메인
+    <ul>
+        <sec:authorize access="hasAuthority('ROLE_HRADMIN')">
+        <li><a href="/admin/evalseasons">'평가 관리'</a>를 이용해서 평가를 생성하고 관리하세요.</li>
+        </sec:authorize>
+        <sec:authorize access="hasAuthority('ROLE_SYSTEMADMIN')">
+        <li><a href="/admin/system">'시스템 관리'</a>를 이용해서 권한을 관리하세요.</li>
+        </sec:authorize>
+    </ul>
 </div>
 
 <script src="/webjars/jquery/1.9.0/jquery.js"></script>

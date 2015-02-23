@@ -1,6 +1,7 @@
 <%@ page contentType="text/html;charset=UTF-8" session="false" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
+<%@ taglib prefix="tf" tagdir="/WEB-INF/tags" %>
 <!DOCTYPE html>
 <html ng-app="mainApp">
 <head>
@@ -15,6 +16,7 @@
 <div ng-cloak class="container" ng-controller="selfPerfEvalCtrl" ng-init="init()">
     <input type="hidden" ng-init="evalSeasonId = '${selfPerfEvalData.evalSeasonId}'" />
     <input type="hidden" ng-init="selfEvalDone = ${selfPerfEvalData.done}"/>
+    <c:set var="itemAndEvalsJson"><tf:toJson value="${selfPerfEvalData.itemAndEvals}"/></c:set>
     <input type="hidden" ng-init="itemAndEvals = <c:out value="${itemAndEvalsJson}" escapeXml="true"/>"/>
     <ol class="breadcrumb">
         <li><a href="/main">홈</a></li>

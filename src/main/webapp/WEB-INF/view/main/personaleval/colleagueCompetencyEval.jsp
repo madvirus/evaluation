@@ -116,7 +116,7 @@
             </tr>
             </thead>
             <tbody>
-            <tr ng-form='itemForm' ng-repeat="itemEval in evalSet.leadershipEvals">
+            <tr ng-form='itemForm' ng-repeat="itemEval in evalSet.amEvals">
                 <td class="col-md-1">{{competencyItems.am[$index].name}}</td>
                 <td class="col-md-4">
                     <small ng-bind-html="competencyItems.am[$index].description | nl2br"></small>

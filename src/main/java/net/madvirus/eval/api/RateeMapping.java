@@ -1,8 +1,11 @@
 package net.madvirus.eval.api;
 
-import net.madvirus.eval.api.evalseaon.RateeType;
+import net.madvirus.eval.domain.evalseason.RateeType;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 
 public class RateeMapping {
     private String rateeId;

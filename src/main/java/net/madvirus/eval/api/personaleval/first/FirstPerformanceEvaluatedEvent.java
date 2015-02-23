@@ -1,6 +1,6 @@
 package net.madvirus.eval.api.personaleval.first;
 
-import net.madvirus.eval.api.personaleval.ItemEval;
+import net.madvirus.eval.domain.personaleval.ItemEval;
 
 import java.util.List;
 

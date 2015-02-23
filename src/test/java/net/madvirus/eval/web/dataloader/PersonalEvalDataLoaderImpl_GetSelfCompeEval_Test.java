@@ -4,8 +4,6 @@ import net.madvirus.eval.api.evalseaon.EvalSeasonNotFoundException;
 import net.madvirus.eval.api.personaleval.YouAreNotRateeException;
 import org.junit.Test;
 
-import java.util.Optional;
-
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertThat;

@@ -1,13 +1,17 @@
 package net.madvirus.eval.web.dataloader;
 
 import net.madvirus.eval.api.personaleval.Grade;
+import net.madvirus.eval.query.user.UserModel;
 
 public interface PersonalEvalState {
+    UserModel getRatee();
     boolean isStarted();
     boolean isSelfPerfEvalDone();
     boolean isSelfCompeEvalDone();
 
     boolean isColleagueCompeEvalDone(String colleagueId);
+
+    boolean isFirstEvalSkipTarget();
 
     boolean isFirstPerfEvalHad();
     Grade getFirstPerfEvalGrade();
@@ -16,11 +20,22 @@ public interface PersonalEvalState {
     Grade getFirstTotalEvalGrade();
     boolean isFirstTotalEvalDone();
 
+    boolean isSecondPerfEvalHad();
+    Grade getSecondPerfEvalGrade();
+    boolean isSecondCompeEvalHad();
+    Grade getSecondCompeEvalGrade();
+    Grade getSecondTotalEvalGrade();
+    boolean isSecondTotalEvalDone();
 }
 
 class PersonalEvalStateBuilder {
-    static PersonalEvalState notStarted() {
+    static PersonalEvalState notStarted(UserModel ratee) {
         return new PersonalEvalState() {
+            @Override
+            public UserModel getRatee() {
+                return ratee;
+            }
+
             @Override
             public boolean isStarted() {
                 return false;
@@ -38,6 +53,11 @@ class PersonalEvalStateBuilder {
 
             @Override
             public boolean isColleagueCompeEvalDone(String colleagueId) {
+                return false;
+            }
+
+            @Override
+            public boolean isFirstEvalSkipTarget() {
                 return false;
             }
 
@@ -68,6 +88,36 @@ class PersonalEvalStateBuilder {
 
             @Override
             public boolean isFirstTotalEvalDone() {
+                return false;
+            }
+
+            @Override
+            public boolean isSecondPerfEvalHad() {
+                return false;
+            }
+
+            @Override
+            public Grade getSecondPerfEvalGrade() {
+                return null;
+            }
+
+            @Override
+            public boolean isSecondCompeEvalHad() {
+                return false;
+            }
+
+            @Override
+            public Grade getSecondCompeEvalGrade() {
+                return null;
+            }
+
+            @Override
+            public Grade getSecondTotalEvalGrade() {
+                return null;
+            }
+
+            @Override
+            public boolean isSecondTotalEvalDone() {
                 return false;
             }
         };

@@ -3,15 +3,15 @@ package net.madvirus.eval.command.personaleval;
 import net.madvirus.eval.api.RateeMapping;
 import net.madvirus.eval.api.evalseaon.EvalSeasonNotFoundException;
 import net.madvirus.eval.api.evalseaon.RateeNotFoundException;
-import net.madvirus.eval.api.personaleval.PersonalEval;
-import net.madvirus.eval.api.personaleval.self.UpdateSelfCompetencyEvalCommand;
-import net.madvirus.eval.api.personaleval.self.UpdateSelfPerformanceEvalCommand;
-import net.madvirus.eval.api.evalseaon.EvalSeason;
+import net.madvirus.eval.command.personaleval.self.UpdateSelfCompetencyEvalCommand;
+import net.madvirus.eval.command.personaleval.self.UpdateSelfPerformanceEvalCommand;
+import net.madvirus.eval.domain.evalseason.EvalSeason;
+import net.madvirus.eval.domain.personaleval.PersonalEval;
 import org.axonframework.commandhandling.annotation.CommandHandler;
 import org.axonframework.repository.AggregateNotFoundException;
 import org.axonframework.repository.Repository;
 
-import static net.madvirus.eval.api.personaleval.PersonalEval.createId;
+import static net.madvirus.eval.domain.personaleval.PersonalEval.createId;
 
 public class UpdateSelfEvalCommandHandler {
     private Repository<PersonalEval> personalEvalRepository;
@@ -47,7 +47,7 @@ public class UpdateSelfEvalCommandHandler {
         }
 
         if (!evalSeason.containsRatee(userId)) {
-            throw new RateeNotFoundException();
+            throw new RateeNotFoundException(userId);
         }
 
         String personalEvalId = createId(evalSeasonId, userId);

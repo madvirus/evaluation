@@ -1,15 +1,14 @@
 package net.madvirus.eval.springconfig;
 
-import net.madvirus.eval.api.evalseaon.EvalSeason;
-import net.madvirus.eval.api.personaleval.PersonalEval;
 import net.madvirus.eval.command.evalseason.CreateEvalSeasonCommandHandler;
+import net.madvirus.eval.command.evalseason.DeleteMappingCommandHandler;
+import net.madvirus.eval.command.evalseason.UpdateDistributionRuleCommandHandler;
 import net.madvirus.eval.command.evalseason.UpdateMappingCommandHandler;
-import net.madvirus.eval.command.personaleval.RejectEvalCommandHandler;
-import net.madvirus.eval.command.personaleval.UpdateColleagueEvalCommandHandler;
-import net.madvirus.eval.command.personaleval.UpdateFirstEvalCommandHandler;
-import net.madvirus.eval.command.personaleval.UpdateSelfEvalCommandHandler;
+import net.madvirus.eval.command.personaleval.*;
+import net.madvirus.eval.domain.evalseason.EvalSeason;
+import net.madvirus.eval.domain.personaleval.PersonalEval;
+import net.madvirus.eval.query.evalseason.EvalSeasonMappingModelRepository;
 import net.madvirus.eval.query.user.UserModelRepository;
-import net.madvirus.eval.web.dataloader.EvalSeasonDataLoader;
 import org.axonframework.commandhandling.CommandBus;
 import org.axonframework.commandhandling.annotation.AggregateAnnotationCommandHandlerFactoryBean;
 import org.axonframework.common.annotation.ParameterResolverFactory;
@@ -33,10 +32,10 @@ public class AxonCommandHandlerConfig {
     private UserModelRepository userModelRepository;
 
     @Autowired
-    private CommandBus commandBus;
+    private EvalSeasonMappingModelRepository mappingModelRepository;
 
     @Autowired
-    private EvalSeasonDataLoader evalSeasonDataLoader;
+    private CommandBus commandBus;
 
     @Bean
     public CreateEvalSeasonCommandHandler createEvalSeasonCommandHandler() {
@@ -46,8 +45,18 @@ public class AxonCommandHandlerConfig {
     @Bean
     public UpdateMappingCommandHandler updateMappingCommandHandler() {
         return new UpdateMappingCommandHandler(
-                evalSeasonRepository, userModelRepository
+                evalSeasonRepository, personalEvalRepository, userModelRepository, mappingModelRepository
         );
+    }
+
+    @Bean
+    public DeleteMappingCommandHandler deleteMappingCommandHandler() {
+        return new DeleteMappingCommandHandler(evalSeasonRepository, personalEvalRepository);
+    }
+
+    @Bean
+    public UpdateDistributionRuleCommandHandler updateDistributionRuleCommandHandler() {
+        return new UpdateDistributionRuleCommandHandler(evalSeasonRepository, personalEvalRepository);
     }
 
     @Bean
@@ -90,5 +99,10 @@ public class AxonCommandHandlerConfig {
     @Bean
     public UpdateColleagueEvalCommandHandler updateColleagueEvalCommandHandler() {
         return new UpdateColleagueEvalCommandHandler(personalEvalRepository, evalSeasonRepository);
+    }
+
+    @Bean
+    public UpdateSecondEvalCommandHandler updateSecondEvalCommandHandler() {
+        return new UpdateSecondEvalCommandHandler(personalEvalRepository);
     }
 }

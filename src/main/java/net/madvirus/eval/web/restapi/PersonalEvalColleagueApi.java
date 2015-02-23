@@ -1,6 +1,6 @@
 package net.madvirus.eval.web.restapi;
 
-import net.madvirus.eval.api.personaleval.colleague.UpdateColleagueCompetencyEvalCommand;
+import net.madvirus.eval.command.personaleval.colleague.UpdateColleagueCompetencyEvalCommand;
 import net.madvirus.eval.query.user.UserModel;
 import org.axonframework.commandhandling.gateway.CommandGateway;
 import org.springframework.beans.factory.annotation.Autowired;

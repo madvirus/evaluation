@@ -1,6 +1,6 @@
 package net.madvirus.eval.query.evalseason
 
-import net.madvirus.eval.api.evalseaon.RateeType
+import net.madvirus.eval.domain.evalseason.RateeType
 import net.madvirus.eval.query.user.UserModel
 import org.axonframework.test.matchers.Matchers._
 import org.junit.Assert._
@@ -69,6 +69,14 @@ class EvalSeasonMappingModelTest {
     val rateeOfColleague3 = model.getRateesOfColleague(colleague3.getId)
     assertContains(rateeOfColleague3, List(ratee3))
     assertNotContains(rateeOfColleague3, List(ratee1, ratee2))
+  }
+
+  @Test
+  def removeRatee(): Unit = {
+    model = model.deleteMappings(List(ratee2.getId()), 0L);
+    val rateesOfSecond = model.getRateesOfSecondRater(second1.getId());
+    assertContains(rateesOfSecond, List(ratee1, ratee3));
+    assertNotContains(rateesOfSecond, List(ratee2));
   }
 
   @Test

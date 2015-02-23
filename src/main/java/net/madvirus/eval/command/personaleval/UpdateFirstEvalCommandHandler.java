@@ -1,9 +1,13 @@
 package net.madvirus.eval.command.personaleval;
 
-import net.madvirus.eval.api.personaleval.PersonalEval;
 import net.madvirus.eval.api.personaleval.PersonalEvalNotFoundException;
-import net.madvirus.eval.api.personaleval.TotalEval;
-import net.madvirus.eval.api.personaleval.first.*;
+import net.madvirus.eval.api.personaleval.first.NotYetFirstPerfOrCompeEvalDoneException;
+import net.madvirus.eval.api.personaleval.first.YouAreNotFirstRaterException;
+import net.madvirus.eval.command.personaleval.first.UpdateFirstCompetencyEvalCommand;
+import net.madvirus.eval.command.personaleval.first.UpdateFirstPerformanceEvalCommand;
+import net.madvirus.eval.command.personaleval.first.UpdateFirstTotalEvalCommand;
+import net.madvirus.eval.domain.personaleval.PersonalEval;
+import net.madvirus.eval.domain.personaleval.TotalEval;
 import org.axonframework.commandhandling.annotation.CommandHandler;
 import org.axonframework.repository.AggregateNotFoundException;
 import org.axonframework.repository.Repository;
@@ -44,7 +48,7 @@ public class UpdateFirstEvalCommandHandler {
     @CommandHandler
     public void handle(UpdateFirstTotalEvalCommand command) {
         List<PersonalEval> evals = getPersonalEvals(command);
-        if (!evals.stream().allMatch(eval -> eval.checkFirstRater(command.getFirstRaterId()))) {
+        if (!evals.stream().allMatch(eval -> eval.checkFirstRater(command.getRaterId()))) {
             throw new YouAreNotFirstRaterException();
         }
         Map<String, PersonalEval> evalMap = new HashMap<>();
@@ -57,7 +61,7 @@ public class UpdateFirstEvalCommandHandler {
         }
         command.getEvalUpdates().forEach(update -> {
             PersonalEval personalEval = evalMap.get(PersonalEval.createId(command.getEvalSeasonId(), update.getRateeId()));
-            personalEval.updateFirstTotalEval(new TotalEval(update.getComment(), update.getGrade(), command.isDone()));
+            personalEval.getFirstRaterOperator().updateFirstTotalEval(new TotalEval(update.getComment(), update.getGrade(), command.isDone()));
         });
     }
 

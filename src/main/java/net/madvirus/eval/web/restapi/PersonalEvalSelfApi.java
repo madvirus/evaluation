@@ -1,7 +1,7 @@
 package net.madvirus.eval.web.restapi;
 
-import net.madvirus.eval.api.personaleval.self.UpdateSelfCompetencyEvalCommand;
-import net.madvirus.eval.api.personaleval.self.UpdateSelfPerformanceEvalCommand;
+import net.madvirus.eval.command.personaleval.self.UpdateSelfCompetencyEvalCommand;
+import net.madvirus.eval.command.personaleval.self.UpdateSelfPerformanceEvalCommand;
 import net.madvirus.eval.query.user.UserModel;
 import org.axonframework.commandhandling.gateway.CommandGateway;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,7 +29,6 @@ public class PersonalEvalSelfApi {
             @PathVariable("evalSeasonId") String evalSeasonId,
             @RequestBody UpdateSelfCompetencyEvalCommand command,
             @AuthenticationPrincipal UserModel userModel) {
-        // TODO: 권한 검사, 본인만 본인 성과 평가 업데이트 가능
         command.setRateeId(userModel.getId());
         gateway.sendAndWait(command);
         return ResponseEntity.ok().build();

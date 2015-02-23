@@ -1,7 +1,8 @@
 package net.madvirus.eval.web.dataloader;
 
-import net.madvirus.eval.api.evalseaon.RateeType;
-import net.madvirus.eval.api.personaleval.*;
+import net.madvirus.eval.api.personaleval.Grade;
+import net.madvirus.eval.domain.evalseason.RateeType;
+import net.madvirus.eval.domain.personaleval.*;
 import net.madvirus.eval.query.user.UserModel;
 
 import java.util.List;
@@ -10,7 +11,7 @@ import java.util.Optional;
 public class FirstTotalEvalSummary {
 
     private UserModel ratee;
-    private RateeType rateeType;
+    protected RateeType rateeType;
     private Optional<PerformanceEvalSet> firstPerfEval;
     private Optional<CompetencyEvalSet> firstCompeEval;
     private Optional<TotalEval> firstTotalEval;
@@ -71,7 +72,7 @@ public class FirstTotalEvalSummary {
         return firstCompeEval.flatMap(eval -> Optional.of(eval.getTotalEval().getGrade())).orElse(null);
     }
 
-    public Double calculateTotalMark() {
+    public Double getFirstTotalMark() {
         return MarkCalculator.calculate(rateeType,
                 getFirstPerfEvalGrade(),
                 getFirstCompeCommonAvg(),

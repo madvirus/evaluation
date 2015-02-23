@@ -1,6 +1,6 @@
 package net.madvirus.eval.query.evalseason
 
-import net.madvirus.eval.api.evalseaon.RateeType
+import net.madvirus.eval.domain.evalseason.RateeType
 import net.madvirus.eval.query.user.UserModel
 
 import scala.beans.BeanProperty
@@ -21,6 +21,10 @@ case class RateeMappingModel(@BeanProperty ratee: UserModel,
   def containsColleagueRater(raterId: String): Boolean = {
     val userModelOpt = colleagueRaters.find(userModel => userModel.getId() == raterId)
     return userModelOpt.nonEmpty
+  }
+
+  def hasFirstRater(): Boolean = {
+    return firstRater != null
   }
 }
 
@@ -91,13 +95,30 @@ case class EvalSeasonMappingModel(
 
   def deleteMappings(rateeIds: List[String], seqNumber: Long): EvalSeasonMappingModel = {
     var newRateeToMappings = rateeToMappingMap
-    println(rateeIds)
-    rateeIds.foreach(id => newRateeToMappings = newRateeToMappings - id)
+    var newFirstRaterToRateesMap = firstRaterToRateesMap
+    var newSecondRaterToRateesMap = secondRaterToRateesMap
+    var newColleagueRaterToRateesMap = colleagueRaterToRateesMap
+    rateeIds.foreach(rateeId => {
+      val mappingOpt = rateeToMappingMap.get(rateeId)
+      if (mappingOpt.nonEmpty) {
+        val mapping = mappingOpt.get
+        newRateeToMappings = newRateeToMappings - rateeId
+        if (mapping.hasFirstRater()) {
+          newFirstRaterToRateesMap = newFirstRaterToRateesMap.removeMapping(mapping.ratee, mapping.firstRater)
+        }
+        newSecondRaterToRateesMap = newSecondRaterToRateesMap.removeMapping(mapping.ratee, mapping.secondRater)
+        mapping.colleagueRaters.foreach(um => {
+          newColleagueRaterToRateesMap = newColleagueRaterToRateesMap.removeMapping(mapping.ratee, um)
+        })
+      }
+    })
 
-    println(newRateeToMappings)
     copy(
       sequenceNumber = seqNumber,
-      rateeToMappingMap = newRateeToMappings
+      rateeToMappingMap = newRateeToMappings,
+      firstRaterToRateesMap = newFirstRaterToRateesMap,
+      secondRaterToRateesMap = newSecondRaterToRateesMap,
+      colleagueRaterToRateesMap = newColleagueRaterToRateesMap
     )
   }
 
@@ -117,10 +138,18 @@ case class RaterToRateesMap(map: Map[String, Set[UserModel]]) {
       map + (rater.getId -> (map.get(rater.getId).getOrElse(Set()) + ratee))
     )
 
-  def removeMapping(ratee: UserModel, rater: UserModel): RaterToRateesMap =
-    RaterToRateesMap(
-      map + (rater.getId -> (map.get(rater.getId).getOrElse(Set()) - ratee))
-    )
+  def removeMapping(ratee: UserModel, rater: UserModel): RaterToRateesMap = {
+    val newSet = map.get(rater.getId).getOrElse(Set()) - ratee
+    if (newSet.isEmpty) {
+      RaterToRateesMap(
+        map - rater.getId
+      )
+    } else {
+      RaterToRateesMap(
+        map + (rater.getId -> newSet)
+      )
+    }
+  }
 
   def updateMapping(ratee: UserModel, oldRaterOpt: Option[UserModel], newRaterOpt: Option[UserModel]): RaterToRateesMap = {
     (oldRaterOpt.flatMap(um => Some(um.getId())), newRaterOpt.flatMap(um => Some(um.getId()))) match {

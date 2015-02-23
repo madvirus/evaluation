@@ -3,7 +3,6 @@ package net.madvirus.eval.web.dataloader;
 import net.madvirus.eval.api.personaleval.PersonalEvalNotFoundException;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 
 public interface PersonalEvalDataLoader {
@@ -20,4 +19,6 @@ public interface PersonalEvalDataLoader {
     CompeEvalData getColleagueCompeEvalDataForEvalForm(String evalSeasonId, String rateeId, String colleagueId);
 
     public FirstTotalEvalData getFirstTotalEvalData(String evalSeasonId, String firstRaterId);
+
+    SecondTotalEvalData getSecondTotalEvalData(String evalSeasonId, String id);
 }

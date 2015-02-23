@@ -1,7 +1,7 @@
 package net.madvirus.eval.springconfig;
 
-import net.madvirus.eval.api.evalseaon.EvalSeason;
-import net.madvirus.eval.api.personaleval.PersonalEval;
+import net.madvirus.eval.domain.evalseason.EvalSeason;
+import net.madvirus.eval.domain.personaleval.PersonalEval;
 import net.madvirus.eval.query.evalseason.EvalSeasonMappingModelRepository;
 import net.madvirus.eval.query.user.UserModelRepository;
 import net.madvirus.eval.web.dataloader.EvalSeasonDataLoader;
@@ -33,14 +33,18 @@ public class DataLoaderConfig {
 
     @Bean
     public EvalSeasonDataLoader evalSeasonDataLoader() {
-        return new EvalSeasonDataLoaderImpl(evalSeasonRepository, evalSeasonMappingModelRepository);
+        return new EvalSeasonDataLoaderImpl(
+                evalSeasonRepository,
+                evalSeasonMappingModelRepository,
+                userModelRepository);
     }
 
     @Bean
     public PersonalEvalDataLoader personalEvalDataLoader() {
         return new PersonalEvalDataLoaderImpl(
                 personalEvalRepository,
-                evalSeasonDataLoader(),
-                userModelRepository);
+                evalSeasonRepository,
+                userModelRepository,
+                evalSeasonMappingModelRepository);
     }
 }

@@ -1,6 +1,6 @@
 package net.madvirus.eval.web.restapi;
 
-import net.madvirus.eval.api.personaleval.first.*;
+import net.madvirus.eval.command.personaleval.first.*;
 import net.madvirus.eval.query.user.UserModel;
 import org.axonframework.commandhandling.gateway.CommandGateway;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +21,7 @@ public class PersonalEvalFirstApi {
             @RequestBody UpdateFirstPerformanceEvalCommand command,
             @AuthenticationPrincipal UserModel userModel) {
         command.setEvalSeasonId(evalSeasonId);
-        command.setFirstRaterId(userModel.getId());
+        command.setRaterId(userModel.getId());
         command.setRateeId(rateeId);
         gateway.sendAndWait(command);
         return ResponseEntity.ok().build();
@@ -47,7 +47,7 @@ public class PersonalEvalFirstApi {
             @RequestBody UpdateFirstCompetencyEvalCommand command,
             @AuthenticationPrincipal UserModel userModel) {
         command.setEvalSeasonId(evalSeasonId);
-        command.setFirstRaterId(userModel.getId());
+        command.setRaterId(userModel.getId());
         command.setRateeId(rateeId);
         gateway.sendAndWait(command);
         return ResponseEntity.ok().build();
@@ -73,7 +73,7 @@ public class PersonalEvalFirstApi {
             @AuthenticationPrincipal UserModel userModel,
             @RequestBody UpdateFirstTotalEvalCommand command) {
         command.setEvalSeasonId(evalSeasonId);
-        command.setFirstRaterId(userModel.getId());
+        command.setRaterId(userModel.getId());
         gateway.sendAndWait(command);
         return ResponseEntity.ok().build();
     }

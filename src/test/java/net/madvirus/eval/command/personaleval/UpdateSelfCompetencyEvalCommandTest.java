@@ -2,13 +2,19 @@ package net.madvirus.eval.command.personaleval;
 
 import net.avh4.test.junit.Nested;
 import net.madvirus.eval.api.RateeMapping;
-import net.madvirus.eval.api.evalseaon.*;
-import net.madvirus.eval.api.personaleval.PersonalEval;
+import net.madvirus.eval.api.evalseaon.EvalSeasonCreatedEvent;
+import net.madvirus.eval.api.evalseaon.EvalSeasonNotFoundException;
+import net.madvirus.eval.api.evalseaon.MappingUpdatedEvent;
+import net.madvirus.eval.api.evalseaon.RateeNotFoundException;
 import net.madvirus.eval.api.personaleval.PersonalEvaluationCreatedEvent;
 import net.madvirus.eval.api.personaleval.self.SelfCompetencyEvaluatedEvent;
-import net.madvirus.eval.api.personaleval.self.UpdateSelfCompetencyEvalCommand;
 import net.madvirus.eval.command.EventCaptureMatcher;
-import net.madvirus.eval.testhelper.CreationHelper;
+import net.madvirus.eval.command.personaleval.self.UpdateSelfCompetencyEvalCommand;
+import net.madvirus.eval.domain.evalseason.EvalSeason;
+import net.madvirus.eval.domain.evalseason.RateeType;
+import net.madvirus.eval.domain.personaleval.PersonalEval;
+import net.madvirus.eval.testhelper.CommandHelper;
+import net.madvirus.eval.testhelper.EventHelper;
 import org.axonframework.repository.AggregateNotFoundException;
 import org.axonframework.repository.Repository;
 import org.axonframework.test.FixtureConfiguration;
@@ -31,6 +37,11 @@ import static org.mockito.Mockito.when;
 
 @RunWith(Nested.class)
 public class UpdateSelfCompetencyEvalCommandTest {
+    public static final String EVALSEASON_ID = "EVAL1024";
+    public static final String RATEE_ID = "bkchoi";
+    public static final String FIRST_ID = "first";
+    public static final String SECOND_ID = "second";
+    public static final String PERSONAL_EVAL_ID = "EVAL1024-bkchoi";
     protected FixtureConfiguration fixture;
     private Repository<PersonalEval> personalEvalRepository;
     private Repository<EvalSeason> mockEvalSeasonRepository;
@@ -53,7 +64,7 @@ public class UpdateSelfCompetencyEvalCommandTest {
 
     @Test
     public void givenEvalSeason_but_NoRatee_thenThrow_ex() throws Exception {
-        givenEvalSeasonData("EVAL1024");
+        givenEvalSeasonData(EVALSEASON_ID);
 
         fixture.given()
                 .when(updateSelfCompeEvalCmdWithDraft())
@@ -62,7 +73,7 @@ public class UpdateSelfCompetencyEvalCommandTest {
 
     @Test
     public void givenEvalSeason_and_Ratee_but_NoPersnalEval() throws Exception {
-        givenEvalSeasonData("EVAL1024", "bkchoi");
+        givenEvalSeasonData(EVALSEASON_ID, RATEE_ID);
 
         EventCaptureMatcher captureMatcher = new EventCaptureMatcher();
 
@@ -73,8 +84,8 @@ public class UpdateSelfCompetencyEvalCommandTest {
         List<Object> events = captureMatcher.getPayloads();
         PersonalEvaluationCreatedEvent createdEvent = (PersonalEvaluationCreatedEvent) events.get(0);
         assertThat(createdEvent.getRateeType(), equalTo(RateeType.MEMBER));
-        assertThat(createdEvent.getFirstRaterId(), equalTo("first"));
-        assertThat(createdEvent.getSecondRaterId(), equalTo("second"));
+        assertThat(createdEvent.getFirstRaterId(), equalTo(FIRST_ID));
+        assertThat(createdEvent.getSecondRaterId(), equalTo(SECOND_ID));
 
         SelfCompetencyEvaluatedEvent updatedEvent = (SelfCompetencyEvaluatedEvent) events.get(1);
     }
@@ -85,7 +96,7 @@ public class UpdateSelfCompetencyEvalCommandTest {
 
         @Before
         public void setUp() throws Exception {
-            givenEvalSeasonData("EVAL1024", "bkchoi");
+            givenEvalSeasonData(EVALSEASON_ID, RATEE_ID);
             testExecutor = fixture.given(createEvent());
         }
 
@@ -98,11 +109,11 @@ public class UpdateSelfCompetencyEvalCommandTest {
                     .expectEventsMatching(captureMatcher);
 
             SelfCompetencyEvaluatedEvent selfCompeEvalEvent = (SelfCompetencyEvaluatedEvent) captureMatcher.getPayload();
-            assertThat(selfCompeEvalEvent.getPersonalEvalId(), equalTo("EVAL1024-bkchoi"));
+            assertThat(selfCompeEvalEvent.getPersonalEvalId(), equalTo(PERSONAL_EVAL_ID));
             assertThat(selfCompeEvalEvent.getEvalSet().isDone(), equalTo(false));
 
             runInUOW(() -> {
-                PersonalEval personalEval = personalEvalRepository.load("EVAL1024-bkchoi");
+                PersonalEval personalEval = personalEvalRepository.load(PERSONAL_EVAL_ID);
                 assertThat(personalEval.isSelfCompeEvalDone(), equalTo(false));
             });
         }
@@ -116,7 +127,7 @@ public class UpdateSelfCompetencyEvalCommandTest {
                     .expectEventsMatching(captureMatcher);
 
             runInUOW(() -> {
-                PersonalEval personalEval = personalEvalRepository.load("EVAL1024-bkchoi");
+                PersonalEval personalEval = personalEvalRepository.load(PERSONAL_EVAL_ID);
                 assertThat(personalEval.isSelfCompeEvalDone(), equalTo(true));
             });
         }
@@ -129,13 +140,13 @@ public class UpdateSelfCompetencyEvalCommandTest {
 
     private void givenEvalSeasonData(String evalSeasonId, String... rateeIds) {
         EvalSeason evalSeason = new EvalSeason();
-        evalSeason.on(new EvalSeasonCreatedEvent("EVAL1024", "평가", new Date()));
+        evalSeason.on(new EvalSeasonCreatedEvent(EVALSEASON_ID, "평가", new Date()));
         if (rateeIds.length > 0) {
             List<RateeMapping> mappings = new ArrayList<>();
             for (String rateeId : rateeIds) {
-                mappings.add(new RateeMapping(rateeId, RateeType.MEMBER, "first", "second"));
+                mappings.add(new RateeMapping(rateeId, RateeType.MEMBER, FIRST_ID, SECOND_ID));
             }
-            evalSeason.on(new MappingUpdatedEvent("EVAL1024", mappings));
+            evalSeason.on(new MappingUpdatedEvent(EVALSEASON_ID, mappings));
         }
         when(mockEvalSeasonRepository.load(evalSeasonId)).thenReturn(evalSeason);
     }
@@ -153,11 +164,11 @@ public class UpdateSelfCompetencyEvalCommandTest {
     }
 
     private UpdateSelfCompetencyEvalCommand createUpdateCommand(boolean done, boolean hasLeadership, boolean hasAm) {
-        return CreationHelper.updateSelfCompeEvalCommand("EVAL1024", "bkchoi", done, hasLeadership, hasAm);
+        return CommandHelper.updateSelfCompeEvalCommand(EVALSEASON_ID, RATEE_ID, done, hasLeadership, hasAm);
     }
 
     private PersonalEvaluationCreatedEvent createEvent() {
-        return CreationHelper.personalEvalCreatedEvent("EVAL1024", "bkchoi", "first", "second");
+        return EventHelper.personalEvalCreatedEvent(EVALSEASON_ID, RATEE_ID, FIRST_ID, SECOND_ID);
     }
 
 }
