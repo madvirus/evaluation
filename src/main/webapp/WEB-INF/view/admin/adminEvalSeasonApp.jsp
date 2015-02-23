@@ -30,6 +30,7 @@
 <script src="/js/admin/ng-admin-evanseason-app.js"></script>
 <script src="/js/admin/ng-admin-evalseason-controller.js"></script>
 <script src="/js/admin/ng-admin-evalseason-controller-distrule.js"></script>
+<script src="/js/admin/ng-admin-evalseason-controller-states.js"></script>
 
 </body>
 </html>

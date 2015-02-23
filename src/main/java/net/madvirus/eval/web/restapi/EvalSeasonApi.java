@@ -60,6 +60,11 @@ public class EvalSeasonApi {
         }
     }
 
+    @RequestMapping(value = "/api/evalseasons/{id}/evalStates")
+    public ResponseEntity getEvalStates(@PathVariable("id") String evalSeasonId) {
+        return ResponseEntity.ok(evalSeasonDataLoader.loadEvalStates(evalSeasonId));
+    }
+
     @Autowired
     public void setEvalSeasonDataLoader(EvalSeasonDataLoader evalSeasonDataLoader) {
         this.evalSeasonDataLoader = evalSeasonDataLoader;

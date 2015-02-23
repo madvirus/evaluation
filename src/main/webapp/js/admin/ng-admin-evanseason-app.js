@@ -17,6 +17,10 @@ evalAdminApp.config(
                     templateUrl: '/template/admin/evalseason/evalseasonDistrule.jsp',
                     controller: 'adminEvalSeasonDistruleCtrl'
                 }).
+                when('/:evalSeasonId/evalStates', {
+                    templateUrl: '/template/admin/evalseason/evalStates.jsp',
+                    controller: 'adminEvalSeasonStatesCtrl'
+                }).
                 otherwise({
                     redirectTo: '/'
                 });

@@ -5,7 +5,7 @@
 
     <bean id="mappingModelInitializer" class="net.madvirus.eval.query.evalseason.EvanSeasonMappingModelInitializerTestImpl">
         <constructor-arg ref="evalSeasonCluster" />
-        <constructor-arg ref="evalSeasonMappingModelRepository" />
+        <constructor-arg ref="mappingModelRepository" />
     </bean>
 
 </beans>

@@ -41,10 +41,11 @@
         </dd>
     </dl>
     <dl class="dl-horizontal">
-        <dt>배분 규칙</dt>
+        <dt>기능</dt>
         <dd>
             <p>
-                <a href="#{{evalSeason.id}}/distrule">[배분 규칙 관리 화면으로 이동하기]</a>
+                <a href="#{{evalSeason.id}}/distrule">[배분 규칙 관리하기]</a>
+                <a href="#{{evalSeason.id}}/evalStates">[평가 상태 조회 및 상태 변경 관리]</a>
             </p>
         </dd>
         <dt>피평가자 매핑</dt>

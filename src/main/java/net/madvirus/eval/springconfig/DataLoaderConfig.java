@@ -36,7 +36,8 @@ public class DataLoaderConfig {
         return new EvalSeasonDataLoaderImpl(
                 evalSeasonRepository,
                 evalSeasonMappingModelRepository,
-                userModelRepository);
+                userModelRepository,
+                personalEvalRepository);
     }
 
     @Bean

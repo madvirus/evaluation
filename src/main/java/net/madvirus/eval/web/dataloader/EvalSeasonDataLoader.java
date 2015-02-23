@@ -11,4 +11,6 @@ public interface EvalSeasonDataLoader {
     List<EvalSeasonSimpleData> loadAll();
 
     DistributionRuleData getDistributionRule(String evalSeasonId);
+
+    EvalSeasonAllEvalStates loadEvalStates(String evalSeasonId);
 }

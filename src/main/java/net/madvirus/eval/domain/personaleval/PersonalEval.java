@@ -232,6 +232,10 @@ public class PersonalEval extends AbstractAnnotatedAggregateRoot<String> {
                 .orElse(false);
     }
 
+    public boolean hasColleagueCompeEval(String colleagueId) {
+        return compeEval.getColleagueEvalOf(colleagueId).isPresent();
+    }
+
     public Optional<PerformanceEvalSet> getFirstPerfEvalSet() {
         return perfEval.getFirstEvalSet();
     }

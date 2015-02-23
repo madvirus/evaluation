@@ -3,6 +3,7 @@ package net.madvirus.eval.web.dataloader;
 import net.madvirus.eval.domain.evalseason.EvalSeason;
 import net.madvirus.eval.query.evalseason.EvalSeasonMappingModel;
 import net.madvirus.eval.query.evalseason.RateeMappingModel;
+import net.madvirus.eval.query.user.UserModel;
 import scala.Option;
 
 import java.util.List;
@@ -32,4 +33,6 @@ public class EvalSeasonData extends EvalSeasonSimpleData {
         return mappingOpt.isEmpty() ? false :
                 mappingOpt.get().containsColleagueRater(colleagueRaterId);
     }
+
+
 }

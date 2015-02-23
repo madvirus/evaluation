@@ -25,6 +25,13 @@ evalAppService.factory('evalSeasonService',
                     }
                 );
             };
+            evalSeasonService.getEvalSeasonStates = function(evalSeasonId) {
+                return httpRunner.create(
+                    function() {
+                        return $http.get("/api/evalseasons/"+evalSeasonId+"/evalStates", {});
+                    }
+                );
+            };
             evalSeasonService.getDistRule = function(evalSeasonId) {
                 return httpRunner.create(
                     function() {
