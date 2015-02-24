@@ -43,6 +43,10 @@
             <span ng-show="evalState.first.state == 'NONE'" class="label label-default">시작전</span>
             <span ng-show="evalState.first.state == 'DOING'" class="label label-info">진행중</span>
             <span ng-show="evalState.first.state == 'DONE'" class="label label-success">완료</span>
+
+            <span ng-show="evalState.second.state == 'NONE'">
+                <a href="" ng-click="returnToDraftFirstEvalOf(evalState.first.rater)">[1차 평가 완료 취소하기]</a>
+            </span>
         </td>
         <td>
             {{evalState.second.rater.name}}:

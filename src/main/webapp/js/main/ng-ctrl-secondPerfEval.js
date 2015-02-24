@@ -5,9 +5,27 @@ firstPerfEvalApp.controller('secondPerfEvalCtrl',
         function ($scope, secondEvalService, dialogService) {
             $scope.grades = ['S', 'A', 'B', 'C', 'D'];
             $scope.showError = false;
+            $scope.weights = [];
 
             $scope.readonly = function() {
                 return !$scope.firstTotalEvalDone || $scope.secondTotalEvalDone;
+            };
+            $scope.addWeight = function(weight) {
+                $scope.weights.push(weight);
+            };
+
+            $scope.getMark = function() {
+                var sum = 0;
+                angular.forEach($scope.evalData.itemEvals, function(val, idx) {
+                    var mark = 0;
+                    if (val.grade == 'S') mark = 5;
+                    else if (val.grade == 'A') mark = 4;
+                    else if (val.grade == 'B') mark = 3;
+                    else if (val.grade == 'C') mark = 2;
+                    else if (val.grade == 'D') mark = 1;
+                    sum += mark * $scope.weights[idx] / 100;
+                });
+                return sum;
             };
 
             var showErrorDisplay = function () {

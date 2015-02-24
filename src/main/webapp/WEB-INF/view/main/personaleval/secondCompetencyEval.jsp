@@ -264,7 +264,7 @@
                             class="form-control input-sm">
                     </select>
                 </td>
-                <td class="col-md-3"></td>
+                <td class="col-md-3">계산 평점: {{getMark() | number:2}}</td>
             </tr>
             </tbody>
         </table>

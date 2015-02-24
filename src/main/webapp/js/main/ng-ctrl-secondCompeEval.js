@@ -19,6 +19,36 @@ firstCompeEvalApp.controller('secondCompeEvalCtrl',
                 $scope.showError = false;
             };
 
+            $scope.getMark = function() {
+                var sum = 0;
+                var count = 5;
+                angular.forEach($scope.evalSet.commonsEvals, function(val, idx){
+                    sum += getMark(val.grade);
+                });
+                if ($scope.hasLeadership) {
+                    angular.forEach($scope.evalSet.leadershipEvals, function(val, idx){
+                        sum += getMark(val.grade);
+                    });
+                    count += $scope.evalSet.leadershipEvals.length;
+                }
+                if ($scope.hasAm) {
+                    angular.forEach($scope.evalSet.amEvals, function(val, idx) {
+                        sum += getMark(val.grade);
+                    });
+                    count += $scope.evalSet.amEvals.length;
+                }
+                return sum / count;
+            };
+
+            var getMark = function(grade) {
+                if (grade == 'S') return 5;
+                else if (grade == 'A') return 4;
+                else if (grade == 'B') return 3;
+                else if (grade == 'C') return 2;
+                else if (grade == 'D') return 1;
+                return 0;
+            };
+
             var makeCommand = function (done) {
                 var command = {};
                 command.evalSeasonId = $scope.evalSeasonId;

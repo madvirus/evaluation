@@ -59,7 +59,7 @@
                     <td rowspan="3">${itemAndEval.item.category}</td>
                     <td rowspan="3">${itemAndEval.item.goalType}</td>
                     <td rowspan="3"><tf:pre value='${itemAndEval.item.result}'/></td>
-                    <td rowspan="3">${itemAndEval.item.weight}</td>
+                    <td rowspan="3" ng-init="addWeight(${itemAndEval.item.weight})">${itemAndEval.item.weight}</td>
                     <td>피평가자</td>
                     <td><tf:pre value='${itemAndEval.selfEval.comment}'/></td>
                     <td>${itemAndEval.selfEval.grade}</td>
@@ -117,7 +117,7 @@
                             required>
                     </select>
                 </td>
-                <td class="col-md-3"></td>
+                <td class="col-md-3">계산 평점: {{getMark() | number:2}}</td>
             </tr>
             </tbody>
         </table>
