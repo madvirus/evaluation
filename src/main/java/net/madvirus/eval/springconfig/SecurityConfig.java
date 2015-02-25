@@ -17,6 +17,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.authentication.configurers.GlobalAuthenticationConfigurerAdapter;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.annotation.web.servlet.configuration.EnableWebMvcSecurity;
 import org.springframework.security.core.Authentication;
@@ -97,17 +98,25 @@ public class SecurityConfig {
         private SecurityContextRepository customContextRepository;
 
         @Override
+        public void configure(WebSecurity web) throws Exception {
+            web.ignoring().antMatchers("/webjars/**");
+        }
+
+        @Override
         protected void configure(HttpSecurity http) throws Exception {
-            http.csrf().disable();
-
-            http.requestCache()
-                    .requestCache(new NullRequestCache());
-
-            http.securityContext()
-                    .securityContextRepository(customContextRepository);
+//            http.csrf().disable();
+//
+//            http.requestCache()
+//                    .requestCache(new NullRequestCache());
+//
+//            http.securityContext()
+//                    .securityContextRepository(customContextRepository);
 
             http
                     .antMatcher("/api/**")
+                    .csrf().disable()
+                    .requestCache().requestCache(new NullRequestCache()).and()
+                    .securityContext().securityContextRepository(customContextRepository).and()
                     .authorizeRequests()
                     .antMatchers(HttpMethod.POST, "/api/evalseasons").hasRole("HRADMIN")
                     .antMatchers(HttpMethod.PUT, "/api/evalseasons/*").hasRole("HRADMIN")

@@ -13,7 +13,7 @@ public class AuthorityDaoImpl implements AuthorityDao {
 
     @Override
     public List<Authority> selectByUserId(String id) {
-        return jdbcTemplate.query("select * from Authority where user_id = ?",
+        return jdbcTemplate.query("select * from authority where user_id = ?",
                 new String[] {id},
                 (rs, rowNum) -> new Authority(rs.getString("user_id"), rs.getString("role")));
     }
