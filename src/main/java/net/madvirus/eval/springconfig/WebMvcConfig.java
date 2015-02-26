@@ -1,20 +1,12 @@
 package net.madvirus.eval.springconfig;
 
-import org.springframework.boot.autoconfigure.web.ServerProperties;
-import org.springframework.boot.context.embedded.ConfigurableEmbeddedServletContainer;
-import org.springframework.boot.context.embedded.EmbeddedServletContainerCustomizer;
-import org.springframework.boot.context.embedded.ErrorPage;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpStatus;
 import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.ViewResolverRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
 @Configuration
 public class WebMvcConfig extends WebMvcConfigurerAdapter {
-
-    public static final int CACHE_PERIOD_30DAY = 2592000;
 
     @Override
     public void addViewControllers(ViewControllerRegistry registry) {
@@ -33,24 +25,4 @@ public class WebMvcConfig extends WebMvcConfigurerAdapter {
         registry.jsp("/WEB-INF/view/", ".jsp");
     }
 
-    @Bean
-    public ServerProperties serverProperties() {
-        return new ServerProperties();
-    }
-
-    @Bean
-    public EmbeddedServletContainerCustomizer containerCustomizer(){
-        return new ErrorPageCustomizer();
-    }
-
-    private static class ErrorPageCustomizer implements EmbeddedServletContainerCustomizer {
-
-        @Override
-        public void customize(ConfigurableEmbeddedServletContainer container) {
-            container.addErrorPages(new ErrorPage(HttpStatus.FORBIDDEN, "/error/403"));
-            container.addErrorPages(new ErrorPage(HttpStatus.NOT_FOUND, "/error/404"));
-            container.addErrorPages(new ErrorPage(HttpStatus.INTERNAL_SERVER_ERROR, "/error/500"));
-        }
-
-    }
 }
