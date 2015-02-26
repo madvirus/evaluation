@@ -26,7 +26,7 @@ public class ContainerConfig {
 
     @Bean
     public EmbeddedServletContainerCustomizer containerCustomizer(){
-        return new ErrorPageCustomizer(tomcatJspServletConfig());
+        return new TomcatContainerCustomizer(tomcatJspServletConfig());
     }
 
     @Bean
@@ -34,11 +34,11 @@ public class ContainerConfig {
         return new TomcatJspServletConfig(jasperSetting);
     }
 
-    private static class ErrorPageCustomizer implements EmbeddedServletContainerCustomizer {
+    private static class TomcatContainerCustomizer implements EmbeddedServletContainerCustomizer {
 
         private TomcatJspServletConfig tomcatJspServletConfig;
 
-        public ErrorPageCustomizer(TomcatJspServletConfig tomcatJspServletConfig) {
+        public TomcatContainerCustomizer(TomcatJspServletConfig tomcatJspServletConfig) {
             this.tomcatJspServletConfig = tomcatJspServletConfig;
         }
 
