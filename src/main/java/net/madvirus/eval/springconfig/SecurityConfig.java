@@ -104,14 +104,6 @@ public class SecurityConfig {
 
         @Override
         protected void configure(HttpSecurity http) throws Exception {
-//            http.csrf().disable();
-//
-//            http.requestCache()
-//                    .requestCache(new NullRequestCache());
-//
-//            http.securityContext()
-//                    .securityContextRepository(customContextRepository);
-
             http
                     .antMatcher("/api/**")
                     .csrf().disable()
