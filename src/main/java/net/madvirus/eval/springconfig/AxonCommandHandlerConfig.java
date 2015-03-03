@@ -105,4 +105,9 @@ public class AxonCommandHandlerConfig {
     public UpdateSecondEvalCommandHandler updateSecondEvalCommandHandler() {
         return new UpdateSecondEvalCommandHandler(personalEvalRepository);
     }
+
+    @Bean
+    public ReturnDraftCommandHandler returnDraftCommandHandler() {
+        return new ReturnDraftCommandHandler(mappingModelRepository, personalEvalRepository);
+    }
 }

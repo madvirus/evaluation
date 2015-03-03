@@ -119,7 +119,7 @@ adminEvalSeasonController.controller('ruleManagerDialogCtrl',
                     $scope.dupRatees = dupRatees;
                     showErrorDisplay();
                 } else {
-                    var confirmDialogInstance = dialogService.confirm('확인', '배분 규칙을 적용하시겠습니까?')
+                    var confirmDialogInstance = dialogService.confirm('확인', '배분 규칙을 적용하시겠습니까?');
                     confirmDialogInstance.result.then(function () {
                         var command = {};
                         command.firstRaterId = ruleData.firstRater.id;

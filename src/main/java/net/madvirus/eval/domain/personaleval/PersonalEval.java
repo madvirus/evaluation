@@ -1,10 +1,7 @@
 package net.madvirus.eval.domain.personaleval;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import net.madvirus.eval.api.personaleval.ColleagueEvalDeletedEvent;
-import net.madvirus.eval.api.personaleval.PersonalEvalFirstRaterChangedEvent;
-import net.madvirus.eval.api.personaleval.PersonalEvalSecondRaterChangedEvent;
-import net.madvirus.eval.api.personaleval.PersonalEvaluationCreatedEvent;
+import net.madvirus.eval.api.personaleval.*;
 import net.madvirus.eval.api.personaleval.colleague.ColleagueCompetencyEvaluatedEvent;
 import net.madvirus.eval.api.personaleval.first.*;
 import net.madvirus.eval.api.personaleval.second.SecondCompetencyEvaluatedEvent;
@@ -300,4 +297,22 @@ public class PersonalEval extends AbstractAnnotatedAggregateRoot<String> {
         return secondRaterId;
     }
 
+    public void returnToFirstDraft() {
+        if (isSecondTotalEvalDone()) {
+            throw new AlreadySecondEvalDoneException();
+        }
+        apply(new FirstDraftReturnedEvent(this.id));
+    }
+
+    @EventSourcingHandler
+    public void on(FirstDraftReturnedEvent event) {
+        if (firstTotalEval.isPresent()) {
+            TotalEval totalEval = firstTotalEval.get();
+            if (totalEval.isDone()) {
+                firstTotalEval = Optional.of(new TotalEval(totalEval.getComment(), totalEval.getGrade(), false));
+                perfEval.returnFirstDraft();
+                compeEval.returnFirstDraft();
+            }
+        }
+    }
 }

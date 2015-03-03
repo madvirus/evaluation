@@ -51,6 +51,7 @@ colleagueCompeEvalApp.controller('colleagueCompeEvalCtrl',
                 hideErrorDisplay();
                 if (!$scope.compeEvalForm.$valid) {
                     showErrorDisplay();
+                    dialogService.error("입력 확인", "필수 입력 항목 및 의견 길이를 확인해주세요");
                 } else {
                     hideErrorDisplay();
                     var confirmDialogInstance = dialogService.confirm(

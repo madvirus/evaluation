@@ -74,6 +74,13 @@ evalAppService.factory('evalSeasonService',
                     }
                 );
             };
+            evalSeasonService.returnFirstEvalDraft = function(evalSeasonId, firstRaterId) {
+                return httpRunner.create(
+                    function() {
+                        return $http.put("/api/evalseasons/"+evalSeasonId+"/evalStates/firstRaters/"+firstRaterId+"?action=returnDraft")
+                    }
+                );
+            };
 
             return evalSeasonService;
         }

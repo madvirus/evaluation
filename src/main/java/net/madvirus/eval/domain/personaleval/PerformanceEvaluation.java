@@ -67,4 +67,11 @@ public class PerformanceEvaluation {
     public void updateSecondPerfEvalDone() {
         secondEvalSet = Optional.of(secondEvalSet.get().copy(true));
     }
+
+    public void returnFirstDraft() {
+        if (firstEvalSet.isPresent()) {
+            PerformanceEvalSet evalSet = firstEvalSet.get().copy(false);
+            firstEvalSet = Optional.of(evalSet);
+        }
+    }
 }

@@ -66,6 +66,7 @@
                               ng-readonly="evalDone()"
                               class="form-control input-sm msd-elastic: \n;"
                               name="comment"
+                              ng-minlength="10" ng-maxlength="100"
                               required></textarea>
                 </td>
                 <td class="col-md-1" ng-class="{'has-error': showError && !itemForm.grade.$valid}">
@@ -96,6 +97,7 @@
                               ng-readonly="evalDone()"
                               class="form-control input-sm msd-elastic: \n;"
                               name="comment"
+                              ng-minlength="10" ng-maxlength="100"
                               required></textarea>
                 </td>
                 <td class="col-md-1" ng-class="{'has-error': showError && !itemForm.grade.$valid}">
@@ -126,6 +128,7 @@
                               ng-readonly="evalDone()"
                               class="form-control input-sm msd-elastic: \n;"
                               name="comment"
+                              ng-minlength="10" ng-maxlength="100"
                               required></textarea>
                 </td>
                 <td class="col-md-1" ng-class="{'has-error': showError && !itemForm.grade.$valid}">
@@ -148,6 +151,7 @@
                               ng-readonly="evalDone()"
                               class="form-control input-sm msd-elastic: \n;"
                               name="totalComment"
+                              ng-minlength="10" ng-maxlength="100"
                               required></textarea>
                 </td>
                 <td class="col-md-4"></td>
@@ -159,6 +163,7 @@
                     <div class="alert alert-danger" role="alert">
                         <ul>
                             <li ng-show="!compeEvalForm.$valid">평가를 완료하려면, 모든 항목을 입력해야 합니다.</li>
+                            <li ng-show="!compeEvalForm.$valid">의견은 최소 (공백 포함) 10글자 이상 입력해야 합니다. (최대 100글자)</li>
                         </ul>
                     </div>
                 </td>

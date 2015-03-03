@@ -41,6 +41,12 @@ public class PersonalEvalHelper {
         return createFirstDonePersonalEvalWithSecondEvalDoneOption(evalSeasonId, rateeId, secondPerfCompeHad, false);
     }
 
+
+    public static PersonalEval createPersonalEvalWithFirstDoneAndNoSecondEval(
+            String evalSeasonId, String rateeId, String firstRaterId) {
+        return createFirstDonePersonalEvalWithSecondEvalDoneOption(evalSeasonId, rateeId, firstRaterId, false, false);
+    }
+
     public static PersonalEval createPersonalEvalWithFirstDone(
             String evalSeasonId, String rateeId, String firstRaterId, boolean secondPerfCompeHad) {
         return createFirstDonePersonalEvalWithSecondEvalDoneOption(evalSeasonId, rateeId, firstRaterId, secondPerfCompeHad, false);

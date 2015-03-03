@@ -5,6 +5,7 @@ import net.madvirus.eval.api.evalseaon.ColleagueEvalAlreadyStartedException;
 import net.madvirus.eval.command.evalseason.CreateEvalSeasonCommand;
 import net.madvirus.eval.command.evalseason.OpenEvaluationCommand;
 import net.madvirus.eval.command.evalseason.StartColleagueEvalCommand;
+import net.madvirus.eval.command.personaleval.ReturnFirstEvalDraftCommand;
 import net.madvirus.eval.web.dataloader.EvalSeasonDataLoader;
 import net.madvirus.eval.web.dataloader.EvalSeasonSimpleData;
 import org.axonframework.commandhandling.gateway.CommandGateway;
@@ -63,6 +64,14 @@ public class EvalSeasonApi {
     @RequestMapping(value = "/api/evalseasons/{id}/evalStates")
     public ResponseEntity getEvalStates(@PathVariable("id") String evalSeasonId) {
         return ResponseEntity.ok(evalSeasonDataLoader.loadEvalStates(evalSeasonId));
+    }
+
+    @RequestMapping(value = "/api/evalseasons/{id}/evalStates/firstRaters/{firstRaterId}", method = RequestMethod.PUT, params = "action=returnDraft")
+    public ResponseEntity returnFirstStateToDraft(@PathVariable("id") String evalSeasonId,
+                                                  @PathVariable("firstRaterId") String firstRaterId) {
+        ReturnFirstEvalDraftCommand command = new ReturnFirstEvalDraftCommand(evalSeasonId, firstRaterId);
+        gateway.sendAndWait(command);
+        return ResponseEntity.ok().build();
     }
 
     @Autowired
