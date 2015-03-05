@@ -9,7 +9,7 @@ import org.springframework.context.annotation.Configuration;
 public class QueryModelRepositoryConfig {
 
     @Bean
-    public EvalSeasonMappingModelRepository evalSeasonMappingModelRepository() {
+    public EvalSeasonMappingModelRepository mappingModelRepository() {
         return new EvalSeasonMappingModelRepositoryImpl();
     }
 
