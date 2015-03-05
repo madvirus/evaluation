@@ -119,6 +119,7 @@ public class AxonInfraConfig implements BeanClassLoaderAware {
     public EventSourcingRepository personalEvalRepository() {
         EventSourcingRepository repository = new EventSourcingRepository(personalEvalAggregateFactory(), jdbcEventStore());
         repository.setEventBus(eventBus());
+        repository.setSnapshotterTrigger(snapshotterTrigger());
         return repository;
     }
 
