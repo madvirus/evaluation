@@ -84,10 +84,10 @@
                     <c:if test="${collEvalState.personalEvalStarted}">
                         <c:if test="${collEvalState.colleagueEvalDone}">
                             <span class="label label-success">동료 역량 평가 완료</span>
-                            <a href="/main/evalseasons/EVAL2014/colleval/ratees/${collEvalState.ratee.id}">평가 내용 보기</a>
+                            <a href="/main/evalseasons/${evalSeason.id}/colleval/ratees/${collEvalState.ratee.id}">평가 내용 보기</a>
                         </c:if>
                         <c:if test="${!collEvalState.colleagueEvalDone}">
-                            <a href="/main/evalseasons/EVAL2014/colleval/ratees/${collEvalState.ratee.id}">평가하러 가기</a>
+                            <a href="/main/evalseasons/${evalSeason.id}/colleval/ratees/${collEvalState.ratee.id}">평가하러 가기</a>
                         </c:if>
                     </c:if>
                 </li>

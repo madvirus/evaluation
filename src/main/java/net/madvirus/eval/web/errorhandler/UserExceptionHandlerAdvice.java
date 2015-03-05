@@ -80,7 +80,7 @@ public class UserExceptionHandlerAdvice {
 
     @ExceptionHandler
     public void commonError(Exception ex, HttpServletResponse response) throws IOException {
-        logger.warn(ex.getMessage(), ex);
+        logger.error(ex.getMessage(), ex);
         response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
     }
 }
