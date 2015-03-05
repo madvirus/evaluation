@@ -172,7 +172,6 @@ public class PersonalEvalData implements PersonalEvalState {
                 .flatMap(eval -> Optional.ofNullable(eval.getTotalEval())).orElse(null);
     }
 
-    // TODO FirstRater인지 확인하는 기능 EvalSeason으로 이동 필요
     public boolean checkFirstRater(String firstRaterId) {
         return personalEval.checkFirstRater(firstRaterId);
     }

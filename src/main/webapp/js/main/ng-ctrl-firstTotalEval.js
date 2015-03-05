@@ -69,10 +69,6 @@ firstTotalEvalApp.controller('firstTotalEvalCtrl',
                     firstEvalService.updateFirstTotalEval($scope.evalSeasonId, command).then(
                         function (result) {
                             dialogService.success("성공", "평가 내용을 임시로 저장했습니다.");
-                        },
-                        function (result) {
-                            // TODO 에러 메시지 내용을 보여 주어야 함
-                            dialogService.error("실패", "문제가 발생했습니다.");
                         }
                     );
                 });
@@ -119,10 +115,6 @@ firstTotalEvalApp.controller('firstTotalEvalCtrl',
                             function (result) {
                                 $scope.totalEvalDone = true;
                                 dialogService.success("성공", "1차 평가를 완료했습니다.");
-                            },
-                            function (result) {
-                                // TODO 에러 메시지 내용을 보여 주어야 함
-                                dialogService.error("실패", "문제가 발생했습니다.");
                             }
                         );
                     });

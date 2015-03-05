@@ -11,10 +11,15 @@ httpModule.factory('httpRunner',
                                 successCallback({data: data, status: status, headers: headers});
                             })
                             .error(function (data, status, headers, config) {
-                                console.log("에러: " + status);
+                                console.log("httpModule.httpRunner 에러 로그: " + status);
                                 if (errorCallback == undefined || ! errorCallback({data: data, status: status, headers: headers})) {
-                                    // TODO angularjs http 공통 에러 처리 코드!
-                                    dialogService.error("에러", "에러["+status+"]가 발생했습니다.");
+                                    if (status == 0) {
+                                        dialogService.error("에러", "서버에 연결할 수 없습니다.");
+                                    } else if (status == 403) {
+                                        dialogService.error("에러", "접근 권한이 없습니다.");
+                                    } else {
+                                        dialogService.error("에러", "에러[" + status + "]가 발생했습니다.");
+                                    }
                                 }
                             });
                     }

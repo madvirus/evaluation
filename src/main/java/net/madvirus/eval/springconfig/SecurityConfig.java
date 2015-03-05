@@ -161,7 +161,7 @@ public class SecurityConfig {
                     .antMatchers("/admin").hasAnyRole("SYSTEMADMIN", "HRADMIN")
                     .antMatchers("/admin/system").hasAnyRole("SYSTEMADMIN")
                     .antMatchers("/admin/evalseasons").hasAnyRole("HRADMIN")
-                    .antMatchers("/template/admin/evalseasons/**").hasAnyRole("HRADMIN")
+                    .antMatchers("/template/admin/evalseason/**").hasAnyRole("HRADMIN")
                     .anyRequest().authenticated();
         }
 

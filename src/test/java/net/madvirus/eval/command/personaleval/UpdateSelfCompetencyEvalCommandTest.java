@@ -12,9 +12,11 @@ import net.madvirus.eval.command.EventCaptureMatcher;
 import net.madvirus.eval.command.personaleval.self.UpdateSelfCompetencyEvalCommand;
 import net.madvirus.eval.domain.evalseason.EvalSeason;
 import net.madvirus.eval.domain.evalseason.RateeType;
+import net.madvirus.eval.domain.personaleval.AlreadySelfCompetencyEvalDoneException;
 import net.madvirus.eval.domain.personaleval.PersonalEval;
 import net.madvirus.eval.testhelper.CommandHelper;
 import net.madvirus.eval.testhelper.EventHelper;
+import net.madvirus.eval.testhelper.PersonalEvalHelper;
 import org.axonframework.repository.AggregateNotFoundException;
 import org.axonframework.repository.Repository;
 import org.axonframework.test.FixtureConfiguration;
@@ -131,7 +133,25 @@ public class UpdateSelfCompetencyEvalCommandTest {
                 assertThat(personalEval.isSelfCompeEvalDone(), equalTo(true));
             });
         }
+    }
 
+    public class GivenAlreadyCompeEvalDone {
+        private TestExecutor testExecutor;
+
+        @Before
+        public void setUp() throws Exception {
+            givenEvalSeasonData(EVALSEASON_ID, RATEE_ID);
+            testExecutor = fixture.given(
+                    createEvent(),
+                    EventHelper.selfCompeEvaluatedEvent(EVALSEASON_ID, RATEE_ID, true));
+        }
+
+        @Test
+        public void whenUpdate_then_Should_Throw_ex() {
+            testExecutor
+                    .when(updateSelfCompeEvalCmdWithDraft())
+                    .expectException(AlreadySelfCompetencyEvalDoneException.class);
+        }
     }
 
     private void givenNoEvalSeason() {

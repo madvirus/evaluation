@@ -30,13 +30,6 @@ public class CompetencyEvaluation {
     }
 
     public void updateColleagueCompetencyEval(String colleagueRaterId, CompetencyEvalSet evalSet) {
-        // TODO 동료가 이미 평가를 완료했는지 여부를 이벤트 처리 메서드에서 하면 안 될 것 같음
-        if (colleagueEvals.containsKey(colleagueRaterId)) {
-            CompetencyEvalSet colleagueEvalSet = colleagueEvals.get(colleagueRaterId);
-            if (colleagueEvalSet.isDone()) {
-                throw new AlreadyEvaluationDoneException();
-            }
-        }
         colleagueEvals.put(colleagueRaterId, evalSet);
     }
 

@@ -35,7 +35,6 @@ public class UpdateColleagueEvalCommandHandler {
             throw new RateeNotFoundException(command.getRateeId());
         }
 
-        // TODO 동료 평가자 여부 검사하는 코드를 PersonalEval로 넣기!
         if (!evalSeason.containsColleagueRater(command.getRateeId(), command.getRaterId())) {
             throw new YouAreNotColleagueRaterException();
         }

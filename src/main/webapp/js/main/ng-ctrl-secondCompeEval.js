@@ -81,9 +81,6 @@ firstCompeEvalApp.controller('secondCompeEvalCtrl',
                         ).then(
                             function (result) {
                                 dialogService.success("성공", "역량 평가를 저장했습니다.");
-                            },
-                            function () {
-                                // TODO 에러 메시지 처리
                             }
                         );
                     });

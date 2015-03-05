@@ -3,7 +3,7 @@ var evalAdminApp = angular.module('adminEvalSeasonsApp',
 
 evalAdminApp.config(
     ['$routeProvider', '$httpProvider',
-        function($routeProvider, $httpProvider) {
+        function($routeProvider) {
             $routeProvider.
                 when('/', {
                     templateUrl: '/template/admin/evalseason/evalseasons.jsp',
@@ -26,3 +26,15 @@ evalAdminApp.config(
                 });
         }
     ]);
+
+
+evalAdminApp.controller("adminEvalSeasonsCtrl", ["$rootScope", function($rootScope) {
+    $rootScope.showRouteError = false;
+    $rootScope.$on("$routeChangeStart", function() {
+        $rootScope.showRouteError = false;
+    });
+    $rootScope.$on("$routeChangeError", function(event, current, previous, rejection) {
+        $rootScope.showRouteError = true;
+        $rootScope.errorStatus = rejection.status;
+    })
+}]);

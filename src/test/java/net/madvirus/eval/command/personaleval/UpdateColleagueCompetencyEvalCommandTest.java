@@ -6,7 +6,6 @@ import net.madvirus.eval.api.evalseaon.EvalSeasonCreatedEvent;
 import net.madvirus.eval.api.evalseaon.EvalSeasonNotFoundException;
 import net.madvirus.eval.api.evalseaon.MappingUpdatedEvent;
 import net.madvirus.eval.api.evalseaon.RateeNotFoundException;
-import net.madvirus.eval.api.personaleval.AlreadyEvaluationDoneException;
 import net.madvirus.eval.api.personaleval.PersonalEvalNotFoundException;
 import net.madvirus.eval.api.personaleval.PersonalEvaluationCreatedEvent;
 import net.madvirus.eval.api.personaleval.colleague.ColleagueCompetencyEvaluatedEvent;
@@ -15,6 +14,7 @@ import net.madvirus.eval.command.EventCaptureMatcher;
 import net.madvirus.eval.command.personaleval.colleague.UpdateColleagueCompetencyEvalCommand;
 import net.madvirus.eval.domain.evalseason.EvalSeason;
 import net.madvirus.eval.domain.evalseason.RateeType;
+import net.madvirus.eval.domain.personaleval.AlreadyColleagueEvalDoneException;
 import net.madvirus.eval.domain.personaleval.CompetencyEvalSet;
 import net.madvirus.eval.domain.personaleval.PersonalEval;
 import net.madvirus.eval.testhelper.CommandHelper;
@@ -128,7 +128,7 @@ public class UpdateColleagueCompetencyEvalCommandTest {
         public void when_ColleagueRater_Evaluate_then_Should_Throw_Ex() throws Exception {
             testExecutor
                     .when(updateColleagueCompeEvalCmdWithDraft())
-                    .expectException(AlreadyEvaluationDoneException.class);
+                    .expectException(AlreadyColleagueEvalDoneException.class);
         }
 
     }
