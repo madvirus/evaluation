@@ -3,7 +3,7 @@
 <!DOCTYPE html>
 <html ng-app="adminEvalSeasonsApp" ng-controller="adminEvalSeasonsCtrl">
 <head>
-    <meta charset="utf-8">
+    <jsp:include page="/WEB-INF/view/main/common/metatag.jsp" />
     <title>관리도구</title>
     <jsp:include page="/WEB-INF/view/main/common/css.jsp" />
 </head>

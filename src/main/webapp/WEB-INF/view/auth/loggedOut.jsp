@@ -1,6 +1,8 @@
 <%@ page contentType="text/html;charset=UTF-8" session="false" %>
+<!DOCTYPE html>
 <html>
 <head>
+    <jsp:include page="/WEB-INF/view/main/common/metatag.jsp" />
     <title>사용 종료</title>
     <link rel="stylesheet" href="/webjars/bootstrap/3.1.1/css/bootstrap.css"/>
 </head>

@@ -4,7 +4,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <meta charset="utf-8">
+    <jsp:include page="/WEB-INF/view/main/common/metatag.jsp" />
     <title>관리도구</title>
     <link rel="stylesheet" href="/webjars/bootstrap/3.1.1/css/bootstrap.css"/>
 </head>

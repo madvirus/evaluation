@@ -4,7 +4,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <meta charset="utf-8">
+    <jsp:include page="/WEB-INF/view/main/common/metatag.jsp" />
     <title>평가 시스템</title>
     <jsp:include page="/WEB-INF/view/main/common/css.jsp"/>
 </head>
