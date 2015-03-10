@@ -1,6 +1,35 @@
 var mainApp = angular.module('mainApp',
     ['ui.bootstrap', 'personalEvalService', 'dialogModule', 'competency.item', 'monospaced.elastic']);
 
+mainApp.config(function ($provide) {
+    $provide.decorator('inputDirective', function($delegate, $log) {
+        $log.debug('Hijacking input directive');
+        var directive = $delegate[0];
+        angular.extend(directive.link, {
+            post: function(scope, element, attr, ctrls) {
+                element.on('compositionupdate', function (event) {
+                    $log.debug('Composition update, faking end');
+                    element.triggerHandler('compositionend');
+                })
+            }
+        });
+        return $delegate;
+    });
+    $provide.decorator('textareaDirective', function($delegate, $log) {
+        $log.debug('Hijacking input directive');
+        var directive = $delegate[0];
+        angular.extend(directive.link, {
+            post: function(scope, element, attr, ctrls) {
+                element.on('compositionupdate', function (event) {
+                    $log.debug('Composition update, faking end');
+                    element.triggerHandler('compositionend');
+                })
+            }
+        });
+        return $delegate;
+    });
+});
+
 mainApp.directive('ngInitial', function($parse) {
     return {
         restrict: "A",
