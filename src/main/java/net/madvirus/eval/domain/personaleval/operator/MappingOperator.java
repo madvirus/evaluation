@@ -5,6 +5,7 @@ import net.madvirus.eval.api.evalseaon.FirstEvalDoneException;
 import net.madvirus.eval.api.personaleval.ColleagueEvalDeletedEvent;
 import net.madvirus.eval.api.personaleval.PersonalEvalFirstRaterChangedEvent;
 import net.madvirus.eval.api.personaleval.PersonalEvalSecondRaterChangedEvent;
+import net.madvirus.eval.api.personaleval.RateeTypeUpdatedEvent;
 import net.madvirus.eval.domain.personaleval.*;
 
 import java.util.List;
@@ -24,7 +25,7 @@ public class MappingOperator {
         boolean firstChanged = changed[0];
         boolean secondChanged = changed[1];
         boolean colleagueChanged = changed[2];
-        if (!firstChanged && !secondChanged && !colleagueChanged) return;
+        if (!firstChanged && !secondChanged && !colleagueChanged && rateeMapping.getType() == personalEval.getRateeType()) return;
 
         if (firstChanged) {
             if (personalEval.isFirstCompeEvalHad() || personalEval.isFirstPerfEvalHad()) {
@@ -59,6 +60,14 @@ public class MappingOperator {
             if (!removeTargetColleagueIds.isEmpty()) {
                 personalEval.applyEvent(new ColleagueEvalDeletedEvent(personalEval.getId(), removeTargetColleagueIds));
             }
+        }
+        if (rateeMapping.getType() != personalEval.getRateeType()) {
+            // 본인 평가를 완료했으면 변경할 수 없음
+            if (personalEval.isSelfCompeEvalDone()) {
+                throw new AlreadySelfCompetencyEvalDoneException();
+            }
+            // 진행 중인 동료 평가를 모두 비 완료로 변경
+            personalEval.applyEvent(new RateeTypeUpdatedEvent(personalEval.getId(), rateeMapping.getType()));
         }
     }
 

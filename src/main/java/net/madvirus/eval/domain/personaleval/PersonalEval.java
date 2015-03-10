@@ -315,4 +315,11 @@ public class PersonalEval extends AbstractAnnotatedAggregateRoot<String> {
             }
         }
     }
+
+    @EventSourcingHandler
+    public void on(RateeTypeUpdatedEvent event) {
+        RateeType newRateeType = event.getRateeType();
+        this.rateeType = newRateeType;
+        compeEval.applyNewRateeType(newRateeType);
+    }
 }

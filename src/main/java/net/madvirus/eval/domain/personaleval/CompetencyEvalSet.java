@@ -1,6 +1,8 @@
 package net.madvirus.eval.domain.personaleval;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import net.madvirus.eval.api.personaleval.Grade;
+import net.madvirus.eval.domain.evalseason.RateeType;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -65,6 +67,26 @@ public class CompetencyEvalSet {
 
     public CompetencyEvalSet copy(boolean done) {
         return new CompetencyEvalSet(commonsEvals, leadershipEvals, amEvals, totalEval, done);
+    }
+
+    public CompetencyEvalSet applyNewType(RateeType newRateeType) {
+        return applyNewType(newRateeType, done);
+    }
+
+    public CompetencyEvalSet applyNewType(RateeType newRateeType, boolean newDone) {
+        List<ItemEval> newCommandEvals = commonsEvals;
+        List<ItemEval> newLeadershipEvals = leadershipEvals;
+        if (newRateeType.hasLeadership()) {
+            if (leadershipEvals == null || leadershipEvals.isEmpty()) {
+                newLeadershipEvals = new ArrayList<>();
+                newLeadershipEvals.add(new ItemEval(null, null));
+                newLeadershipEvals.add(new ItemEval(null, null));
+                newLeadershipEvals.add(new ItemEval(null, null));
+                newLeadershipEvals.add(new ItemEval(null, null));
+                newLeadershipEvals.add(new ItemEval(null, null));
+            }
+        }
+        return new CompetencyEvalSet(newCommandEvals, newLeadershipEvals, amEvals, totalEval, newDone);
     }
 
     @Override

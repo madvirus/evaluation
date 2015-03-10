@@ -2,6 +2,7 @@ package net.madvirus.eval.domain.personaleval;
 
 import net.madvirus.eval.api.evalseaon.SomeColleagueEvalDoneException;
 import net.madvirus.eval.api.personaleval.AlreadyEvaluationDoneException;
+import net.madvirus.eval.domain.evalseason.RateeType;
 
 import java.util.*;
 
@@ -115,6 +116,16 @@ public class CompetencyEvaluation {
         if (firstEvalSet.isPresent()) {
             CompetencyEvalSet evalSet = firstEvalSet.get().copy(false);
             firstEvalSet = Optional.of(evalSet);
+        }
+    }
+
+    public void applyNewRateeType(RateeType newRateeType) {
+        if (selfEvalSet.isPresent()) {
+            selfEvalSet = Optional.of(selfEvalSet.get().applyNewType(newRateeType));
+        }
+        for (String collId : colleagueEvals.keySet()) {
+            CompetencyEvalSet newEvalSet = colleagueEvals.get(collId).applyNewType(newRateeType, false);
+            colleagueEvals.put(collId, newEvalSet);
         }
     }
 }
