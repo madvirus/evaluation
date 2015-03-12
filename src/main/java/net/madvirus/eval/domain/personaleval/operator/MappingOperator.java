@@ -48,7 +48,7 @@ public class MappingOperator {
                             rateeMapping.getSecondRaterId()));
         }
 
-        if (personalEval.isFirstTotalEvalDone()) {
+        if (!personalEval.isFirstEvalSkipTarget() && personalEval.isFirstTotalEvalDone()) {
             throw new FirstEvalDoneException();
         }
         if (personalEval.isSecondTotalEvalDone()) {

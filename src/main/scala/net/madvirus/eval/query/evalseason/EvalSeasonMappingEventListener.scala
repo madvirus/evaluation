@@ -28,11 +28,14 @@ class EvalSeasonMappingEventListener(
             val rater1 = if (mapping.hasFirstRater) userRepository.findOne(mapping.getFirstRaterId) else null
             val rater2 = userRepository.findOne(mapping.getSecondRaterId)
             val colleagueRater = mapping.getColleagueRaterIds.toList.foldLeft(Set[UserModel]()) { (set, colleagueId) => {
-              val colUser = userRepository.findOne(colleagueId)
-              if (colUser != null)
-                set + colUser
-              else
-                set
+              if (colleagueId == null || colleagueId.trim().isEmpty) set
+              else {
+                val colUser = userRepository.findOne(colleagueId.trim())
+                if (colUser != null)
+                  set + colUser
+                else
+                  set
+              }
             }
             }
             evalSeason = evalSeason.updateMapping(RateeMappingModel(ratee, mapping.getType, rater1, rater2, colleagueRater), seqNumber)

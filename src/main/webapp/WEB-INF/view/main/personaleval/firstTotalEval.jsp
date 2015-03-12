@@ -29,7 +29,7 @@
     </div>
 
     <div class="alert alert-warning" role="alert" ng-show="!totalEvalAvailable">
-        "1차 평가를 시작한 이후" 또는 "성과 평가와 역량 평가를 모두 작성해야" 종합 평가를 할 수 있습니다.
+        <!-- "1차 평가를 시작한 이후" 또는 --> "성과 평가와 역량 평가를 모두 작성해야" 종합 평가를 할 수 있습니다.
     </div>
 
     <div class="alert alert-info" role="alert" ng-show="totalEvalDone">
