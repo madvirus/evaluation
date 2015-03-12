@@ -5,7 +5,9 @@ import net.madvirus.eval.api.evalseaon.ColleagueEvalAlreadyStartedException;
 import net.madvirus.eval.command.evalseason.CreateEvalSeasonCommand;
 import net.madvirus.eval.command.evalseason.OpenEvaluationCommand;
 import net.madvirus.eval.command.evalseason.StartColleagueEvalCommand;
+import net.madvirus.eval.command.evalseason.StartFirstEvalCommand;
 import net.madvirus.eval.command.personaleval.ReturnFirstEvalDraftCommand;
+import net.madvirus.eval.domain.evalseason.FirstEvalAlreadyStartedException;
 import net.madvirus.eval.web.dataloader.EvalSeasonDataLoader;
 import net.madvirus.eval.web.dataloader.EvalSeasonSimpleData;
 import org.axonframework.commandhandling.gateway.CommandGateway;
@@ -57,6 +59,18 @@ public class EvalSeasonApi {
             gateway.sendAndWait(command);
             return ResponseEntity.ok().build();
         } catch (ColleagueEvalAlreadyStartedException ex) {
+            return ResponseEntity.ok().build();
+        }
+    }
+
+
+    @RequestMapping(value = "/api/evalseasons/{id}", method = RequestMethod.PUT, params = "action=startFirstEval")
+    public ResponseEntity putStartFirstEval(@PathVariable("id") String evalSeasonId) {
+        try {
+            StartFirstEvalCommand command = new StartFirstEvalCommand(evalSeasonId);
+            gateway.sendAndWait(command);
+            return ResponseEntity.ok().build();
+        } catch (FirstEvalAlreadyStartedException ex) {
             return ResponseEntity.ok().build();
         }
     }

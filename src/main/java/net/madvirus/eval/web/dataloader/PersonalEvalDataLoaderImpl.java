@@ -237,4 +237,24 @@ public class PersonalEvalDataLoaderImpl implements PersonalEvalDataLoader {
         });
     }
 
+    @Override
+    public List<PersonalEvalData> getAllPersonalEvalData(String evalSeasonId) {
+        return runInUOW(() -> {
+            EvalSeasonMappingModel mappingModel = getMappingModelOrThrowExIfNotFound(evalSeasonId);
+            List<PersonalEvalData> result = new ArrayList<PersonalEvalData>();
+            mappingModel.getRateeMappingModels().forEach(mapping -> {
+                try {
+                    PersonalEval personalEval = personalEvalRepository.load(createId(evalSeasonId, mapping.getRatee().getId()));
+                    UserModel ratee = userModelRepository.findOne(personalEval.getUserId());
+
+                    result.add(new PersonalEvalData(personalEval, ratee));
+                } catch (AggregateNotFoundException e) {
+                    //result.add()
+                }
+
+            });
+            return result;
+        });
+    }
+
 }

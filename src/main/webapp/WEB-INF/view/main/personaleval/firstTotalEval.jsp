@@ -16,6 +16,7 @@
 
 <div class="container" ng-controller="firstTotalEvalCtrl" ng-cloak>
     <input type="hidden" ng-model="evalSeasonId" ng-initial value="${evalSeasonId}"/>
+    <input type="hidden" ng-init="firstEvaluationStarted = ${evalSeason.firstEvaluationStarted}"/>
     <input type="hidden" ng-init="totalEvalAvailable = ${firstTotalEvalData.totalEvalAvailable}"/>
     <input type="hidden" ng-init="totalEvalDone = ${firstTotalEvalData.totalEvalDone}"/>
     <ol class="breadcrumb">
@@ -28,7 +29,7 @@
     </div>
 
     <div class="alert alert-warning" role="alert" ng-show="!totalEvalAvailable">
-        성과 평가와 역량 평가를 모두 작성해야 종합 평가를 할 수 있습니다.
+        "1차 평가를 시작한 이후" 또는 "성과 평가와 역량 평가를 모두 작성해야" 종합 평가를 할 수 있습니다.
     </div>
 
     <div class="alert alert-info" role="alert" ng-show="totalEvalDone">

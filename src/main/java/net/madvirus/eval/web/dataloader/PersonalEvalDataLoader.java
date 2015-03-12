@@ -21,4 +21,6 @@ public interface PersonalEvalDataLoader {
     public FirstTotalEvalData getFirstTotalEvalData(String evalSeasonId, String firstRaterId);
 
     SecondTotalEvalData getSecondTotalEvalData(String evalSeasonId, String id);
+
+    List<PersonalEvalData> getAllPersonalEvalData(String evalSeasonId);
 }

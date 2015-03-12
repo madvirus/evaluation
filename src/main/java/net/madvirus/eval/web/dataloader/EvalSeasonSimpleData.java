@@ -8,12 +8,14 @@ public class EvalSeasonSimpleData {
     private String name;
     private boolean opened;
     private boolean colleagueEvalutionStarted;
+    private boolean firstEvaluationStarted;
 
     public EvalSeasonSimpleData(EvalSeason evalSeason) {
         this.id = evalSeason.getId();
         this.name = evalSeason.getName();
         this.opened = evalSeason.isOpened();
         this.colleagueEvalutionStarted = evalSeason.isColleagueEvalutionStarted();
+        this.firstEvaluationStarted = evalSeason.isFirstEvaluationStarted();
     }
 
     public String getId() {
@@ -30,5 +32,9 @@ public class EvalSeasonSimpleData {
 
     public boolean isColleagueEvalutionStarted() {
         return colleagueEvalutionStarted;
+    }
+
+    public boolean isFirstEvaluationStarted() {
+        return firstEvaluationStarted;
     }
 }

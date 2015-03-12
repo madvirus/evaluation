@@ -50,7 +50,7 @@ public class UpdateMappingCommandHandler {
                 ratees.forEach(ratee -> {
                     try {
                         PersonalEval eval = personalEvalRepository.load(PersonalEval.createId(command.getEvalSeasonId(), ratee.getId()));
-                        if (eval.isFirstTotalEvalDone()) {
+                        if (!eval.isFirstEvalSkipTarget() && eval.isFirstTotalEvalDone()) {
                             throw new FirstEvalDoneException();
                         }
                     } catch (AggregateNotFoundException e) {

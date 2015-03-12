@@ -5,6 +5,7 @@ import net.madvirus.eval.api.RateeMapping;
 import net.madvirus.eval.api.evalseaon.*;
 import net.madvirus.eval.command.evalseason.OpenEvaluationCommand;
 import net.madvirus.eval.command.evalseason.StartColleagueEvalCommand;
+import net.madvirus.eval.command.evalseason.StartFirstEvalCommand;
 import net.madvirus.eval.util.PairValues;
 import org.axonframework.commandhandling.annotation.CommandHandler;
 import org.axonframework.eventsourcing.annotation.AbstractAnnotatedAggregateRoot;
@@ -23,6 +24,7 @@ public class EvalSeason extends AbstractAnnotatedAggregateRoot<String> {
     private boolean opened;
     private Date creationDate;
     private boolean colleagueEvalutionStarted;
+    private boolean firstEvaluationStarted;
 
     private Mappings mappings;
     private Map<String, List<DistributionRule>> rulesMap;
@@ -52,6 +54,10 @@ public class EvalSeason extends AbstractAnnotatedAggregateRoot<String> {
 
     public boolean isColleagueEvalutionStarted() {
         return colleagueEvalutionStarted;
+    }
+
+    public boolean isFirstEvaluationStarted() {
+        return firstEvaluationStarted;
     }
 
     public boolean containsRatee(String rateeId) {
@@ -142,6 +148,19 @@ public class EvalSeason extends AbstractAnnotatedAggregateRoot<String> {
     @EventSourcingHandler
     public void on(ColleagueEvalStartedEvent event) {
         colleagueEvalutionStarted = true;
+    }
+
+
+    @CommandHandler
+    public void handle(StartFirstEvalCommand command) {
+        if (!opened) throw new EvalSeasonNotYetOpenedException();
+        if (firstEvaluationStarted) throw new FirstEvalAlreadyStartedException();
+        apply(new FirstEvalStartedEvent(this.id));
+    }
+
+    @EventSourcingHandler
+    public void on(FirstEvalStartedEvent event) {
+        firstEvaluationStarted = true;
     }
 
     public boolean containsColleagueRater(String rateeId, String raterId) {

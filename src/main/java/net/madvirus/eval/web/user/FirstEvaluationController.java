@@ -9,10 +9,7 @@ import net.madvirus.eval.domain.personaleval.PerformanceItemAndAllEval;
 import net.madvirus.eval.query.evalseason.EvalSeasonMappingModelRepository;
 import net.madvirus.eval.query.evalseason.RateeMappingModel;
 import net.madvirus.eval.query.user.UserModel;
-import net.madvirus.eval.web.dataloader.CompetencyEvalSetUtil;
-import net.madvirus.eval.web.dataloader.FirstTotalEvalData;
-import net.madvirus.eval.web.dataloader.PersonalEvalData;
-import net.madvirus.eval.web.dataloader.PersonalEvalDataLoader;
+import net.madvirus.eval.web.dataloader.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.web.bind.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
@@ -27,6 +24,7 @@ import java.util.stream.Collectors;
 @Controller
 public class FirstEvaluationController {
     private PersonalEvalDataLoader personalEvalDataLoader;
+    private EvalSeasonDataLoader evalSeasonDataLoader;
     private EvalSeasonMappingModelRepository evalSeasonMappingModelRepository;
 
     @Autowired
@@ -37,6 +35,11 @@ public class FirstEvaluationController {
     @Autowired
     public void setEvalSeasonMappingModelRepository(EvalSeasonMappingModelRepository evalSeasonMappingModelRepository) {
         this.evalSeasonMappingModelRepository = evalSeasonMappingModelRepository;
+    }
+
+    @Autowired
+    public void setEvalSeasonDataLoader(EvalSeasonDataLoader evalSeasonDataLoader) {
+        this.evalSeasonDataLoader = evalSeasonDataLoader;
     }
 
     @RequestMapping(value = "/main/evalseasons/{evalSeasonId}/firsteval/{rateeId}/performance")
@@ -84,6 +87,7 @@ public class FirstEvaluationController {
     }
 
     private PersonalEvalData checkAndSetModelOrThrowEx(String evalSeasonId, String rateeId, UserModel userModel, Model model) throws IOException {
+        populateEvalSeasonModel(evalSeasonId, model);
         PersonalEvalData personalEval = personalEvalDataLoader.getPersonalEval(evalSeasonId, rateeId);
         if (!personalEval.checkFirstRater(userModel.getId())) {
             throw new YouAreNotFirstRaterException();
@@ -92,12 +96,19 @@ public class FirstEvaluationController {
         return personalEval;
     }
 
+    private void populateEvalSeasonModel(String evalSeasonId, Model model) {
+        EvalSeasonData evalSeasonData = evalSeasonDataLoader.load(evalSeasonId);
+        model.addAttribute("evalSeason", evalSeasonData);
+    }
+
     @RequestMapping(value = "/main/evalseasons/{evalSeasonId}/firsttotaleval")
     public String totalEvalForm(
             @PathVariable("evalSeasonId") String evalSeasonId,
             @AuthenticationPrincipal UserModel userModel,
             Model model) {
         model.addAttribute("evalSeasonId", evalSeasonId);
+        populateEvalSeasonModel(evalSeasonId, model);
+
         FirstTotalEvalData firstTotalEvalData = personalEvalDataLoader.getFirstTotalEvalData(evalSeasonId, userModel.getId());
         model.addAttribute("firstTotalEvalData", firstTotalEvalData);
         return "main/personaleval/firstTotalEval";
