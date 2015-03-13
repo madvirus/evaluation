@@ -66,7 +66,6 @@
                               ng-readonly="evalDone()"
                               class="form-control input-sm msd-elastic: \n;"
                               name="comment"
-                              ng-minlength="10" ng-maxlength="100"
                               required></textarea>
                 </td>
                 <td class="col-md-1" ng-class="{'has-error': showError && !itemForm.grade.$valid}">
@@ -97,7 +96,6 @@
                               ng-readonly="evalDone()"
                               class="form-control input-sm msd-elastic: \n;"
                               name="comment"
-                              ng-minlength="10" ng-maxlength="100"
                               required></textarea>
                 </td>
                 <td class="col-md-1" ng-class="{'has-error': showError && !itemForm.grade.$valid}">
@@ -128,7 +126,6 @@
                               ng-readonly="evalDone()"
                               class="form-control input-sm msd-elastic: \n;"
                               name="comment"
-                              ng-minlength="10" ng-maxlength="100"
                               required></textarea>
                 </td>
                 <td class="col-md-1" ng-class="{'has-error': showError && !itemForm.grade.$valid}">
@@ -151,7 +148,6 @@
                               ng-readonly="evalDone()"
                               class="form-control input-sm msd-elastic: \n;"
                               name="totalComment"
-                              ng-minlength="10" ng-maxlength="100"
                               required></textarea>
                 </td>
                 <td class="col-md-4"></td>
