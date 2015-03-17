@@ -24,8 +24,7 @@ public class EvalSeasonController {
 
     @RequestMapping("/main/evalseasons/{seasonId}")
     public String main(@PathVariable("seasonId") String evalSeasonId, Model model,
-                       @AuthenticationPrincipal UserModel currentUser,
-                       HttpServletResponse response) throws IOException {
+                       @AuthenticationPrincipal UserModel currentUser) throws IOException {
         EvalSeasonData evalSeasonData = evalSeasonDataLoader.load(evalSeasonId);
         model.addAttribute("evalSeason", evalSeasonData);
 

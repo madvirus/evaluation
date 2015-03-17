@@ -48,7 +48,7 @@ public class PersonalEvalDataLoaderImpl implements PersonalEvalDataLoader {
                 PersonalEval personalEval = personalEvalRepository.load(createId(evalSeasonId, rateeId));
                 UserModel ratee = userModelRepository.findOne(personalEval.getUserId());
 
-                return new PersonalEvalData(personalEval, ratee);
+                return new StartedPersonalEvalData(personalEval, ratee);
             } catch (AggregateNotFoundException e) {
                 throw new PersonalEvalNotFoundException();
             }
@@ -62,7 +62,7 @@ public class PersonalEvalDataLoaderImpl implements PersonalEvalDataLoader {
             UserModel ratee = userModelRepository.findOne(rateeId);
             try {
                 PersonalEval personalEval = personalEvalRepository.load(createId(evalSeasonId, rateeId));
-                return new PersonalEvalData(personalEval, ratee);
+                return new StartedPersonalEvalData(personalEval, ratee);
             } catch (AggregateNotFoundException e) {
                 return PersonalEvalStateBuilder.notStarted(ratee);
             }
@@ -247,9 +247,9 @@ public class PersonalEvalDataLoaderImpl implements PersonalEvalDataLoader {
                     PersonalEval personalEval = personalEvalRepository.load(createId(evalSeasonId, mapping.getRatee().getId()));
                     UserModel ratee = userModelRepository.findOne(personalEval.getUserId());
 
-                    result.add(new PersonalEvalData(personalEval, ratee));
+                    result.add(new StartedPersonalEvalData(personalEval, ratee));
                 } catch (AggregateNotFoundException e) {
-                    //result.add()
+                    result.add(new NotStartedPersonalEvalData(mapping.getRatee(), evalSeasonId, mapping.getType()));
                 }
 
             });

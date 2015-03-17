@@ -1,5 +1,5 @@
-var competencyItemModule = angular.module('competency.item', ['ui.bootstrap']);
-competencyItemModule.factory('competencyItemService', ['$modal', function($modal) {
+var competencyItemModule = angular.module('competency.item', []);
+competencyItemModule.factory('competencyItemService', [function() {
     var commonItems = [
         {
             name: '윤리의식',

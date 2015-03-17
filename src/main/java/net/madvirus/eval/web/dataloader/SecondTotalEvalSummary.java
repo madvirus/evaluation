@@ -21,66 +21,45 @@ public class SecondTotalEvalSummary extends FirstTotalEvalSummary {
     }
 
     public boolean isSecondPerfEvalHad() {
-        return secondPerfEval.flatMap(eval -> Optional.of(true)).orElse(false);
+        return personalEval.isSecondPerfEvalHad();
     }
 
     public Grade getSecondPerfEvalGrade() {
-        return secondPerfEval.flatMap(eval -> Optional.of(eval.getTotalEval().getGrade())).orElse(null);
+        return personalEval.getSecondPerfEvalGrade();
     }
 
     public boolean isSecondCompeEvalHad() {
-        return secondCompeEval.flatMap(eval -> Optional.of(true)).orElse(false);
+        return personalEval.isSecondCompeEvalHad();
     }
 
     public Double getSecondCompeCommonAvg() {
-        return secondCompeEval
-                .flatMap(eval -> Optional.of(calculateAverage(eval.getCommonsEvals())))
-                .orElse(null);
+        return personalEval.getSecondCompeEvalSet().flatMap(eval -> Optional.ofNullable(eval.getCommonsAverage())).orElse(null);
     }
 
     public Double getSecondCompeLeadershipAvg() {
         if (!rateeType.hasLeadership()) return null;
-        return secondCompeEval
-                .flatMap(eval -> Optional.of(calculateAverage(eval.getLeadershipEvals())))
-                .orElse(null);
+        return personalEval.getSecondCompeEvalSet().flatMap(eval -> Optional.ofNullable(eval.getLeadershipAverage())).orElse(null);
     }
 
     public Double getSecondCompeAmAvg() {
         if (!rateeType.hasAm()) return null;
-        return secondCompeEval
-                .flatMap(eval -> Optional.of(calculateAverage(eval.getAmEvals())))
-                .orElse(null);
-    }
-
-    private Double calculateAverage(List<ItemEval> evals) {
-        int count = 0;
-        double sum = 0.0;
-
-        for (ItemEval itemEval : evals) {
-            sum += itemEval.getGrade().getNumber();
-            count ++;
-        }
-        return sum / count;
+        return personalEval.getSecondCompeEvalSet().flatMap(eval -> Optional.ofNullable(eval.getAmAverage())).orElse(null);
     }
 
     public Grade getSecondCompeEvalGrade() {
-        return secondCompeEval.flatMap(eval -> Optional.of(eval.getTotalEval().getGrade())).orElse(null);
+        return personalEval.getSecondCompeEvalGrade();
     }
 
     public Double getSecondTotalMark() {
-        return MarkCalculator.calculate(rateeType,
-                getSecondPerfEvalGrade(),
-                getSecondCompeCommonAvg(),
-                getSecondCompeLeadershipAvg(),
-                getSecondCompeAmAvg());
+        return personalEval.getSecondMark();
     }
 
     public TotalEval getSecondTotalEval() {
-        return secondTotalEval.orElse(null);
+        return personalEval.getSecondTotalEval().orElse(null);
     }
 
     public boolean isSecondTotalEvalDone() {
-        return secondTotalEval.flatMap(eval -> Optional.of(eval.isDone())).orElse(false);
+        return personalEval.isSecondTotalEvalDone();
     }
 
 }

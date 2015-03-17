@@ -12,16 +12,12 @@ public class FirstTotalEvalSummary {
 
     private UserModel ratee;
     protected RateeType rateeType;
-    private Optional<PerformanceEvalSet> firstPerfEval;
-    private Optional<CompetencyEvalSet> firstCompeEval;
-    private Optional<TotalEval> firstTotalEval;
+    protected PersonalEval personalEval;
 
     public FirstTotalEvalSummary(UserModel ratee, PersonalEval personalEval) {
         this.ratee = ratee;
+        this.personalEval = personalEval;
         this.rateeType = personalEval.getRateeType();
-        firstPerfEval = personalEval.getFirstPerfEvalSet();
-        firstCompeEval = personalEval.getFirstCompeEvalSet();
-        firstTotalEval = personalEval.getFirstTotalEval();
     }
 
     public UserModel getRatee() {
@@ -29,62 +25,50 @@ public class FirstTotalEvalSummary {
     }
 
     public boolean isFirstPerfEvalHad() {
-        return firstPerfEval.flatMap(eval -> Optional.of(true)).orElse(false);
+        return personalEval.isFirstPerfEvalHad();
     }
 
     public Grade getFirstPerfEvalGrade() {
-        return firstPerfEval.flatMap(eval -> Optional.of(eval.getTotalEval().getGrade())).orElse(null);
+        return personalEval.getFirstPerfEvalGrade();
     }
 
     public boolean isFirstCompeEvalHad() {
-        return firstCompeEval.flatMap(eval -> Optional.of(true)).orElse(false);
+        return personalEval.isFirstCompeEvalHad();
     }
 
     public Double getFirstCompeCommonAvg() {
-        if (!firstCompeEval.isPresent()) return null;
-        return calculateAverage(firstCompeEval.get().getCommonsEvals());
+        return personalEval.getFirstCompeEvalSet()
+                .flatMap(evalSet -> Optional.ofNullable(evalSet.getCommonsAverage()))
+                .orElse(null);
     }
 
     public Double getFirstCompeLeadershipAvg() {
-        if (!firstCompeEval.isPresent()) return null;
         if (!rateeType.hasLeadership()) return null;
-        return calculateAverage(firstCompeEval.get().getLeadershipEvals());
+        return personalEval.getFirstCompeEvalSet()
+                .flatMap(evalSet -> Optional.ofNullable(evalSet.getLeadershipAverage()))
+                .orElse(null);
     }
 
     public Double getFirstCompeAmAvg() {
-        if (!firstCompeEval.isPresent()) return null;
         if (!rateeType.hasAm()) return null;
-        return calculateAverage(firstCompeEval.get().getAmEvals());
-    }
-
-    private Double calculateAverage(List<ItemEval> evals) {
-        int count = 0;
-        double sum = 0.0;
-
-        for (ItemEval itemEval : evals) {
-            sum += itemEval.getGrade().getNumber();
-            count ++;
-        }
-        return sum / count;
+        return personalEval.getFirstCompeEvalSet()
+                .flatMap(evalSet -> Optional.ofNullable(evalSet.getAmAverage()))
+                .orElse(null);
     }
 
     public Grade getFirstCompeEvalGrade() {
-        return firstCompeEval.flatMap(eval -> Optional.of(eval.getTotalEval().getGrade())).orElse(null);
+        return personalEval.getFirstCompeEvalGrade();
     }
 
     public Double getFirstTotalMark() {
-        return MarkCalculator.calculate(rateeType,
-                getFirstPerfEvalGrade(),
-                getFirstCompeCommonAvg(),
-                getFirstCompeLeadershipAvg(),
-                getFirstCompeAmAvg());
+        return personalEval.getFirstMark();
     }
 
     public TotalEval getFirstTotalEval() {
-        return firstTotalEval.orElse(null);
+        return personalEval.getFirstTotalEval().orElse(null);
     }
 
     public boolean isFirstTotalEvalDone() {
-        return firstTotalEval.flatMap(eval -> Optional.of(eval.isDone())).orElse(false);
+        return personalEval.isFirstTotalEvalDone();
     }
 }

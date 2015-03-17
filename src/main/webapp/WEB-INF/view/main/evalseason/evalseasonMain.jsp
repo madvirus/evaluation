@@ -266,7 +266,7 @@
                     </td>
                     <td>
                         <c:if test="${rateeState.started && rateeState.firstEvalSkipTarget}">
-                            1차 평가 생략 대상
+                            <span class="label label-success">1차 평가 생략 대상</span>
                         </c:if>
                         <c:if test="${!rateeState.firstEvalSkipTarget}">
                             <c:if test="${!rateeState.firstPerfEvalHad && !rateeState.firstCompeEvalHad}">

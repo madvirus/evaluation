@@ -8,6 +8,7 @@ public interface PersonalEvalState {
     boolean isStarted();
     boolean isSelfPerfEvalDone();
     boolean isSelfCompeEvalDone();
+    boolean isSelfEvalDone();
 
     boolean isColleagueCompeEvalDone(String colleagueId);
 
@@ -48,6 +49,11 @@ class PersonalEvalStateBuilder {
 
             @Override
             public boolean isSelfCompeEvalDone() {
+                return false;
+            }
+
+            @Override
+            public boolean isSelfEvalDone() {
                 return false;
             }
 

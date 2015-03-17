@@ -41,6 +41,7 @@
             <thead>
             <tr class="success">
                 <th rowspan="2">피평가자</th>
+                <th rowspan="2">평가자</th>
                 <th rowspan="2">2차 성과 평가</th>
                 <th colspan="4">2차 역량 평가</th>
                 <th rowspan="2">계산 점수</th>
@@ -58,24 +59,28 @@
             <tbody>
             <c:forEach var="eval" items="${secondTotalEvalData.evalSummaries}" varStatus="status">
                 <tr>
-                    <td>${eval.ratee.name}</td>
-                    <td>${eval.secondPerfEvalHad ? eval.secondPerfEvalGrade : '평가 입력 전'}</td>
+                    <td rowspan="2">${eval.ratee.name}</td>
+                    <td>2차 평가</td>
+                    <td>
+                        <c:if test="${eval.secondPerfEvalHad}"><strong>${eval.secondPerfEvalGrade}</strong></c:if>
+                        <c:if test="${!eval.secondPerfEvalHad}">평가입력 전</c:if>
+                    </td>
                     <c:if test="${!eval.secondCompeEvalHad}">
                         <td colspan="4">평가 입력 전</td>
                     </c:if>
                     <c:if test="${eval.secondCompeEvalHad}">
-                        <td>${eval.secondCompeCommonAvg}</td>
-                        <td>${eval.secondCompeLeadershipAvg}</td>
-                        <td>${eval.secondCompeAmAvg}</td>
-                        <td>${eval.secondCompeEvalGrade}</td>
+                        <td><strong>${eval.secondCompeCommonAvg}</strong></td>
+                        <td><strong>${eval.secondCompeLeadershipAvg}</strong></td>
+                        <td><strong>${eval.secondCompeAmAvg}</strong></td>
+                        <td><strong>${eval.secondCompeEvalGrade}</strong></td>
                     </c:if>
                     <c:if test="${eval.secondPerfEvalHad && eval.secondCompeEvalHad}">
-                        <td>${eval.getSecondTotalMark()}</td>
-                        <td>
+                        <td><strong>${eval.getSecondTotalMark()}</strong></td>
+                        <td ng-class="{'has-error': showError && !totalEvalForm.totalEvalComment${status.index}.$valid}">
                             <input type="hidden" ng-initial ng-model="evalData.totalEvals[${status.index}].rateeId" value="${eval.ratee.id}">
                             <textarea ng-model="evalData.totalEvals[${status.index}].comment"
                                       class="form-control input-sm msd-elastic: \n;"
-                                      name="totalEvalComment"
+                                      name="totalEvalComment${status.index}"
                                       ng-initial
                                       ng-readonly="readonly()"
                                       required>${eval.secondTotalEval.comment}</textarea>
@@ -107,9 +112,30 @@
                         <td>-</td>
                     </c:if>
                 </tr>
+                <tr>
+                    <td>1차 평가</td>
+                    <td>${eval.firstPerfEvalGrade}</td>
+                    <td>${eval.firstCompeCommonAvg}</td>
+                    <td>${eval.firstCompeLeadershipAvg}</td>
+                    <td>${eval.firstCompeAmAvg}</td>
+                    <td>${eval.firstCompeEvalGrade}</td>
+                    <td>${eval.getFirstTotalMark()}</td>
+                    <td><tf:pre value="${eval.firstTotalEval.comment}"/></td>
+                    <td>${eval.firstTotalEval.grade}</td>
+                </tr>
             </c:forEach>
             </tbody>
             <tfoot>
+            <tr ng-show="showErrorHelp()">
+                <td colspan="9">
+                    <div class="alert alert-danger" role="alert">
+                        <ul>
+                            <li ng-show="!totalEvalForm.$valid">내용을 입력하세요.</li>
+                            <li ng-show="ruleCountViolation">등급 배분에 맞게 종합 등급을 지정하세요.</li>
+                        </ul>
+                    </div>
+                </td>
+            </tr>
             <tr>
                 <td colspan="9">
                     <button ng-disabled="readonly()" class="btn btn-default" type="button " ng-click="saveDraft()">임시 저장</button>

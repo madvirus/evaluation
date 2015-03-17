@@ -71,6 +71,9 @@ firstTotalEvalApp.controller('secondTotalEvalCtrl',
             var hideErrorDisplay = function() {
                 $scope.showError = false;
             };
+            $scope.showErrorHelp = function() {
+                return $scope.showError && $scope.totalEvalForm.$invalid;
+            };
 
         }
     ]);

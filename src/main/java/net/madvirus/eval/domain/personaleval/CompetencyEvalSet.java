@@ -7,6 +7,7 @@ import net.madvirus.eval.domain.evalseason.RateeType;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.OptionalDouble;
 
 public class CompetencyEvalSet {
     @JsonProperty
@@ -43,6 +44,24 @@ public class CompetencyEvalSet {
 
     public List<ItemEval> getCommonsEvals() {
         return unmodifiableList(commonsEvals);
+    }
+
+    public Double getCommonsAverage() {
+        return calculateAverage(commonsEvals);
+    }
+
+    private Double calculateAverage(List<ItemEval> evals) {
+        if (evals == null || evals.isEmpty()) return null;
+        OptionalDouble average = evals.stream().mapToInt(itemEval -> itemEval.getGrade().getNumber()).average();
+        return average.getAsDouble();
+    }
+
+    public Double getLeadershipAverage() {
+        return calculateAverage(leadershipEvals);
+    }
+
+    public Double getAmAverage() {
+        return calculateAverage(amEvals);
     }
 
     private List<ItemEval> unmodifiableList(List<ItemEval> evals) {

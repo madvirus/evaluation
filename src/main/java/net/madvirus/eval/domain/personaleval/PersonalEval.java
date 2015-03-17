@@ -164,6 +164,25 @@ public class PersonalEval extends AbstractAnnotatedAggregateRoot<String> {
         compeEval.removeColleagueRaterEval(event.getColleagueIds());
     }
 
+    @EventSourcingHandler
+    public void on(FirstDraftReturnedEvent event) {
+        if (firstTotalEval.isPresent()) {
+            TotalEval totalEval = firstTotalEval.get();
+            if (totalEval.isDone()) {
+                firstTotalEval = Optional.of(new TotalEval(totalEval.getComment(), totalEval.getGrade(), false));
+                perfEval.returnFirstDraft();
+                compeEval.returnFirstDraft();
+            }
+        }
+    }
+
+    @EventSourcingHandler
+    public void on(RateeTypeUpdatedEvent event) {
+        RateeType newRateeType = event.getRateeType();
+        this.rateeType = newRateeType;
+        compeEval.applyNewRateeType(newRateeType);
+    }
+
     public String getId() {
         return id;
     }
@@ -219,6 +238,10 @@ public class PersonalEval extends AbstractAnnotatedAggregateRoot<String> {
                 .flatMap(evalSet -> Optional.of(evalSet.isDone())).orElse(false);
     }
 
+    public boolean isSelfEvalDone() {
+        return isSelfPerfEvalDone() && isSelfCompeEvalDone();
+    }
+
     public Optional<CompetencyEvalSet> getSelfCompeEvalSet() {
         return compeEval.getSelfEvalSet();
     }
@@ -250,11 +273,11 @@ public class PersonalEval extends AbstractAnnotatedAggregateRoot<String> {
     }
 
     public boolean isFirstCompeEvalHad() {
-        return perfEval.getFirstEvalSet().flatMap(evalSet -> Optional.of(true)).orElse(false);
+        return compeEval.getFirstEvalSet().flatMap(evalSet -> Optional.of(true)).orElse(false);
     }
 
     public boolean isFirstTotalEvalDone() {
-        return isFirstEvalSkipTarget() || firstTotalEval.flatMap(totalEval -> Optional.of(totalEval.isDone())).orElse(false);
+        return isSelfEvalDone() && (isFirstEvalSkipTarget() || firstTotalEval.flatMap(totalEval -> Optional.of(totalEval.isDone())).orElse(false));
     }
 
     public Optional<PerformanceEvalSet> getSecondPerfEvalSet() {
@@ -274,7 +297,7 @@ public class PersonalEval extends AbstractAnnotatedAggregateRoot<String> {
     }
 
     public boolean isSecondCompeEvalHad() {
-        return perfEval.getSecondEvalSet().flatMap(evalSet -> Optional.of(true)).orElse(false);
+        return compeEval.getSecondEvalSet().flatMap(evalSet -> Optional.of(true)).orElse(false);
     }
 
     public boolean isSecondTotalEvalDone() {
@@ -304,22 +327,44 @@ public class PersonalEval extends AbstractAnnotatedAggregateRoot<String> {
         apply(new FirstDraftReturnedEvent(this.id));
     }
 
-    @EventSourcingHandler
-    public void on(FirstDraftReturnedEvent event) {
-        if (firstTotalEval.isPresent()) {
-            TotalEval totalEval = firstTotalEval.get();
-            if (totalEval.isDone()) {
-                firstTotalEval = Optional.of(new TotalEval(totalEval.getComment(), totalEval.getGrade(), false));
-                perfEval.returnFirstDraft();
-                compeEval.returnFirstDraft();
-            }
-        }
+    public Double getFirstMark() {
+        if (!(isFirstPerfEvalHad() && isFirstCompeEvalHad()) || isFirstEvalSkipTarget())
+            return null;
+        else
+            return MarkCalculator.calculate(getRateeType(),
+                    getFirstPerfEvalGrade(),
+                    getAllCompeEvals().getFirstEvalSet().getCommonsAverage(),
+                    getAllCompeEvals().getFirstEvalSet().getLeadershipAverage(),
+                    getAllCompeEvals().getFirstEvalSet().getAmAverage()
+            );
     }
 
-    @EventSourcingHandler
-    public void on(RateeTypeUpdatedEvent event) {
-        RateeType newRateeType = event.getRateeType();
-        this.rateeType = newRateeType;
-        compeEval.applyNewRateeType(newRateeType);
+    public Grade getFirstPerfEvalGrade() {
+        return getFirstPerfEvalSet()
+                .flatMap(eval -> Optional.of(eval.getTotalEval().getGrade())).orElse(null);
+    }
+
+    public Grade getFirstCompeEvalGrade() {
+        return getFirstCompeEvalSet().flatMap(eval -> Optional.of(eval.getTotalEval().getGrade())).orElse(null);
+    }
+
+    public Grade getSecondPerfEvalGrade() {
+        return getSecondPerfEvalSet().flatMap(eval -> Optional.of(eval.getTotalEval().getGrade())).orElse(null);
+    }
+
+    public Grade getSecondCompeEvalGrade() {
+        return getSecondPerfEvalSet().flatMap(eval -> Optional.of(eval.getTotalEval().getGrade())).orElse(null);
+    }
+
+    public Double getSecondMark() {
+        if (!(isSecondPerfEvalHad() && isSecondCompeEvalHad()))
+            return null;
+        else
+            return MarkCalculator.calculate(getRateeType(),
+                    getSecondPerfEvalGrade(),
+                    getAllCompeEvals().getSecondEvalSet().getCommonsAverage(),
+                    getAllCompeEvals().getSecondEvalSet().getLeadershipAverage(),
+                    getAllCompeEvals().getSecondEvalSet().getAmAverage()
+            );
     }
 }

@@ -130,10 +130,10 @@ public class UpdateMappingsCommandTest extends AbstractEvalSeasonCommandTest {
                     new EvalSeasonCreatedEvent(EVALSEASON_ID, "평가", new Date()),
                     new MappingUpdatedEvent(EVALSEASON_ID,
                             Arrays.asList(
-                                    new RateeMapping(RATEE_11, RateeType.TEAM_LEADER, FIRST_RATER_1, SECOND_RATER_1, COLLEAGUE_1),
-                                    new RateeMapping(RATEE_12, RateeType.TEAM_LEADER, FIRST_RATER_1, SECOND_RATER_1, COLLEAGUE_1),
-                                    new RateeMapping(RATEE_21, RateeType.TEAM_LEADER, FIRST_RATER_2, SECOND_RATER_1, COLLEAGUE_1),
-                                    new RateeMapping(RATEE_22, RateeType.TEAM_LEADER, FIRST_RATER_2, SECOND_RATER_1, COLLEAGUE_1)
+                                    new RateeMapping(RATEE_11, RateeType.MEMBER, FIRST_RATER_1, SECOND_RATER_1, COLLEAGUE_1),
+                                    new RateeMapping(RATEE_12, RateeType.MEMBER, FIRST_RATER_1, SECOND_RATER_1, COLLEAGUE_1),
+                                    new RateeMapping(RATEE_21, RateeType.MEMBER, FIRST_RATER_2, SECOND_RATER_1, COLLEAGUE_1),
+                                    new RateeMapping(RATEE_22, RateeType.MEMBER, FIRST_RATER_2, SECOND_RATER_1, COLLEAGUE_1)
                             ))
             );
             for (int i = 0 ; i < givenEvent.size() ; i++) {
@@ -158,10 +158,13 @@ public class UpdateMappingsCommandTest extends AbstractEvalSeasonCommandTest {
             testExecutor
                     .when(new UpdateMappingCommand(EVALSEASON_ID,
                             Arrays.asList(
-                                    new RateeMapping(RATEE_11, RateeType.TEAM_LEADER, FIRST_RATER_1, SECOND_RATER_1, COLLEAGUE_1, COLLEAGUE_2),
-                                    new RateeMapping(RATEE_12, RateeType.TEAM_LEADER, FIRST_RATER_2, SECOND_RATER_2, COLLEAGUE_1))))
+                                    new RateeMapping(RATEE_11, RateeType.MEMBER, FIRST_RATER_1, SECOND_RATER_1, COLLEAGUE_1, COLLEAGUE_2),
+                                    new RateeMapping(RATEE_12, RateeType.MEMBER, FIRST_RATER_2, SECOND_RATER_2, COLLEAGUE_1))))
                     .expectEvents(
-                            new MappingUpdatedEvent(EVALSEASON_ID, Arrays.asList(new RateeMapping(RATEE_11, RateeType.TEAM_LEADER, FIRST_RATER_1, SECOND_RATER_1, COLLEAGUE_1, COLLEAGUE_2), new RateeMapping(RATEE_12, RateeType.TEAM_LEADER, FIRST_RATER_2, SECOND_RATER_2, COLLEAGUE_1)))
+                            new MappingUpdatedEvent(EVALSEASON_ID,
+                                    Arrays.asList(
+                                            new RateeMapping(RATEE_11, RateeType.MEMBER, FIRST_RATER_1, SECOND_RATER_1, COLLEAGUE_1, COLLEAGUE_2),
+                                            new RateeMapping(RATEE_12, RateeType.MEMBER, FIRST_RATER_2, SECOND_RATER_2, COLLEAGUE_1)))
                     );
         }
 
@@ -170,7 +173,7 @@ public class UpdateMappingsCommandTest extends AbstractEvalSeasonCommandTest {
             EventCaptureMatcher matcher = new EventCaptureMatcher();
             testExecutor
                     .when(new UpdateMappingCommand(EVALSEASON_ID, Arrays.asList(
-                            new RateeMapping(RATEE_11, RateeType.TEAM_LEADER, FIRST_RATER_2, SECOND_RATER_1, COLLEAGUE_1, COLLEAGUE_2)
+                            new RateeMapping(RATEE_11, RateeType.MEMBER, FIRST_RATER_2, SECOND_RATER_1, COLLEAGUE_1, COLLEAGUE_2)
                     )))
                     .expectEventsMatching(matcher);
 
@@ -184,7 +187,7 @@ public class UpdateMappingsCommandTest extends AbstractEvalSeasonCommandTest {
 
             testExecutor
                     .when(new UpdateMappingCommand(EVALSEASON_ID, Arrays.asList(
-                            new RateeMapping(RATEE_11, RateeType.TEAM_LEADER, FIRST_RATER_2, SECOND_RATER_1, COLLEAGUE_1, COLLEAGUE_2)
+                            new RateeMapping(RATEE_11, RateeType.MEMBER, FIRST_RATER_2, SECOND_RATER_1, COLLEAGUE_1, COLLEAGUE_2)
                     )))
                     .expectException(FirstEvalStartedException.class);
 
@@ -196,7 +199,7 @@ public class UpdateMappingsCommandTest extends AbstractEvalSeasonCommandTest {
             EventCaptureMatcher matcher = new EventCaptureMatcher();
             testExecutor
                     .when(new UpdateMappingCommand(EVALSEASON_ID, Arrays.asList(
-                            new RateeMapping(RATEE_11, RateeType.TEAM_LEADER, FIRST_RATER_1, SECOND_RATER_2, COLLEAGUE_1, COLLEAGUE_2)
+                            new RateeMapping(RATEE_11, RateeType.MEMBER, FIRST_RATER_1, SECOND_RATER_2, COLLEAGUE_1, COLLEAGUE_2)
                     )))
                     .expectEventsMatching(matcher);
 
@@ -210,7 +213,7 @@ public class UpdateMappingsCommandTest extends AbstractEvalSeasonCommandTest {
 
             testExecutor
                     .when(new UpdateMappingCommand(EVALSEASON_ID, Arrays.asList(
-                            new RateeMapping(RATEE_11, RateeType.TEAM_LEADER, FIRST_RATER_2, SECOND_RATER_2, COLLEAGUE_1, COLLEAGUE_2)
+                            new RateeMapping(RATEE_11, RateeType.MEMBER, FIRST_RATER_2, SECOND_RATER_2, COLLEAGUE_1, COLLEAGUE_2)
                     )))
                     .expectException(SecondEvalStartedException.class);
 
@@ -226,8 +229,8 @@ public class UpdateMappingsCommandTest extends AbstractEvalSeasonCommandTest {
 
             testExecutor
                     .when(new UpdateMappingCommand(EVALSEASON_ID, Arrays.asList(
-                            new RateeMapping(RATEE_11, RateeType.TEAM_LEADER, FIRST_RATER_1, COLLEAGUE_2),
-                            new RateeMapping(RATEE_12, RateeType.TEAM_LEADER, FIRST_RATER_2, SECOND_RATER_2, COLLEAGUE_1)
+                            new RateeMapping(RATEE_11, RateeType.MEMBER, FIRST_RATER_1, COLLEAGUE_2),
+                            new RateeMapping(RATEE_12, RateeType.MEMBER, FIRST_RATER_2, SECOND_RATER_2, COLLEAGUE_1)
                     )))
                     .expectException(FirstEvalDoneException.class);
         }
@@ -242,8 +245,8 @@ public class UpdateMappingsCommandTest extends AbstractEvalSeasonCommandTest {
 
             testExecutor
                     .when(new UpdateMappingCommand(EVALSEASON_ID, Arrays.asList(
-                            new RateeMapping(RATEE_11, RateeType.TEAM_LEADER, FIRST_RATER_1, COLLEAGUE_2),
-                            new RateeMapping(RATEE_12, RateeType.TEAM_LEADER, FIRST_RATER_2, SECOND_RATER_2, COLLEAGUE_1)
+                            new RateeMapping(RATEE_11, RateeType.MEMBER, FIRST_RATER_1, COLLEAGUE_2),
+                            new RateeMapping(RATEE_12, RateeType.MEMBER, FIRST_RATER_2, SECOND_RATER_2, COLLEAGUE_1)
                     )))
                     .expectException(SomeColleagueEvalDoneException.class);
         }
