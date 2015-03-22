@@ -86,10 +86,10 @@ public class FirstEvaluationController {
         return "main/personaleval/firstCompetencyEval";
     }
 
-    private PersonalEvalData checkAndSetModelOrThrowEx(String evalSeasonId, String rateeId, UserModel userModel, Model model) throws IOException {
+    private PersonalEvalData checkAndSetModelOrThrowEx(String evalSeasonId, String rateeId, UserModel raterUser, Model model) throws IOException {
         populateEvalSeasonModel(evalSeasonId, model);
         PersonalEvalData personalEval = personalEvalDataLoader.getPersonalEval(evalSeasonId, rateeId);
-        if (!personalEval.checkFirstRater(userModel.getId())) {
+        if (!personalEval.checkFirstRater(raterUser.getId())) {
             throw new YouAreNotFirstRaterException();
         }
         model.addAttribute("personalEval", personalEval);
