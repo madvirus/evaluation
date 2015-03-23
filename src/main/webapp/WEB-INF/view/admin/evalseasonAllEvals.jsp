@@ -2,6 +2,8 @@
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 <%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@ taglib prefix="tf" tagdir="/WEB-INF/tags" %>
 <!DOCTYPE html>
 <html ng-app="mainApp">
 <head>
@@ -35,7 +37,7 @@
     <c:forEach var="personalEval" items="${allEvals}">
         <div class="personalEval">
             <div class="page-header">
-                <h1>${personalEval.ratee.name}
+                <h1>${personalEval.ratee.name}(${personalEval.ratee.id})
                     <small>${evalSeason.name}</small>
                 </h1>
             </div>

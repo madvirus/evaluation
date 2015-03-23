@@ -145,15 +145,21 @@ public class StartedPersonalEvalData extends PersonalEvalData {
         List<ItemEval> secondItemEvals =
                 secondEvalSet.flatMap(set -> Optional.ofNullable(set.getEvals())).orElse(null);
         for (int i = 0; i < items.size(); i++) {
-            ItemEval selfEval = selfItemEvals == null ? null : selfItemEvals.get(i);
-            ItemEval firstEval = firstItemEvals == null ? null : firstItemEvals.get(i);
-            ItemEval secondEval = secondItemEvals == null ? null : secondItemEvals.get(i);
+            ItemEval selfEval = getItemEval(selfItemEvals, i);
+            ItemEval firstEval = getItemEval(firstItemEvals, i);
+            ItemEval secondEval = getItemEval(secondItemEvals, i);
             result.add(new PerformanceItemAndAllEval(
                     items.get(i),
                     selfEval,
                     firstEval, secondEval));
         }
         return result;
+    }
+
+    private ItemEval getItemEval(List<ItemEval> itemEvals, int idx) {
+        if (itemEvals == null) return null;
+        if (itemEvals.isEmpty()) return null;
+        return itemEvals.get(idx);
     }
 
     public AllCompeEvals getAllCompeEvals() {

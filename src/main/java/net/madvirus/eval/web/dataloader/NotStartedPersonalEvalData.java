@@ -18,11 +18,6 @@ public class NotStartedPersonalEvalData extends PersonalEvalData {
     }
 
     @Override
-    public UserModel getRatee() {
-        return null;
-    }
-
-    @Override
     public boolean isStarted() {
         return false;
     }
