@@ -44,9 +44,10 @@
         <dt>기능</dt>
         <dd>
             <p>
-                <a href="#{{evalSeason.id}}/distrule">[배분 규칙 관리하기]</a>
-                <a href="#{{evalSeason.id}}/evalStates">[평가 상태 조회 및 상태 변경 관리]</a>
-                <a href="/admin/evalseasons/{{evalSeason.id}}/evals">[전체 평가 내용 보기]</a>
+                <a href="#{{evalSeason.id}}/distrule">[배분 규칙 관리하기]</a> |
+                <a href="#{{evalSeason.id}}/evalStates">[평가 상태 조회 및 상태 변경 관리]</a> |
+                <a href="/admin/evalseasons/{{evalSeason.id}}/evals">[전체 평가 내용 보기]</a> |
+                <a href="/admin/evalseasons/{{evalSeason.id}}/evalsSummary">[전체 평가 요약 보기]</a>
             </p>
         </dd>
         <dt>피평가자 매핑</dt>

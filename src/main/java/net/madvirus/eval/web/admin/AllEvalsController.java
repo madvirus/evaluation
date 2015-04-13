@@ -21,11 +21,21 @@ public class AllEvalsController {
 
     @RequestMapping("/admin/evalseasons/{seasonId}/evals")
     public String allPersonalEvals(@PathVariable("seasonId") String evalSeasonId, Model model) throws IOException {
+        putAllEvalsToModel(evalSeasonId, model);
+        return "admin/evalseasonAllEvals";
+    }
+
+    @RequestMapping("/admin/evalseasons/{seasonId}/evalsSummary")
+    public String allPersonalEvalsSummary(@PathVariable("seasonId") String evalSeasonId, Model model) throws IOException {
+        putAllEvalsToModel(evalSeasonId, model);
+        return "admin/evalseasonAllEvalsSummary";
+    }
+
+    private void putAllEvalsToModel(@PathVariable("seasonId") String evalSeasonId, Model model) {
         EvalSeasonData evalSeason = evalSeasonDataLoader.load(evalSeasonId);
         model.addAttribute("evalSeason", evalSeason);
         List<PersonalEvalData> allEvals = personalEvalDataLoader.getAllPersonalEvalData(evalSeasonId);
         model.addAttribute("allEvals", allEvals);
-        return "admin/evalseasonAllEvals";
     }
 
     @Autowired
